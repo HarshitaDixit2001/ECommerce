@@ -1,0 +1,261 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+} 
+
+
+<!-- ================= BREADCRUMB SECTION ================= -->
+<section class="breadcrumb-section">
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+                <h1 class="breadcrumb-title">
+                    📞 Get In Touch
+                </h1>
+
+                <p class="breadcrumb-subtitle mb-0">
+                    We're here to help with your wellness journey. Reach out for product inquiries,
+                    order support, or general assistance.
+                </p>
+            </div>
+
+            <div class="col-lg-6 text-lg-end">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-lg-end mb-0">
+
+                        <li class="breadcrumb-item">
+                            <a href="/">Home</a>
+                        </li>
+
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Contact">Contact-us</a>
+                        </li>
+                    </ol>
+                </nav>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+
+<section class="py-5">
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- Contact Details -->
+            <div class="col-lg-5">
+
+                <div class="contact-card">
+
+                    <h3 class="mb-4">
+                        Contact Information
+                    </h3>
+
+                    <div class="contact-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <div>
+                            <h6>Address</h6>
+                            <p class="mb-0">
+                                @Const.COM_ADDRESS
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <div>
+                            <h6>Email</h6>
+                            <p class="mb-0">
+                                @Const.COM_EMAIL
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <div>
+                            <h6>Phone</h6>
+                            <p class="mb-0">
+                                @Const.COM_CONTACT
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <div>
+                            <h6>Working Hours</h6>
+                            <p class="mb-0">
+                                Mon - Sat : 9:00 AM - 6:00 PM
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+
+                <div class="contact-card">
+
+                    <h3 class="mb-4">
+                        Send Us A Message
+                    </h3>
+
+                    <form id="SubmitForm">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <input type="text" id="name" name="name"
+                                       class="form-control" placeholder="Full Name">
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="email" id="email_id" name="email_id"
+                                       class="form-control" placeholder="Email Address">
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text" id="mobile" name="mobile" maxlength="10"
+                                       class="form-control" placeholder="Phone Number">
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text" id="enquiry_type" name="enquiry_type"
+                                       class="form-control"
+                                       placeholder="Subject">
+                            </div>
+
+                            <div class="col-12">
+                                <textarea rows="5" id="msg" name="msg"
+                                          class="form-control" placeholder="Write your message here..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-success btn-lg">
+                                    Send Message
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+                     
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+
+        <div class="whatsapp-banner">
+
+            <div>
+                <h3 class="mb-2">
+                    Need Quick Assistance?
+                </h3>
+
+                <p class="mb-0">
+                    Chat directly with our support team on WhatsApp.
+                </p>
+            </div>
+
+            <a href="https://wa.me/@Const.COM_CONTACT"
+               target="_blank"
+               class="btn btn-light btn-lg">
+
+                <i class="bi bi-whatsapp me-2"></i>
+                Chat Now
+
+            </a>
+
+        </div>
+
+    </div>
+</section>
+<section class="pb-5">
+    <div class="container">
+
+        <div class="contact-card">
+
+            <h3 class="mb-4">
+                Our Location
+            </h3>
+
+            <iframe src="https://maps.google.com/maps?q=Gurgaon,Haryana&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                    width="100%" height="400"
+                    style="border:0;border-radius:15px;" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+
+        </div>
+
+    </div>
+</section>
+ 
+<script src="~/js/jquery-3.7.1.min.js"></script>
+
+@await Html.PartialAsync("_Sweetalert")
+<script>
+
+    $('#SubmitForm').submit(function (e) {
+        e.preventDefault();
+
+        var errors = [];
+        var name = $('#name').val().trim();
+        var mobile = $('#mobile').val().trim();
+        var message = $('#msg').val().trim();
+
+        if (name === '') { errors.push("Please enter your name."); }
+        if (mobile === '') {  errors.push("Please enter your mobile number."); }
+        else {
+            if (!/^[0-9]{10}$/.test(mobile)) {  errors.push("Mobile number must be exactly 10 digits."); }
+            else if (!/^[6-9][0-9]{9}$/.test(mobile)) {  errors.push("Please enter a valid 10-digit Indian mobile number."); }
+        }
+        if (message === '') { errors.push("Please enter your message."); }
+
+        if (errors.length > 0) { showErrorLog(`@Const.ERROR_HEADER`, errors.join('<br>')); return; }
+
+        const formData = new FormData(this);
+        formData.set("enquiry_from", "Contact-Site");
+
+        showLoader();
+        $.ajax({
+            url: '/print/appointment-save',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                hideLoader();
+                if(response.success == true ){
+                    showToastSuccess("Thank you for contacting us! Your enquiry has been submitted successfully. Our team will get in touch with you shortly.");
+                    showSuccessMessage(`@Const.SUCCESS_HEADER`, "Thank you for contacting us! Your enquiry has been submitted successfully. Our team will get in touch with you shortly.");
+                    $('#SubmitForm')[0].reset();
+                }else{
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                }
+            },
+            error: function (res_error) {
+               showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+            }
+        });
+    });
+</script>

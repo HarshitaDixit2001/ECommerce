@@ -1,0 +1,127 @@
+﻿@model MakePayoutData
+@{
+    ViewData["Title"] = "Repurchase_Payout";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Generate Payout
+    </h4>
+    <a asp-controller="payout" asp-action="repurchase-payout-dispatch" class="btn btn-sm btn-outline-success">
+        Payout Dispatched
+    </a>
+</section>
+<br />
+ 
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag"> 
+                <div class="clearfix"></div> 
+                <form asp-action="repurchase-payout" asp-controller="payout" method="post"
+                      id="FormSubmit" autocomplete="off" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label class="form-label">From Date</label>
+                            <input asp-for="from_date" class="form-control" />
+                            <span asp-validation-for="from_date" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">To Date</label>
+                            <input asp-for="to_date" class="form-control" />
+                            <span asp-validation-for="to_date" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">  </div>
+                        <div class="col-md-4">
+                            <label class="form-label"> Last Payout Date: </label>
+                            <span id="payout_symbol" style="margin-right:6px;">💰</span>
+                            <span id="last_payout_date" style="color:blue; font-weight:600;">
+                            </span>
+                        </div>
+                    </div>
+                    <hr />
+                    <!-- Submit -->
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-success" onclick="confirmSubmission(event)">
+                            💰 Generate Payout
+                        </button>
+
+                        <a asp-action="repurchase-payout" asp-controller="payout" class="btn btn-danger ms-2">Cancel</a>
+                    </div>
+                    <br />
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+@await Html.PartialAsync("_DatePicker")
+
+<script>
+
+    $(function () {
+
+        @if (TempData["Error"] != null)
+        {
+            <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+        }
+
+        const formatDate = date => date.toLocaleDateString('en-GB').split('/').join('-');
+        const today = new Date();
+        $('#to_date').val(formatDate(today));
+        $('#to_date, #from_date').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+
+        GetLastPayoutDate();
+    });
+
+
+    function GetLastPayoutDate() {
+        let URL_LIST = `/common/master-reports`;
+        let mst_key = "GET_MATRIX_NEXT_DATE";
+        $.ajax({
+            url: URL_LIST + `?mst_key=${mst_key}`,
+            type: 'GET',
+            success: function (response) {
+                if (response.success === true) {
+                    const dataArray = JSON.parse(response.data) || [];
+                    const data = dataArray[0] || {};
+                    $('#from_date').val(data.next_date);
+                    $('#last_payout_date').html(data.last_payout_date);
+                }
+            },
+            error: function () { }
+        });
+    }
+
+
+
+    function confirmSubmission(event) {
+        event.preventDefault(); // stop the form from auto-submitting
+        Swal.fire({
+            icon: 'question',
+            title: '💰 Generate Payout Confirmation',
+            html: `<div style="text-align: left; white-space: pre-wrap; font-size: 15px; line-height:1.5;">
+                     You are about to <strong>generate a new payout</strong> for the selected date range.<br><br>
+                     <span style="color:#d9534f; font-weight:500;">⚠️ This action is irreversible. Please review the dates before proceeding.</span>
+                   </div>`,
+            showCancelButton: true,
+            confirmButtonText: '✅ Yes, Generate Payout',
+            cancelButtonText: '❌ Cancel',
+            customClass: { htmlContainer: 'text-left' },
+            width: '36%'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('FormSubmit').submit(); // ✅ manually submit
+            }
+        });
+    } 
+
+</script>
+ 

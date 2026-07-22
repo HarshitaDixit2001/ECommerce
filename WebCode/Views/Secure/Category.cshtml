@@ -1,0 +1,377 @@
+﻿@* @model CategoryDto *@
+@{
+    ViewData["Title"] = "Category Management";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Category Management
+    </h4>
+</section>
+
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="panel panel-bd lobidrag">
+                <div class="panel-body">
+                    <div class="table-responsive mb-4">
+                        <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-bd lobidrag">
+                <div class="panel-body">
+                    <!-- Form: Add / Edit -->
+                    <hr />
+                    <h4 class="header-title">Category Management</h4>
+                    <form id="SubmitForm">
+                        <input type="hidden" id="cat_id" name="cat_id" value="0" />
+                        <div>
+                            <label>Category Name <span class="font-bold text-danger">*</span></label>
+                            <input id="cat_name" name="cat_name" class="form-control" />
+                        </div>
+                        <div>
+                            <label>Description</label>
+                            <textarea id="cat_desc" name="cat_desc" class="form-control"></textarea>
+                        </div>
+                        <div style="display:none;">
+                            <label>Image URL</label>
+                            <input id="cat_img" name="cat_img" class="form-control" />
+                        </div>
+                        <div>
+                            <label> Category Icon  </label>
+
+                            <select id="cat_icon" name="cat_icon" class="form-select select2">
+
+                                <option value="">Select Icon</option>
+
+                                <!-- Medicine -->
+                                <option value="bi-capsule">💊 Capsule</option>
+                                <option value="bi-capsule-pill">💊 Capsule Pill</option>
+                                <option value="bi-heart-pulse">❤️ Heart Pulse</option>
+                                <option value="bi-bandaid">🩹 Bandage</option>
+                                <option value="bi-hospital">🏥 Hospital</option>
+                                <option value="bi-shield-plus">🛡 Shield Plus</option>
+                                <option value="bi-prescription2">📋 Prescription</option>
+                                <option value="bi-virus">🦠 Virus</option>
+                                <option value="bi-lungs">🫁 Lungs</option>
+
+                                <!-- Nature -->
+                                <option value="bi-tree">🌳 Tree</option>
+                                <option value="bi-flower1">🌸 Flower</option>
+                                <option value="bi-flower2">🌼 Flower 2</option>
+                                <option value="bi-flower3">🌺 Flower 3</option>
+                                <option value="bi-leaf">🍃 Leaf</option>
+                                <option value="bi-sun">☀ Sun</option>
+                                <option value="bi-droplet">💧 Droplet</option>
+                                <option value="bi-droplet-half">💧 Water</option>
+                                <option value="bi-cloud-sun">⛅ Cloud Sun</option>
+
+                                <!-- Food -->
+                                <option value="bi-cup-hot">☕ Tea</option>
+                                <option value="bi-cup-straw">🥤 Juice</option>
+                                <option value="bi-egg-fried">🍳 Egg</option>
+                                <option value="bi-basket">🧺 Basket</option>
+                                <option value="bi-basket2">🛒 Basket 2</option>
+                                <option value="bi-basket3">🛍 Basket 3</option>
+
+                                <!-- Shopping -->
+                                <option value="bi-cart">🛒 Cart</option>
+                                <option value="bi-cart2">🛒 Cart 2</option>
+                                <option value="bi-cart3">🛒 Cart 3</option>
+                                <option value="bi-bag">👜 Bag</option>
+                                <option value="bi-bag-heart">❤️ Bag Heart</option>
+                                <option value="bi-handbag">👜 Handbag</option>
+                                <option value="bi-credit-card">💳 Card</option>
+                                <option value="bi-wallet2">👛 Wallet</option>
+
+                                <!-- Beauty -->
+                                <option value="bi-stars">⭐ Stars</option>
+                                <option value="bi-gem">💎 Gem</option>
+                                <option value="bi-brush">🖌 Brush</option>
+                                <option value="bi-palette">🎨 Palette</option>
+
+                                <!-- Electronics -->
+                                <option value="bi-phone">📱 Phone</option>
+                                <option value="bi-laptop">💻 Laptop</option>
+                                <option value="bi-tablet">📱 Tablet</option>
+                                <option value="bi-tv">📺 TV</option>
+                                <option value="bi-camera">📷 Camera</option>
+                                <option value="bi-headphones">🎧 Headphones</option>
+                                <option value="bi-watch">⌚ Watch</option>
+
+                                <!-- Clothing -->
+                                <option value="bi-handbag-fill">👜 Handbag Fill</option>
+                                <option value="bi-person">👤 Person</option>
+                                <option value="bi-person-heart">❤️ Person Heart</option>
+
+                                <!-- Home -->
+                                <option value="bi-house">🏠 House</option>
+                                <option value="bi-house-door">🚪 House Door</option>
+                                <option value="bi-lamp">💡 Lamp</option>
+                                <option value="bi-lightbulb">💡 Bulb</option>
+
+                                <!-- Baby -->
+                                <option value="bi-emoji-smile">😊 Baby</option>
+                                <option value="bi-balloon-heart">🎈 Balloon</option>
+
+                                <!-- Pets -->
+                                <option value="bi-heart">❤ Heart</option>
+                                <option value="bi-award">🏆 Award</option>
+
+                                <!-- Sports -->
+                                <option value="bi-trophy">🏆 Trophy</option>
+                                <option value="bi-bicycle">🚴 Bicycle</option>
+
+                                <!-- Office -->
+                                <option value="bi-book">📖 Book</option>
+                                <option value="bi-journal">📓 Journal</option>
+                                <option value="bi-pencil">✏ Pencil</option>
+                                <option value="bi-printer">🖨 Printer</option>
+
+                                <!-- Travel -->
+                                <option value="bi-airplane">✈ Airplane</option>
+                                <option value="bi-car-front">🚗 Car</option>
+                                <option value="bi-train-front">🚆 Train</option>
+                                <option value="bi-truck">🚚 Truck</option>
+
+                                <!-- Misc -->
+                                <option value="bi-star">⭐ Star</option>
+                                <option value="bi-star-fill">⭐ Star Fill</option>
+                                <option value="bi-heart">❤ Heart</option>
+                                <option value="bi-heart-fill">❤ Heart Fill</option>
+                                <option value="bi-check-circle">✔ Check</option>
+                                <option value="bi-check-circle-fill">✔ Check Fill</option>
+                                <option value="bi-patch-check">✅ Verified</option>
+                                <option value="bi-lightning">⚡ Lightning</option>
+                                <option value="bi-lightning-charge">⚡ Charge</option>
+                                <option value="bi-fire">🔥 Fire</option>
+                                <option value="bi-globe">🌍 Globe</option>
+                                <option value="bi-gear">⚙ Gear</option>
+                                <option value="bi-tools">🛠 Tools</option>
+                                <option value="bi-box">📦 Box</option>
+                                <option value="bi-box-seam">📦 Box Seam</option>
+
+                            </select>
+
+                        </div>
+
+                        <div>
+                            <div class="text-center mt-3">
+
+                                <div id="iconPreview"
+                                    style="width:70px;
+                                    height:70px;
+                                    background:#edf7ef;
+                                    border-radius:50%;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                    margin:auto;">
+
+                                    <i class="bi bi-question-circle" style="font-size:30px;color:#198754;"></i>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="status" name="status" />
+                            <label for="status">Active</label>
+                        </div>
+                        <button type="submit" id="saveBtn" class="btn btn-primary">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+@* <script src="~/js/jquery-3.7.1.min.js"></script> *@
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+@* @await Html.PartialAsync("_ValidationScriptsPartial") *@
+
+<script>
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+    let token = "";
+    const DOWNLOAD_FILE_NAME="Category_";
+    const URL_ADD = `/common/add-category`;
+    let URL_LIST = `/common/master-reports`;
+    let mst_key="GET_CATEGORY_LIST";
+
+    $(function () { 
+
+        BindTableData();
+
+        $('#cat_icon').on('change', function () {
+            let icon = $(this).val();
+            if (icon === '') {
+                icon = 'bi-question-circle';
+            }
+            $('#iconPreview').html(`
+                <i class="bi ${icon}" style="font-size:30px;color:#198754;"></i>
+            `);
+        });
+
+    });
+
+
+     function BindTableData() {
+         showLoader();
+         $.ajax({
+             url: URL_LIST + `?mst_key=${mst_key}`,
+             type: 'GET', 
+             success: function (response) {
+                  hideLoader();
+                 if (response.token_valid === false) {
+                     window.location.href = `@Const.LOGOUT`;
+                     return;
+                 }
+                 else if (response.success === true && response.token_valid === true) {
+                     const data = JSON.parse(response.data) || [];
+                     $('#tblList').DataTable({
+                         dom: 'Blfrtip',
+                             scrollY: "500px",
+                             scrollX: true,
+                             scrollCollapse: true,
+                             destroy: true,
+                             responsive: true,
+                             autoWidth: false,
+                             language: { emptyTable: "No records found" },
+                             "lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]],
+                             "pageLength": 15,
+                             buttons: [
+                                 { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                                 { extend: 'copyHtml5', text: 'Copy'},
+                                 'fullscreenToggle',
+                                 'colvis',
+                             ],
+                             data: data,
+                             columns: [
+                             {
+                                 data: 'cat_id', title: 'Edit', orderable: false,
+                                 render: function (id) { return `<i class="fa fa-pencil text-primary" aria-hidden="true" onclick="Get_Detail_By_Id(${id})" style="cursor:pointer; padding:2px; margin:2px;"></i> `; }
+                             },
+                             { data: 'cat_name', title: 'Name' },
+                             { data: 'cat_desc', title: 'Description' },
+                             {
+                                data: 'cat_icon',
+                                title: 'Icon',
+                                className: 'text-center',
+                                render: function (icon) {
+                                    if (!icon) { icon = "bi-question-circle"; }
+                                    return `
+                                        <div class="d-flex justify-content-center">
+                                            <div style="width:42px; height:42px; border-radius:50%;
+                                                background:#edf7ef; display:flex; align-items:center; justify-content:center;">
+                                                <i class="bi ${icon}" style="font-size:20px;color:#198754;"></i>
+                                            </div>
+                                        </div>`;
+                                }
+                            },
+                             {
+                                 data: 'status', title: 'Status', orderable: false,
+                                 render: function (data) {
+                                      return data
+                                     ? '<i class="fa fa-circle text-success" aria-hidden="true" title="Active"></i> <div style="text-align:center; display:none;">' + data + '</div>'
+                                     : '<i class="fa fa-circle text-danger" aria-hidden="true" title="Inactive"></i> <div style="text-align:center; display:none;">' + data + '</div>';
+                                 }
+                             }
+                         ], 
+                     });
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+     }
+
+
+
+    function Get_Detail_By_Id(id) {
+        var mst_key_detail = true;
+        showLoader();
+        $.ajax({
+            url: URL_LIST + `?id=${id}&mst_key=${mst_key}&mst_key_detail=${mst_key_detail}`,
+            method: 'GET',
+            contentType: 'application/json',  
+            success: function (response) {
+                hideLoader();
+                 if (response.success === true && response.token_valid === true) {
+                     const dataArray = JSON.parse(response.data) || [];
+                     const data = dataArray[0] || {};
+                    $('#cat_id').val(data.cat_id);
+                    $('#cat_name').val(data.cat_name);
+                    $('#cat_desc').val(data.cat_desc);
+                    $('#status').prop('checked', data.status);
+                    $('#saveBtn').text('Update');
+                    $('#cat_icon').val(data.cat_icon).trigger("change");
+                 } else {
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                 }
+            },
+            error: function (res_error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+            }
+        });
+    }
+
+
+    $('#SubmitForm').submit(function (e) {
+        e.preventDefault();
+        if($('#cat_name').val().trim() === '') {
+             showErrorLog(`@Const.ERROR_HEADER`, "Category is required.");  return;
+          }
+        const formData = new FormData(this);
+        formData.set("status", $('#status').is(':checked'));
+        showLoader();
+        $.ajax({
+            url: URL_ADD,
+            type: 'POST',
+            data: formData,
+            processData: false,       
+            contentType: false,        
+            success: function (response) {
+                debugger;
+
+                hideLoader();
+                if(response.success == true){
+                     showToastSuccess('Data save successfully');
+                    $('#SubmitForm')[0].reset();
+                    $('#saveBtn').text('Add');
+                    $('#cat_id').val(0);
+                    
+                    $('#cat_icon').val("").trigger("change");
+                    $('#iconPreview').html(`
+                        <i class="bi bi-question-circle" style="font-size:30px;color:#198754;"></i>
+                    `);
+
+
+                    BindTableData();
+                }else{
+                     debugger;
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                }
+            },
+            error: function (res_error) {
+                 debugger;
+               showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+            }
+        });
+    });
+     
+</script>
+

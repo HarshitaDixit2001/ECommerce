@@ -1,0 +1,409 @@
+﻿@model BinaryTeamTreeViewModel
+@{
+    ViewData["Title"] = "User Binary Tree";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>2 Legs Tree View
+    </h4>
+    <a class="btn btn-sm btn-outline-success" onclick="GoUp()"> <i class="fa fa-home"></i> Go Up  </a>
+</section> 
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+
+                <div class="container tree-container">
+                    <!-- Level 1 -->
+                    <div class="tree-level" style="grid-template-columns: 1fr; margin-bottom: 2px;">
+
+                        <div class="user-node parent-node">
+                            @* <div class="user-header">👑 @Model.node1?.name</div> *@
+
+                            <i class="fa fa-user fa-2x @((Model.node1?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                            <span>@Model.node1?.name</span>
+                            <div class="user-body">
+                                <span>ID: @Model.node1?.user_id </span><br />
+                                <span><b>L</b>: @Model.node1?.new_left</span>
+                                <b>  / </b>
+                                <span><b>R</b>: @Model.node1?.new_right </span><br />
+                                <span>Rank: @Model.node1?.rank_name</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Arrow to Level 2 -->
+                    <div class="arrow-connector" style="margin-bottom: 2px;">
+                        <div class="arrow-line" style="height: 2px;"></div>
+                    </div>
+
+                    <!-- Level 2 -->
+                    <div class="tree-level" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="user-node @(Model.node2?.user_id != null ? "clickable" : "open-slot")"
+                             @(Model.node2?.user_id != null ? $"onclick=getUserId('{Model.node2.user_id}')" : "")>
+                            <div class="user-header">
+                                @if (Model.node2?.user_id == null)
+                                {
+                                    <span class="text-muted">➕ Open Position</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user fa-2x @((Model.node2?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                                    <span>@Model.node2?.name</span>
+                                }
+                            </div>
+
+                            @if (Model.node2?.user_id != null)
+                            {
+                                <div class="user-body">
+                                    <span><b>ID:</b> @Model.node2.user_id</span><br />
+                                    <span><b>L:</b> @Model.node2.new_left</span>
+                                    <b>  / </b>
+                                    <span><b>R:</b> @Model.node2.new_right</span><br />
+                                    <span><b>Rank:</b> @Model.node2.rank_name</span>
+                                </div>
+                            }
+                        </div>
+
+
+                        <div class="user-node @(Model.node3?.user_id != null ? "clickable" : "open-slot")"
+                             @(Model.node3?.user_id != null ? $"onclick=getUserId('{Model.node3.user_id}')" : "")>
+                            <div class="user-header">
+                                @if (Model.node3?.user_id == null)
+                                {
+                                    <span class="text-muted">➕ Open Position</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user fa-2x @((Model.node3?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                                    <span>@Model.node3?.name</span>
+                                }
+                            </div>
+
+                            @if (Model.node3?.user_id != null)
+                            {
+                                <div class="user-body">
+                                    <span><b>ID:</b> @Model.node3.user_id</span><br />
+                                    <span><b>L:</b> @Model.node3.new_left</span>
+                                    <b>  / </b>
+                                    <span><b>R:</b> @Model.node3.new_right</span><br />
+                                    <span><b>Rank:</b> @Model.node3.rank_name</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Arrow to Level 3 -->
+                    <div class="arrow-connector">
+                        <div class="horizontal-line"></div>
+                        <div class="vertical-line"></div>
+                        <div class="vertical-line"></div>
+                    </div>
+
+
+
+                    <!-- Level 3 -->
+                    <div class="tree-level" style="grid-template-columns: repeat(4, 1fr);">
+
+                        <div class="user-node @(Model.node4?.user_id != null ? "clickable" : "open-slot")"
+                             @(Model.node4?.user_id != null ? $"onclick=getUserId('{Model.node4.user_id}')" : "")>
+                            <div class="user-header">
+                                @if (Model.node4?.user_id == null)
+                                {
+                                    <span class="text-muted">➕ Open Position</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user fa-2x @((Model.node4?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                                    <span>@Model.node4?.name</span>
+                                }
+                            </div>
+
+                            @if (Model.node4?.user_id != null)
+                            {
+                                <div class="user-body">
+                                    <span><b>ID:</b> @Model.node4.user_id</span><br />
+                                    <span><b>L:</b> @Model.node4.new_left</span>
+                                    <b>  / </b>
+                                    <span><b>R:</b> @Model.node4.new_right</span><br />
+                                    <span><b>Rank:</b> @Model.node4.rank_name</span>
+                                </div>
+                            }
+                        </div>
+
+
+
+                        <div class="user-node @(Model.node5?.user_id != null ? "clickable" : "open-slot")"
+                             @(Model.node5?.user_id != null ? $"onclick=getUserId('{Model.node5.user_id}')" : "")>
+                            <div class="user-header">
+                                @if (Model.node5?.user_id == null)
+                                {
+                                    <span class="text-muted">➕ Open Position</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user fa-2x @((Model.node5?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                                    <span>@Model.node5?.name</span>
+                                }
+                            </div>
+
+                            @if (Model.node5?.user_id != null)
+                            {
+                                <div class="user-body">
+                                    <span><b>ID:</b> @Model.node5.user_id</span><br />
+                                    <span><b>L:</b> @Model.node5.new_left</span>
+                                    <b>  / </b>
+                                    <span><b>R:</b> @Model.node5.new_right</span><br />
+                                    <span><b>Rank:</b> @Model.node5.rank_name</span>
+                                </div>
+                            }
+                        </div>
+
+
+                        <div class="user-node @(Model.node6?.user_id != null ? "clickable" : "open-slot")"
+                             @(Model.node6?.user_id != null ? $"onclick=getUserId('{Model.node6.user_id}')" : "")>
+                            <div class="user-header">
+                                @if (Model.node6?.user_id == null)
+                                {
+                                    <span class="text-muted">➕ Open Position</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user fa-2x @((Model.node6?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                                    <span>@Model.node6?.name</span>
+                                }
+                            </div>
+
+                            @if (Model.node6?.user_id != null)
+                            {
+                                <div class="user-body">
+                                    <span><b>ID:</b> @Model.node6.user_id</span><br />
+                                    <span><b>L:</b> @Model.node6.new_left</span>
+                                    <b>  / </b>
+                                    <span><b>R:</b> @Model.node6.new_right</span><br />
+                                    <span><b>Rank:</b> @Model.node6.rank_name</span>
+                                </div>
+                            }
+                        </div>
+
+
+                        <div class="user-node @(Model.node7?.user_id != null ? "clickable" : "open-slot")"
+                             @(Model.node7?.user_id != null ? $"onclick=getUserId('{Model.node7.user_id}')" : "")>
+                            <div class="user-header">
+                                @if (Model.node7?.user_id == null)
+                                {
+                                    <span class="text-muted">➕ Open Position</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user fa-2x @((Model.node7?.is_paid ?? false) ? "text-success" : "text-danger")"></i>
+                                    <span>@Model.node7?.name</span>
+                                }
+                            </div>
+
+                            @if (Model.node7?.user_id != null)
+                            {
+                                <div class="user-body">
+                                    <span><b>ID:</b> @Model.node7.user_id</span><br />
+                                    <span><b>L:</b> @Model.node7.new_left</span>
+                                    <b>  / </b>
+                                    <span><b>R:</b> @Model.node7.new_right</span><br />
+                                    <span><b>Rank:</b> @Model.node7.rank_name</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+<script>
+    function getUserId(userId) {
+        if (userId && userId !== 'null') {
+            window.location.href = `/user-report/user-binary-tree/${userId}`;
+        }
+    }
+
+    function GoUp() {
+        const userId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+        if (userId && userId !== 'null') {
+            window.location.href = `/user-report/user-binary-tree/${userId}`;
+        }
+    }
+</script>
+<style>
+
+    /*  /* =========================
+                           TREE CONTAINER
+                        ========================= */
+    .tree-container {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin: auto;
+        padding: 25px 10px;
+        max-width: 1100px;
+        text-align: center;
+        position: relative;
+    }
+
+    /* =========================
+                           TREE LEVEL GRID
+                        ========================= */
+    .tree-level {
+        display: grid;
+        justify-content: center;
+        gap: 28px;
+        position: relative;
+        margin-bottom: 45px;
+    }
+
+    /* =========================
+                           USER NODE CARD
+                        ========================= */
+    .user-node {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 12px 10px;
+        width: 100%;
+        max-width: 190px;
+        margin: auto;
+        text-align: center;
+        position: relative;
+        cursor: default;
+        transition: all 0.25s ease;
+        /* 🔵 Light blue border */
+        border: 1.5px solid #93c5fd;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+
+        /* Hover effect only for clickable nodes */
+        .user-node.clickable {
+            cursor: pointer;
+        }
+
+            .user-node.clickable:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), inset 0 0 0 1px rgba(13, 110, 253, 0.4);
+            }
+
+    /* =========================
+                           PARENT (ROOT) NODE
+                        ========================= */
+    .parent-node {
+        background: linear-gradient(135deg, #e0f2fe, #ffffff);
+        border: 2px solid #60a5fa; /* slightly darker blue */
+        box-shadow: 0 8px 22px rgba(13, 110, 253, 0.25);
+    }
+
+    /* =========================
+                           OPEN POSITION
+                        ========================= */
+    .open-slot {
+        background: #f8fafc;
+        border: 2px dashed #93c5fd; /* light blue dashed */
+        box-shadow: none;
+    }
+
+        .open-slot:hover {
+            transform: none;
+        }
+
+    /* =========================
+                           HEADER (NAME)
+                        ========================= */
+    .user-header {
+        font-weight: 800;
+        font-size: 12px;
+        margin-bottom: 6px;
+        color: #0d6efd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* =========================
+                           BODY (DETAILS)
+                        ========================= */
+    .user-body {
+        font-size: 12px;
+        color: #374151;
+        line-height: 1.0;
+    }
+
+        .user-body small {
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+
+    /* =========================
+                           ICON COLORS
+                        ========================= */
+    .text-success {
+        color: #16a34a !important;
+    }
+
+    .text-danger {
+        color: #dc2626 !important;
+    }
+
+    /* =========================
+                           ARROW CONNECTORS
+                        ========================= */
+    .arrow-line {
+        width: 2px;
+        height: 2px;
+        background-color: #0d6efd;
+        margin: 0 auto;
+    }
+
+    .arrow-connector {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 6px;
+        position: relative;
+    }
+
+    .horizontal-line {
+        position: absolute;
+        top: 50%;
+        height: 2px;
+        background-color: #0d6efd;
+        width: 100%;
+    }
+
+    .vertical-line {
+        width: 2px;
+        height: 12px;
+        background-color: #0d6efd;
+        margin: 0 22px;
+    }
+
+    /* =========================
+                           RESPONSIVE
+                        ========================= */
+    @@media (max-width: 768px) {
+        .tree-level {
+            gap: 18px;
+        }
+
+        .user-node {
+            max-width: 160px;
+            padding: 10px 8px;
+        }
+
+        .user-header {
+            font-size: 14px;
+        }
+
+        .user-body {
+            font-size: 14px;
+        }
+    }
+</style>

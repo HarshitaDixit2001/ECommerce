@@ -1,0 +1,228 @@
+﻿@{
+    ViewData["Title"] = "Party_list";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+<!-- Breadcrumb -->
+@* <section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a><i class="fa fa-list"></i>Party Master</a></li>
+
+    </ol>
+        <a asp-action="subadmin-add-franchise" asp-controller="user" class="btn btn-success pull-right"> <i class="fa fa-plus"></i> New </a>
+   
+</section> *@
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Party Master
+    </h4>
+    <a sp-action="subadmin-add-franchise" asp-controller="user" class="btn btn-sm btn-outline-success">
+        <i class="fa fa-plus"></i> New
+    </a>
+</section> 
+<div class="clearfix"></div>
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+                <div class="panel-heading row">
+                    <div class="col-sm-2">
+                        <input type="text" id="from_date" class="form-control" placeholder="From Date" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" id="to_date" class="form-control" placeholder="To Date" />
+                    </div>
+
+                    <div class="col-sm-2">
+                        <input id="user_id" class="form-control" placeholder="User ID." />
+                    </div>
+                    <div class="col-sm-2">
+                        <input id="name" class="form-control" placeholder="User Name." />
+                    </div>
+                    <div class="col-sm-2">
+                        <input id="mobile" class="form-control" placeholder="Mobile No." />
+                    </div>
+                    <div class="col-sm-2">
+                        <select id="status" class="form-control select2">
+                            <option value=-1>All Active </option>
+                            <option value=0>Inactive</option>
+                            <option value=1>Active</option>
+                        </select>
+                    </div>
+
+                    <div class="clearfix"></div>
+                    <div class="col-sm-2">
+                        <input id="gst_no" class="form-control" placeholder="GST No." />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="button" id="btnSearch" class="btn btn-info" value="Search" />
+                    </div>
+
+
+                </div>
+
+                <div class="panel-body">
+                    <div class="table-responsive mb-4">
+                        <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+@* @await Html.PartialAsync("_ValidationScriptsPartial") *@
+<script>
+
+    let table;
+    let token = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(ViewBag.Token?.ToString() ?? ""))';
+    const uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+
+    const DOWNLOAD_FILE_NAME = "Party_List";
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+
+    $(function () {
+    @if (TempData["Success"] != null)
+    {
+        <text> showSuccessMessage(`@Const.SUCCESS_HEADER`, '@TempData["Success"]'); </text>
+    }
+    });
+
+
+
+    $(function () {
+        const formatDate = date => date.toLocaleDateString('en-GB').split('/').join('-');
+        const today = new Date();
+        const weekAgo = new Date(today);
+        weekAgo.setDate(today.getDate() - 45);
+
+        $('#from_date').val(formatDate(weekAgo));
+        $('#to_date').val(formatDate(today));
+        $('#from_date, #to_date').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+
+        initializeTable();
+
+        $('#btnSearch').on('click', function () {  table.ajax.reload(); });
+    });
+
+
+
+    function initializeTable() {
+        table = $('#tblList').DataTable({
+             dom: 'Blfrtip',
+              scrollY: "500px",
+            processing: true,
+            scrollX: true,
+            autoWidth: true,
+            responsive: true,
+            destroy: true,
+            lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
+            pageLength: @Const.NO_OF_PAGE_RECORDS,
+            buttons: [
+                { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                { extend: 'copyHtml5', text: 'Copy'},
+                'fullscreenToggle',
+                'colvis',
+            ],
+            ajax: {
+                url: `/user/get-subadmin-franchise-list`,
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'Authorization': 'Bearer ' + token },
+                data: function (d) {
+                    const parseDate = (dateStr) => {
+                        if (!dateStr) return null;
+                        const parts = dateStr.split("-");
+                        return parts.length === 3 ? `${parts[1]}-${parts[0]}-${parts[2]}` : null;
+                    };
+                    const in_page_record = d.length || 10;
+                    const in_page_no = Math.floor(d.start / in_page_record) + 1;
+                    return JSON.stringify({
+                        from_date: parseDate($('#from_date').val()),
+                        to_date: parseDate($('#to_date').val()),
+                        user_id: $('#user_id').val() || null,
+                        name: $('#name').val() || null,
+                        mobile: $('#mobile').val() || null,
+                        status: $('#status').val() === '-1' ? null : $('#status').val(),
+                        gst_no :  $('#gst_no').val() || null,
+                        role_id:2,
+                        uid : uid,
+                        in_page_no: in_page_no,
+                        in_page_record: in_page_record
+                    });
+                },
+                dataSrc: function (json) {
+                    if(json.token_valid === false){
+                        window.location.href = `@Const.LOGOUT`; return;
+                    }
+                    let data = [];
+                    try { data = json?.data || []; } catch (e) { console.error(e); }
+                    return data;
+                }
+            },
+             columns: [
+                 { data: null, title: '#', render: (d, t, r, m) => m.row + m.settings._iDisplayStart + 1 },
+                 
+                 { data: 'user_id', title: 'User ID',  render: function (data, type, row) {  return `<a href="/user/subadmin-add-franchise/${row.user_id}" class="text-primary text-decoration-underline">${data}</a>`;  } },
+                 { data: 'com_name', title: 'Firm Name' },
+                 { data: 'name', title: 'Party Name' },
+                 { data: 'display_name', title: 'Role' },
+                 { data: 'prev_pbv', title: 'Sales Target' },
+
+                 { data: 'sponsor_user_id', title: 'Mgr/ Sales Id' },
+                 { data: 'sponsor_name', title: 'Mgr/ Sales Name' },
+
+                 
+                 { data: 'mobile', title: 'Mobile No.' },
+                 { data: 'email_id', title: 'Email Id' },
+                 { data: 'state', title: 'State' },
+                 { data: 'district', title: 'District' },
+                 { data: 'city', title: 'City' },
+                 { data: 'pin_code', title: 'Pin code' },
+
+                 // { data: 'bank_name', title: 'Bank Name' },
+                 // { data: 'account_no', title: 'A/c No.' },
+                 // { data: 'ifsc', title: 'IFSC'},
+                 { data: 'pan_no', title: 'Pan No.'},
+                 { data: 'gst_no', title: 'GST No.'},
+                 { data: 'aadhar_no', title: 'Aadhar No.'},
+                 { data: 'doe', title: 'Date',  render: (data) => data ? new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                 { data: 'dob', title: 'DOB',  render: (data) => data ? new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                 { data: 'status', title: 'Status', orderable: false,
+                      render: (d) => {
+                        const s = {0:['Inactive','text-warning'],1:['Active','text-success'],2:['Blocked','text-danger']}[d] || ['Unknown','text-secondary'];
+                        return `<span><i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]}</span>`;
+                      }
+                 },
+                 { data: 'pan_status', title: 'Pan Status', orderable: false,
+                      render: (d) => {
+                            const s = { 0: ['No', 'text-danger'], 1: ['Yes', 'text-success'] }[+d] || ['Unknown', 'text-secondary'];
+                            return `<span><i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]}</span>`;
+                      }
+                 },
+                 { data: 'gst_status', title: 'GST Status', orderable: false,
+                      render: (d) => {
+                            const s = { 0: ['No', 'text-danger'], 1: ['Yes', 'text-success'] }[+d] || ['Unknown', 'text-secondary'];
+                            return `<span><i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]}</span>`;
+                      }
+                 },
+                 { data: 'aadhar_status', title: 'Aadhar Status', orderable: false,
+                      render: (d) => {
+                            const s = { 0: ['No', 'text-danger'], 1: ['Yes', 'text-success'] }[+d] || ['Unknown', 'text-secondary'];
+                            return `<span><i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]}</span>`;
+                      }
+                 }
+             ],
+        });
+    }
+</script>
+ 

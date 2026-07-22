@@ -1,0 +1,827 @@
+﻿@model AddUpdateUserRequest
+@{
+    ViewData["Title"] = "Registration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* ==========================================
+                           AYURVEDIC REGISTRATION PAGE
+                     ========================================== */
+
+    /* ===== CONTAINER ===== */
+    .registration-container {
+        padding: 40px 0;
+        background: linear-gradient(135deg,#f8fcf8,#edf7ef);
+        min-height: 100vh;
+    }
+
+    /* ===== CARD ===== */
+    .registration-card {
+        background: #ffffff;
+        border: 1px solid #d8eadc;
+        border-radius: 18px;
+        box-shadow: 0 12px 35px rgba(25,135,84,0.08);
+        overflow: hidden;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    /* ===== HEADER ===== */
+    .registration-header {
+        background: linear-gradient(135deg,#198754,#2e7d32);
+        color: #ffffff;
+        padding: 25px;
+    }
+
+        .registration-header h3,
+        .registration-header h4,
+        .registration-header h5 {
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .registration-header p {
+            color: rgba(255,255,255,.9);
+            margin-bottom: 0;
+        }
+
+
+    /* ===== SECTION TITLE ===== */
+    .section-title {
+        font-weight: 700;
+        color: #1d5a34;
+        border-left: 5px solid #198754;
+        padding-left: 12px;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    /* ===== LABEL ===== */
+    .form-label {
+        font-weight: 600;
+        color: #2f4f39;
+        margin-bottom: 6px;
+    }
+
+    /* ===== INPUT ===== */
+    .form-control,
+    .form-select {
+        border: 1px solid #d8eadc;
+        border-radius: 10px;
+        padding: 10px 12px;
+        min-height: 45px;
+        transition: all .3s ease;
+        background: #fff;
+    }
+
+        /* ===== INPUT FOCUS ===== */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 .20rem rgba(25,135,84,.15);
+        }
+
+    /* ===== SELECT2 ===== */
+    .select2-container .select2-selection--single {
+        height: 45px !important;
+        border: 1px solid #d8eadc !important;
+        border-radius: 10px !important;
+        padding: 8px !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #198754 !important;
+    }
+
+    /* ===== SPONSOR BOX ===== */
+    .sponsor-name {
+        background: #edf7ef;
+        border: 1px solid #d8eadc;
+        color: #198754;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-top: 5px;
+        font-weight: 600;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-submit {
+        background: linear-gradient(135deg,#198754,#2e7d32);
+        border: none;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: .3s;
+        box-shadow: 0 5px 15px rgba(25,135,84,.20);
+    }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg,#146c43,#1b5e20);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+    .btn-cancel {
+        background: #f1f5f2;
+        border: 1px solid #d8eadc;
+        color: #444;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 600;
+    }
+
+        .btn-cancel:hover {
+            background: #e8f5ec;
+            color: #198754;
+        }
+
+    /* ===== REQUIRED STAR ===== */
+    .required {
+        color: #dc3545;
+    }
+
+    /* ===== CARD DIVIDER ===== */
+    .form-divider {
+        height: 1px;
+        background: #e8f2ea;
+        margin: 20px 0;
+    }
+
+    /* ===== ANIMATION ===== */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===== MOBILE ===== */
+    @@media (max-width: 768px) {
+        .registration-container {
+            padding: 20px 0;
+        }
+
+        .registration-body {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .form-control,
+    .form-select {
+        height: 45px;
+        border-radius: 8px;
+    }
+
+    textarea.form-control {
+        height: auto;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 .15rem rgba(25,135,84,.15);
+    }
+
+    label.fw-semibold {
+        color: #344054;
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+</style>
+
+
+
+
+
+<section class="registration-container">
+    <div class="container">
+        <div class="registration-card">
+            <!-- HEADER -->
+            <div class="registration-header text-white text-center p-4">
+                <h3 class="fw-bold mb-1">
+                    <i class="bi bi-person-plus-fill me-2"></i> Ayurvedic Wellness Registration
+                </h3>
+                <p class="fw-semibold small">
+                    Join our herbal wellness community and start your journey toward a healthier lifestyle.
+                </p>
+            </div>
+            <!-- Form Body -->
+            <div class="registration-body">
+                @await Html.PartialAsync("_Loader")
+
+                <form id="SubmitForm" autocomplete="off">
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "validation-summary text-danger" })
+                    <div class="mx-3 pb-5">
+                        <!-- Row 1 -->
+                        <div class="row align-items-center mb-3">
+
+                            <label class="col-md-2 fw-semibold">
+                                Full Name <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+                                <input asp-for="name"
+                                       class="form-control"
+                                       placeholder="Enter Full Name">
+                                <span asp-validation-for="name" class="text-danger"></span>
+                            </div>
+
+                            <label class="col-md-2 fw-semibold">
+                                Mobile Number <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+                                <input asp-for="mobile"
+                                       maxlength="10"
+                                       class="form-control"
+                                       placeholder="Enter Mobile Number">
+                                <span asp-validation-for="mobile" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="row align-items-center mb-3">
+
+                            <label class="col-md-2 fw-semibold">
+                                Email Address
+                            </label>
+
+                            <div class="col-md-4">
+                                <input asp-for="email_id"
+                                       type="email"
+                                       class="form-control"
+                                       placeholder="Enter Email Address">
+                            </div>
+
+                            <label class="col-md-2 fw-semibold">
+                                City
+                            </label>
+
+                            <div class="col-md-4">
+                                <input asp-for="city"
+                                       class="form-control"
+                                       placeholder="Enter City">
+                            </div>
+
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="row align-items-center mb-3">
+
+                            <label class="col-md-2 fw-semibold">
+                                State <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+
+                                <select asp-for="state_id"
+                                        asp-items="ViewBag.StateList"
+                                        onchange="DistrictSelect()"
+                                        class="form-select select2">
+
+                                    <option value="0">
+                                        @Const.DROPDOWN_DEFAULT
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="state_id"
+                                      class="text-danger"></span>
+
+                            </div>
+
+                            <label class="col-md-2 fw-semibold">
+                                District
+                            </label>
+
+                            <div class="col-md-4">
+
+                                <select id="dist_id"
+                                        name="dist_id"
+                                        asp-items="ViewBag.DistrictList"
+                                        class="form-select select2">
+
+                                    <option value="0">
+                                        @Const.DROPDOWN_DEFAULT
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Row 4 -->
+                        <div class="row align-items-center mb-3">
+
+                            <label class="col-md-2 fw-semibold">
+                                PIN Code <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+
+                                <input asp-for="pin_code"
+                                       class="form-control"
+                                       placeholder="Enter PIN Code">
+
+                                <span asp-validation-for="pin_code"
+                                      class="text-danger"></span>
+
+                            </div>
+
+                            <label class="col-md-2 fw-semibold pt-2">
+                                Address <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+
+                                <textarea asp-for="address"
+                                          rows="2"
+                                          class="form-control"
+                                          placeholder="Enter Complete Address"></textarea>
+
+                                <span asp-validation-for="address"
+                                      class="text-danger"></span>
+
+                            </div>
+
+
+                        </div>
+
+                        <!-- Row 5 -->
+                        <div class="row align-items-center mb-3 d-none">
+
+                            <label class="col-md-2 fw-semibold">
+                                Sponsor ID <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+                                <input asp-for="sponsor_user_id" class="form-control" placeholder="Enter sponsor ID" onchange="GetSponsorName()">
+                                <span asp-validation-for="sponsor_user_id" class="text-danger"></span>
+                                <div id="sponsor_name"></div>
+                            </div>
+
+                            <label class="col-md-2 fw-semibold">
+                                Position (Left/Right) <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="col-md-4">
+                                <select asp-for="p_side" class="form-control">
+                                    <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                    <option value="L">Left</option>
+                                    <option value="R">Right</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- Row 6 -->
+                        <div class="row mb-4">
+                            <label class="col-md-2 fw-semibold">
+                                Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-4">
+                                <input asp-for="password" type="password" class="form-control" placeholder="Enter Password">
+                                <span asp-validation-for="password" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row">
+                            <div class="col-md-12 text-end">
+                                <a asp-action="Index" class="btn btn-secondary px-4 me-2">
+                                    Cancel
+                                </a>
+                                @*  <button type="submit" class="btn btn-success px-4"> 
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    Submit Registration 
+                                </button> *@
+                                <button type="submit" class="btn btn-success px-4" onclick="confirmSubmission(event)">
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    Submit Registration
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<!-- Main Content -->
+@* <section class="registration-container">
+    <div class="container">
+        <div class="registration-card">
+            <!-- HEADER -->
+            <div class="registration-header text-white text-center p-4">
+                <h3 class="fw-bold mb-1">
+                    <i class="bi bi-person-plus-fill me-2"></i> Ayurvedic Wellness Registration
+                </h3>
+                <p class="fw-semibold small">
+                    Join our herbal wellness community and start your journey toward a healthier lifestyle.
+                </p>
+            </div>
+            <!-- Form Body -->
+            <div class="registration-body">
+                @await Html.PartialAsync("_Loader")
+
+                <form asp-action="AddUser" asp-controller="home" method="post" id="FormSubmit" autocomplete="off" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "validation-summary text-danger" })
+
+                    <!-- 👤 User Details -->
+                    <h6 class="section-title">
+                        <i class="bi bi-person-fill me-2 text-success"></i>
+                        Personal Information
+                    </h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-2">
+                            <label asp-for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input asp-for="name" class="form-control" placeholder="Enter your full name" />
+                            <span asp-validation-for="name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label asp-for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                            <input asp-for="mobile" class="form-control" placeholder="Enter mobile number" maxlength="10" />
+                            <span asp-validation-for="mobile" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label asp-for="email_id" class="form-label">Email ID</label>
+                            <input asp-for="email_id" class="form-control" type="email" placeholder="Enter email address" />
+                            <span asp-validation-for="email_id" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-2">
+                            <label asp-for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                            <textarea asp-for="address" class="form-control" rows="2" placeholder="Enter your complete address"></textarea>
+                            <span asp-validation-for="address" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label asp-for="state_id" class="form-label">State <span class="text-danger">*</span></label>
+                            <select asp-for="state_id" asp-items="ViewBag.StateList" onchange="DistrictSelect()" class="form-control select2">
+                                <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                            </select>
+                            <span asp-validation-for="state_id" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label asp-for="dist_id" class="form-label">District</label>
+                            <select id="dist_id" name="dist_id" asp-items="ViewBag.DistrictList" class="form-control select2">
+                                <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="city" class="form-label">City</label>
+                            <input asp-for="city" class="form-control" placeholder="Enter city name" />
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="pin_code" class="form-label">PIN Code <span class="text-danger">*</span></label>
+                            <input asp-for="pin_code" class="form-control" placeholder="Enter PIN code" />
+                            <span asp-validation-for="pin_code" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-3 mb-2 d-none">
+                            <label asp-for="gender" class="form-label">Gender</label>
+                            <select asp-for="gender" class="form-control">
+                                <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2 d-none">
+                            <label asp-for="dob" class="form-label">Date of Birth</label>
+                            <input asp-for="dob" class="form-control" type="date" />
+                            <span asp-validation-for="dob" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- 🏦 Bank Details -->
+                    <h6 class="section-title mt-4 d-none">
+                        <i class="bi bi-bank me-2 text-success"></i>
+                        Bank Details
+                    </h6>
+                    <div class="row mb-3 d-none">
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="bank_id" class="form-label">Bank Name</label>
+                            <select id="bank_id" name="bank_id" asp-items="ViewBag.BankList" class="form-control select2">
+                                <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2 d-none">
+                            <label asp-for="branch" class="form-label">Branch</label>
+                            <input asp-for="branch" class="form-control" placeholder="Enter branch name" />
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="account_no" class="form-label">Account Number</label>
+                            <input asp-for="account_no" class="form-control" placeholder="Enter account number" />
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="ifsc" class="form-label">IFSC Code</label>
+                            <input asp-for="ifsc" class="form-control" placeholder="Enter IFSC code" />
+                        </div>
+                        <div class="col-md-3 mb-2 d-none">
+                            <label asp-for="ac_type" class="form-label">Account Type</label>
+                            <select asp-for="ac_type" class="form-control">
+                                <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                <option value="Saving">Saving</option>
+                                <option value="Current">Current</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="pan_no" class="form-label">PAN Number</label>
+                            <input asp-for="pan_no" class="form-control" placeholder="Enter PAN number" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-2 d-none">
+                            <label asp-for="nom_name" class="form-label">Nominee Name</label>
+                            <input asp-for="nom_name" class="form-control" placeholder="Enter nominee name" />
+                        </div>
+                        <div class="col-md-3 mb-2 d-none">
+                            <label asp-for="nom_rela" class="form-label">Nominee Relation</label>
+                            <input asp-for="nom_rela" class="form-control" placeholder="Enter relation" />
+                        </div>
+                    </div>
+
+                    <!-- 🔒 Sponsor & Security -->
+                    <h6 class="section-title mt-4">
+                        <i class="bi bi-shield-check me-2 text-success"></i>
+                         Security
+                    </h6>
+                    <div class="row mb-3">
+
+                        <div class="col-md-3 mb-2 d-none">
+                            <label class="form-label">Sponsor ID <span class="text-danger">*</span></label>
+                            <input asp-for="sponsor_user_id" class="form-control" placeholder="Enter sponsor ID" onchange="GetSponsorName()" />
+                            <span asp-validation-for="sponsor_user_id" class="text-danger"></span>
+                            <div id="sponsor_name" class="sponsor-name"></div>
+                        </div>
+                        <div class="col-md-3 mb-2 d-none">
+                            <label class="form-label">Position (Left/Right)</label>
+                            <select asp-for="p_side" class="form-control">
+                                <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                <option value="L">Left</option>
+                                <option value="R">Right</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label asp-for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                            <input asp-for="password" class="form-control" type="password" placeholder="Enter password" />
+                            <span asp-validation-for="password" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <!-- Submit Buttons -->
+                    <div class="text-end mt-4">
+
+                        <a asp-action="Index"
+                           class="btn btn-cancel me-2">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Cancel
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-submit shadow-sm"
+                                onclick="confirmSubmission(event)">
+
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Submit Registration
+
+                        </button>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="text-center mt-4 border-top pt-3">
+                        <p class="mb-0 text-muted">
+                            Already have an account?
+                            <a asp-action="Login"
+                               asp-controller="Home"
+                               class="fw-bold text-success text-decoration-none">
+                                Sign In
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section> *@
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+@await Html.PartialAsync("_dropdownsearch")
+
+<script>
+    $(function () {
+        // Initialize Select2 without search
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            minimumResultsForSearch: Infinity // Disable search
+        });
+    });
+
+
+
+    function confirmSubmission(event) {
+        debugger;
+
+        event.preventDefault();
+
+        var name = document.getElementById("name")?.value.trim() || '';
+        var mobile = document.getElementById("mobile")?.value.trim() || '';
+        var sponsor = document.getElementById("sponsor_user_id")?.value || '';
+        var position = document.getElementById("p_side")?.value || '';
+        var posText = position === "L" ? "Left" : position === "R" ? "Right" : "-";
+
+        // Name Validation
+        if (name === '') {
+            Swal.fire('Validation Error', 'Please enter Full Name.', 'warning');
+            return false;
+        }
+
+        // Mobile Validation
+        if (mobile === '') {
+            Swal.fire('Validation Error', 'Please enter Mobile Number.', 'warning');
+            return false;
+        }
+
+        // Indian Mobile Number Validation
+        var mobileRegex = /^[5-9]\d{9}$/;
+        if (!mobileRegex.test(mobile)) {
+            Swal.fire(
+                'Validation Error',
+                'Please enter a valid 10-digit mobile number.',
+                'warning'
+            );
+            return false;
+        }
+
+        Swal.fire({
+            icon: 'question',
+            title: '⚠️ Confirm Registration',
+            width: '450px',
+            confirmButtonText: 'Yes, Submit',
+            cancelButtonText: 'Cancel',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            html: `
+            <div style="text-align:left; font-size:14px;">
+                <p><strong>👤 Full Name:</strong> ${name}</p>
+                <p><strong>📱 Mobile:</strong> ${mobile}</p> 
+                <hr/>
+                <small style="color:#666;">Please verify all details before submitting.</small>
+            </div>`
+        }).then((swalResult) => {
+
+            if (swalResult.isConfirmed) {
+                const formData = new FormData(document.getElementById('SubmitForm'));
+                showLoader();
+                $.ajax({
+                    url: '/Home/AddUser',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        hideLoader();
+                        if (response.success === true) {
+                            window.location.href = `/Home/Thanks?user_id=${response.message}`;
+                        }
+                        else { showErrorLog("Error", response.message); }
+                    },
+                    error: function () {
+                        hideLoader();
+                        Swal.fire('Error', 'Something went wrong!', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+
+
+
+    // function confirmSubmission(event) {
+    //     event.preventDefault();
+
+    //     // 🔹 Get values
+    //     var name = document.getElementById("name")?.value || '';
+    //     var mobile = document.getElementById("mobile")?.value || '';
+    //     var sponsor = document.getElementById("sponsor_user_id")?.value || '';
+    //     var position = document.getElementById("p_side")?.value || '';
+
+    //     // 🔹 Convert position text
+    //     var posText = position === "L" ? "Left" : position === "R" ? "Right" : "-";
+
+    //     Swal.fire({
+    //         icon: 'question',
+    //         title: '⚠️ Confirm Registration',
+    //         width: '450px',
+    //         confirmButtonText: 'Yes, Submit',
+    //         cancelButtonText: 'Cancel',
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#198754',
+
+    //         html: `
+    //         <div style="text-align:left; font-size:14px;">
+    //             <p><strong>👤 Full Name:</strong> ${name || '-'}</p>
+    //             <p><strong>📱 Mobile:</strong> ${mobile || '-'}</p>
+    //             <p><strong>🧑‍🤝‍🧑 Sponsor ID:</strong> ${sponsor || '-'}</p>
+    //             <p><strong>📍 Position:</strong> ${posText}</p>
+    //             <hr/>
+    //             <small style="color:#666;">Please verify all details before submitting.</small>
+    //         </div>`
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             document.getElementById('FormSubmit').submit();
+    //         }
+    //     });
+    // }
+
+
+
+    let URL_DROPDOWN_LIST = `/common/get-master-dropdown`;
+
+    function GetSponsorName() {
+        const userId = $('#sponsor_user_id').val();
+        const $name = $('#sponsor_name');
+        if (!userId) return $name.text('').css('color', '');
+
+        $name.html('<i class="bi bi-hourglass-split me-1"></i>Loading...').css('color', '#1565C0');
+
+        $.get(`/common/master-reports?mst_key=GET_BASIC_USER_DATA&user_id=${userId}`, res => {
+            const data = (JSON.parse(res.data || '[]')[0]) || {};
+            if (data?.name) {
+                $name.html(`<i class="bi bi-check-circle me-1"></i>${data.name}`).css('color', '#4CAF50');
+            } else {
+                $name.html('<i class="bi bi-x-circle me-1"></i>Invalid Sponsor ID').css('color', '#dc3545');
+            }
+        }).fail(() => $name.text('').css('color', ''));
+    }
+
+
+     function DistrictSelect() {
+         const stateId = $('#state_id').val();
+         const $dist = $('#dist_id');
+         const defaultOpt = '<option value="0">🔍 Select District</option>';
+
+         if (!stateId || stateId == 0) {
+             $dist.html(defaultOpt);
+             return;
+         }
+         $dist.html('<option value="0">Loading...</option>');
+         $.get('/common/get-master-dropdown', {
+             mst_key: 'GET_DISTRICT_LIST',
+             id: stateId
+         })
+         .done(res => {
+             const options = (res?.data || [])
+                 .map(x => `<option value="${x.value}">${x.text}</option>`)
+                 .join('');
+             $dist.html(defaultOpt + options);
+         })
+         .fail(() => $dist.html(defaultOpt));
+     }
+
+</script>

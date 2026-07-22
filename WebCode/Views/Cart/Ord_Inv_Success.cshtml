@@ -1,0 +1,244 @@
+﻿@model GetOrderInvModel
+@{
+    ViewData["Title"] = "Order";
+}
+
+<style>
+    /* 🌟 Card hover animation */
+    .card-animate {
+        transition: all 0.3s ease;
+    }
+
+        .card-animate:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+    /* 🌟 Floating success icon */
+    .floating-icon {
+        animation: floatY 2s ease-in-out infinite;
+    }
+
+    @@keyframes floatY {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* 🌟 Button hover effect */
+    .btn-animate {
+        transition: all 0.25s ease;
+    }
+
+        .btn-animate:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+    /* 🌟 Soft gradient background */
+    .bg-soft {
+        background: linear-gradient(135deg, #f8f9fa, #eef2f7);
+    }
+</style>
+
+<div class="container py-5 bg-soft">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 rounded-4 text-center p-4 card-animate">
+
+                <!-- ✅ ORDER GENERATED -->
+                <div class="mb-4 alert alert-success">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center floating-icon shadow"
+                         style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-lg fs-1"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-success mb-2">
+                            Order Placed Successfully!
+                        </h2>
+                        <h6 class="fw-bold mb-2">
+                            Your order has been placed successfully.
+                        </h6>
+                    </div>
+                </div>
+
+
+                <!-- ✅ Order Info -->
+                <div class="bg-light rounded-3 p-3 mb-4 text-start shadow-sm">
+                    <div class="row">
+
+                        <div class="row g-3">
+
+                            <!-- Order Date -->
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Order Date</small>
+                                <div class="fw-semibold">
+                                    @(Model.doe?.ToString("dd MMM yyyy, hh:mm tt"))
+                                </div>
+                            </div>
+
+                            <!-- Order Number -->
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Order No</small>
+                                <div class="fw-semibold text-primary">
+                                    @Model.ord_inv_no
+                                </div>
+                            </div>
+
+                            <!-- Payment Mode -->
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Payment Mode</small>
+                                <div class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(Model.pay_mode) ? "N/A" : Model.pay_mode)
+                                </div>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Total Amount</small>
+                                <div class="fw-bold text-success">
+                                    Rs.@Model.t_amount 
+                                </div>
+                            </div>
+
+                        </div>
+
+                       @*  <div class="col-md-6 mb-2">
+                            <small class="text-muted">Order Date</small>
+                            <div class="fw-semibold">#@Model.doe</div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Order No</small>
+                            <div class="fw-semibold">@Model.ord_inv_no</div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Payment Mode</small>
+                            <div class="fw-semibold">#@Model.pay_mode</div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Total Amount</small>
+                            <div class="fw-bold text-success">@Model.t_amount</div>
+                        </div>
+ *@
+                    </div>
+                </div>
+                
+
+                <!-- ✅ Action Buttons -->
+                <div class="d-grid gap-2">
+                    <a href="/print/user-po/@Model.ord_inv_id" target="_blank" class="btn btn-primary btn-lg btn-animate shadow">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        View Order
+                    </a>
+                </div>
+                <hr />
+
+
+                <!-- ✅ INVOICE GENERATED -->
+                <div class="mb-4 alert alert-success d-none">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center floating-icon shadow"
+                         style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-lg fs-1"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-success mb-2">
+                            Invoice Generated!
+                        </h2>
+                        <h6 class="fw-bold mb-2">
+                            Your invoice <b>INV-2026-001</b> is ready. You can view it anytime.
+                        </h6>
+                    </div>
+                </div>
+
+                <!-- ✅ Invoice Info -->
+                <div class="bg-light rounded-3 p-3 mb-4 text-start shadow-sm d-none">
+                    <div class="row">
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Invoice Date</small>
+                            <div class="fw-semibold">#2026-01-01</div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Invoice No</small>
+                            <div class="fw-semibold">INV-2026-001</div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Payment Mode</small>
+                            <div class="fw-semibold">UPI</div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted">Total Amount</small>
+                            <div class="fw-bold text-success">₹12,500</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ✅ Action Buttons -->
+                <div class="d-grid gap-2 d-none">
+                    <a href="/invoice/view?orderId=123"
+                       class="btn btn-primary btn-lg btn-animate shadow">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        View Invoice
+                    </a>
+                </div>
+
+
+
+                <!-- ✅ Action Buttons -->
+                <div class="d-grid gap-2">
+                    <a href="/home/products"
+                       class="btn btn-outline-secondary btn-lg btn-animate">
+                        <i class="bi bi-bag me-2"></i>
+                        Continue Shopping
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+<script>
+    let uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ord_inv_no = urlParams.get("ord_inv_no");
+        console.log(ord_inv_no);
+    });
+
+
+    function GetUserDashboard() {
+        let URL_LIST = `/secure/get-user-dashboard?uid=${uid}`;
+        showLoader();
+        $.get(URL_LIST, function (resp) {
+            hideLoader();
+            if (resp.success === true) {
+                 const dataArray = JSON.parse(resp.data) || [];
+                 const data = dataArray[0] || {};
+
+                 $('#order_no').html(data.order_no);
+                 $('#total_left').html(formatINR(data.total_left));
+            }
+        });
+    }
+
+
+    function ViewOrder(){
+
+    }
+
+</script>

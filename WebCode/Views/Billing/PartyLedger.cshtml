@@ -1,0 +1,383 @@
+﻿@{
+    ViewData["Title"] = "Party Ledger";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+@* <!-- Breadcrumb -->
+<section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a><i class="fa fa-list"></i> <strong> Party Ledger </strong></a></li> 
+    </ol>
+        <a asp-controller="billing" asp-action="invoice-list" class="btn btn-success pull-right"> <i class="fa fa-list"></i>  Invoice List </a>
+   
+</section> *@
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Party Ledger
+    </h4>
+    <a asp-controller="billing" asp-action="invoice-list" class="btn btn-sm btn-outline-success">
+        Invoice List
+    </a>
+</section> 
+<div class="clearfix"></div>
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <!-- Panel Header -->
+            <div class="panel-heading row">
+                <div class="row mb-12">
+
+                    <!-- Party Dropdown -->
+                    <div class="col-md-4">
+                        <label class="form-label">👤 Party</label>
+                        <select id="buyer_uid" asp-items="ViewBag.BuyerList"
+                                onchange="bindLedgerData()" class="form-control select2">
+                            <option value="0">🔍 Search Party</option>
+                        </select>
+                    </div>
+
+                    <!-- Particulars -->
+                    <div class="col-md-3">
+                        <label class="form-label">📝 Particulars</label>
+                        <input id="particulars" class="form-control" type="text" placeholder="Enter particulars" maxlength="100" />
+                    </div>
+
+                    <!-- Voucher Type -->
+                    <div class="col-md-3">
+                        <label class="form-label">📄 Voucher Type</label>
+                        <select id="voucher_id" class="form-control select2">
+                            <option value="12">💵 Receipt Voucher</option>
+                            <option value="17">📄 Credit Note Voucher</option>
+                            <option value="1">➖ Party Debit by Admin</option>
+                            @* <option value="2">➕ Party Credit by Admin</option> *@
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-12">
+                    <!-- Voucher Number -->
+                    <div class="col-md-4">
+                        <label class="form-label">🔢 Voucher No.</label>
+                        <input id="voucher_no" class="form-control" type="text" placeholder="Voucher No." maxlength="50" />
+                    </div>
+
+                    <!-- Receive Amount -->
+                    <div class="col-md-3">
+                        <label class="form-label">💰 Receive Amount</label>
+                        <input id="receive_amount" class="form-control" type="text"
+                               placeholder="0.00" onkeypress="return onlyDecimal(event)" maxlength="20" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">📅 Date</label>
+                        <input type="text" id="doe" class="form-control" placeholder="Date" />
+                    </div>
+                    <!-- Submit Button -->
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <label class="form-label"></label>
+                        <button type="submit" id="saveBtn" class="btn btn-success w-100"
+                                onclick="confirmSubmissionReceivedAmount(event)">
+                            ✅ Submit
+                        </button>
+                    </div>
+                </div>
+
+                <hr />
+                <!-- Panel Body -->
+
+                <div class="row mb-12">
+                    <div class="col-sm-2">
+                        <input type="text" id="from_date" class="form-control" placeholder="From Date" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" id="to_date" class="form-control" placeholder="To Date" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input class="btn btn-info" type="button" id="btnSearch" value="Search" />
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="table-responsive mb-4">
+                    <table id="tblReceivedAmount" class="table table-bordered table-hover table-striped nowrap w-100">
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end"></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="row mb-12">
+                        <div class="col-sm-8">
+                        </div>
+                        <div class="col-sm-2">
+                            Total Debit:
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="totalDebit" class="text-end fw-bold mt-2"></div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="row mb-12">
+                        <div class="col-sm-8">
+                        </div>
+                        <div class="col-sm-2">
+                            Total Credit:
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="totalCredit" class="text-end fw-bold mt-2"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-12">
+                        <div class="col-sm-8">
+                        </div>
+                        <div class="col-sm-2">
+                            Balance:
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="balanceResult" class="text-end fw-bold mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+@* @await Html.PartialAsync("_ValidationScriptsPartial") *@
+<script>
+
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+
+    $(function () {
+
+    @if (TempData["Error"] != null)
+    {
+        <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <text>
+                    showSuccessMessage(`@Const.SUCCESS_HEADER`, '@TempData["Success"]');
+        </text>
+    }
+
+
+        const formatDate = date => date.toLocaleDateString('en-GB').split('/').join('-');
+        const today = new Date();
+        const weekAgo = new Date(today);
+        weekAgo.setDate(today.getDate() - 30);
+
+        $('#from_date').val(formatDate(weekAgo));
+        $('#to_date').val(formatDate(today));
+        $('#doe').val(formatDate(today));
+        $('#from_date, #to_date, #doe').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+
+
+
+        bindLedgerData();
+        $('#btnSearch').on('click', function () {
+             bindLedgerData();
+        });
+    });
+
+
+
+    function bindLedgerData() {
+        const buyerId = $('#buyer_uid').val();
+
+        const parseDate = (dateStr) => {
+            if (!dateStr) return null;
+            const parts = dateStr.split("-");
+            return parts.length === 3 ? `${parts[1]}/${parts[0]}/${parts[2]}` : null;
+        };
+
+        let from_date = parseDate($('#from_date').val());
+        let to_date = parseDate($('#to_date').val());
+
+        // Encode URI components to handle special characters
+        const url = `/billing/get-payment-history?buyer_uid=${buyerId}&from_date=${encodeURIComponent(from_date)}&to_date=${encodeURIComponent(to_date)}`;
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                if (response.success === true) {
+                    const paymentData = JSON.parse(response.data) || [];
+
+                    $('#tblReceivedAmount').DataTable({
+                        dom: 'Blrtip',
+                        scrollY: "500px",
+                        scrollX: true,
+                        scrollCollapse: true,
+                        destroy: true,
+                        responsive: true,
+                        autoWidth: false,
+                        paging: false,
+                        ordering: false,
+                        language: {
+                            emptyTable: "No records found"
+                        },
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'Excel',
+                                filename: () => `Payment_History_${new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')}`
+                            },
+                            {
+                                extend: 'csvHtml5',
+                                text: 'CSV',
+                                filename: () => `Payment_History_${new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')}`
+                            },
+                            { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                            { extend: 'copyHtml5', text: 'Copy'},
+                            'fullscreenToggle',
+                            'colvis',
+                        ],
+                        data: paymentData,
+                        columns: [
+                            { title: '#', data: null, className: 'text-center', render: function (data, type, row, meta) { return meta.row + 1;  } },
+                            { data: 'doe', title: 'Date' },
+                            // { data: 'd_c', title: 'Type', render: (d) => d === 'D' ? 'Dr' : d === 'C' ? 'Cr' : (d ?? '') },
+                            { data: 'd_c', title: 'Type', render: d => d === 'D' ? '<span style="color:red;font-weight:bold;">Dr</span>' : d === 'C' ? '<span style="color:green;font-weight:bold;">Cr</span>' : (d ?? '') },
+
+                            { data: 'remarks', title: 'Particulars' },
+                            { data: 'voucher_type', title: 'Voucher Type' },
+                            { data: 'tran_no', title: 'Voucher No.' },
+                            { data: 'debit', title: 'Debit', className: 'text-end', render: d => d ? `<span style="color:red;">${d}</span>` : '' },
+                            { data: 'credit', title: 'Credit', className: 'text-end', render: d => d ? `<span style="color:green;">${d}</span>` : '' },
+
+                            // { data: 'debit', title: 'Debit', className: 'text-end' },
+                            // { data: 'credit', title: 'Credit', className: 'text-end' },
+
+
+                        ],
+                        footerCallback: function (row, data, start, end, display) {
+                            const api = this.api();
+
+                            const getTotal = (index) => {
+                                return api.column(index, { page: 'current' }).data().reduce((a, b) => {
+                                    const x = parseFloat(a) || 0;
+                                    const y = parseFloat(b) || 0;
+                                    return x + y;
+                                }, 0);
+                            };
+
+                            const totalDebit = getTotal(6);
+                            const totalCredit = getTotal(7);
+                            //const balance = Math.max(0, totalDebit - totalCredit);
+                            const balance = (totalDebit - totalCredit);
+                            $(api.column(6).footer()).html(totalDebit.toFixed(2));   // Debit
+                            $(api.column(7).footer()).html(totalCredit.toFixed(2));  // Credit
+
+                               // Always show Total Debit in primary color
+                            $('#totalDebit').html(`<strong class="text-primary">  ${totalDebit.toFixed(2)}</strong>`);
+
+                            // Change color based on credit amount
+                            let creditColor = totalCredit > 0 ? 'text-info' : 'text-secondary';
+                            $('#totalCredit').html(`<strong class="${creditColor}">  ${totalCredit.toFixed(2)}</strong>`);
+
+                            // Change color of Balance: green if > 0, red if 0 or less
+                            let balanceColor = balance > 0 ? 'text-success' : 'text-danger';
+                            $('#balanceResult').html(`<strong class="${balanceColor}">  ${balance.toFixed(2)}</strong>`);
+                             
+                        }
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                showErrorLog('Error', 'Unexpected error occurred while loading payment history.');
+            }
+        });
+    }
+
+
+
+
+    function submitReceivedAmount() {
+        const buyerUid = $('#buyer_uid').val();
+        const receiveAmount = $('#receive_amount').val();
+        const voucherId = $('#voucher_id').val();
+        const particulars = $('#particulars').val();
+        const voucherNo = $('#voucher_no').val();
+        const doe = $('#doe').val();
+
+        if (parseInt(buyerUid) <= 0) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Please select a party."); return;
+        }
+        if (parseFloat(receiveAmount) <= 0) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Receive amount is required."); return;
+        }
+        if (!voucherId) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Please select a voucher type."); return;
+        }
+        if (!particulars.trim()) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Please enter particulars."); return;
+        }
+        if (!voucherNo.trim()) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Please enter voucher number."); return;
+        }
+
+        showLoader();
+        const url = `/billing/add-partial-payment`;
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {
+                buyer_uid: buyerUid,
+                receive_amount: receiveAmount,
+                voucher_id: voucherId,
+                particulars: particulars,
+                voucher_no: voucherNo,
+                doe : doe
+            },
+            success: function (response) {
+                hideLoader();
+                if (response.success === true) {
+                    showToastSuccess('Data saved successfully.');
+                    bindLedgerData();
+                } else {
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message || "Failed to save data.");
+                }
+            },
+            error: function () {
+                hideLoader();
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+            }
+        });
+    }
+
+
+     function confirmSubmissionReceivedAmount(event) {
+            event.preventDefault(); // stop the form from auto-submitting
+            Swal.fire({
+                icon: 'question',
+                title: '⚠️ Are you sure you want to continue?',
+                html: `<div style="text-align: left; white-space: pre-wrap; font-size: 16px;"><strong>${'Do you want to submit the details?'}</strong></div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                customClass: { htmlContainer: 'text-left' },
+                width: '35%'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitReceivedAmount();
+                }
+            });
+        } 
+</script>
+ 

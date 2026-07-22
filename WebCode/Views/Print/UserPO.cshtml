@@ -1,0 +1,653 @@
+﻿@model List<UserOrderProductViewModel>
+@{
+    ViewData["Title"] = "Order Detail ";
+    Layout = null;
+}
+
+<style>
+    .total-bold1 table tr td, .total-bold1 table tr th {
+        border: 1px solid #b1b1b1;
+    }
+    /* Normal status text */
+    #status {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+        /* OK style */
+        #status.ok {
+            color: green;
+        }
+
+        /* Cancelled = always center big watermark */
+        #status.cancelled {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 100px;
+            font-weight: 900;
+            color: rgba(255, 0, 0, 0.15);
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
+            z-index: 9999;
+            pointer-events: none;
+        }
+</style>
+
+<style>
+    .total-bold {
+        font-size: 12px;
+    }
+
+    .text-start {
+        font-size: 12px;
+    }
+
+    .dt-type-numeric {
+        font-size: 12px;
+    }
+
+    .dt-column-title {
+        font-size: 12px;
+    }
+
+    .total {
+        font-size: 12px !important;
+    }
+
+    .desc {
+        font-size: 12px;
+    }
+
+    .total_table {
+        width: 30%;
+        margin-left: 2%;
+        float: right
+    }
+
+    #notices {
+        width: 55%;
+        float: left;
+    }
+
+    .barcode {
+        width: 40%;
+        float: left;
+        margin-left: 5%
+    }
+
+    .logo {
+        width: 250px;
+    }
+
+    .banner {
+        width: 25cm;
+        /*height: 3.88cm;*/
+    }
+
+    .clearfix:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    a {
+        color: #5D6975;
+        text-decoration: underline;
+    }
+
+    body {
+        position: relative;
+        width: 25cm;
+        /* height: 29.7cm; */
+        margin: 0 auto;
+        color: #001028;
+        background: #FFFFFF;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        font-family: Arial;
+    }
+
+    header {
+        position: relative;
+        padding: 10px 0;
+        margin-bottom: 30px;
+        width: 25cm;
+        margin: auto;
+    }
+
+    .right-sign {
+        position: absolute;
+    }
+
+    .tax-invoice {
+        position: absolute;
+        right: 220px;
+        margin-top: 1px;
+    }
+
+    .arogyam_logo {
+        position: absolute;
+        right: 0px;
+        margin-top: 15px;
+    }
+
+    #logo {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+        #logo img {
+            width: 90px;
+        }
+
+    h1 {
+        border-top: 1px solid #5D6975;
+        border-bottom: 1px solid #5D6975;
+        color: #5D6975;
+        font-size: 2.4em;
+        line-height: 1.4em;
+        font-weight: normal;
+        text-align: center;
+        margin: 0 0 20px 0;
+        background: url(dimension.png);
+    }
+
+    .total-bold {
+        font-weight: bold;
+    }
+
+    #project {
+        float: left;
+        width: 50%;
+    }
+
+        #project span {
+            color: #001028;
+            text-align: left;
+            /*width: 96px;*/
+            margin-right: 10px;
+            display: inline-block;
+            font-size: 12px;
+            line-height: 1.5;
+            /* font-weight: bold;*/
+        }
+
+    #company span {
+        /* font-weight: bold;*/
+        color: #001028;
+        text-align: left;
+        /* width: 90px;*/
+        margin-right: 10px;
+        display: inline-block;
+        font-size: 1.0em;
+        line-height: 1.5;
+    }
+
+    #company {
+        float: left;
+        /* text-align: right; */
+        width: 47%;
+        margin-left: 1%;
+        border-left: 1px dotted;
+        padding-left: 10px;
+    }
+
+        #project div,
+        #company div {
+            /*white-space: nowrap;   */
+        }
+
+    table {
+        width: 100%;
+        /* border-collapse: collapse;*/
+        border-spacing: 0;
+        margin-bottom: 20px;
+    }
+
+        table tr td {
+            /*background: #F5F5F5;*/
+            border-bottom: 2px dotted #000;
+        }
+
+        table th,
+        table td {
+            text-align: left;
+        }
+
+        table th {
+            padding: 5px;
+            color: #000;
+            border-bottom: 2px dotted #000000;
+            white-space: nowrap;
+            font-weight: normal;
+        }
+
+        table .service,
+        table .desc {
+            text-align: left;
+        }
+
+        table td {
+            padding: 5px;
+            /*text-align: right;*/
+        }
+
+            table td.service,
+            table td.desc {
+                vertical-align: top;
+            }
+
+            table td.unit,
+            table td.qty,
+            table td.total {
+                font-size: 1.2em;
+            }
+
+            table td.grand {
+                /*border-top: 1px solid #5D6975;*/
+                border-bottom: 2px dotted #000;
+            }
+
+    #notices .notice {
+        color: #5D6975;
+        font-size: 1.2em;
+    }
+
+    footer {
+        color: #5D6975;
+        width: 100%;
+        height: 30px;
+        position: absolute;
+        bottom: 0;
+        border-top: 1px solid #C1CED9;
+        padding: 8px 0;
+        text-align: center;
+    }
+</style>
+
+<header class="clearfix">
+    <div class="clearfix"></div>
+    <div style="width: 48%; float:left;"><img src="@Const.LOGO" class="logo" /></div>
+    <div style="width: 48%; float: left; text-align: end; padding: 4px; font-size: 36px; color: #918c8c;"> Order Details </div>
+    <div class="clearfix"></div>
+    <br />
+    <div id="project">
+
+        <div>
+            <span class="total-bold">CIN No. : </span>
+            <span>@Const.COMP_CINNO</span>
+        </div>
+        <div class="total-bold" style="font-size: larger;">
+            <span style="display: inline-block; width: 100%; font-size: 14px;">
+                @Const.COM_NAME
+            </span>
+        </div>
+        <div>
+            <span style="display:inline-block;height:40px;width:100%;">
+                @Const.COM_ADDRESS
+            </span>
+        </div>
+        <div>
+            <span class="total-bold">Tel : </span>
+            <span>@Const.COM_CONTACT</span>
+        </div>
+        <div>
+            <span class="total-bold">Email:</span>
+            <span>@Const.COM_EMAIL</span>
+        </div>
+        <div>
+            <span class="total-bold">GSTIN :</span>
+            <span>@Const.COMP_GST</span>
+        </div>
+        <div>
+            <span class="total-bold">PAN :</span>
+            <span>  @Const.COMP_PANNO </span>
+        </div>
+        <div style="display: none;">
+            <span class="total-bold">CIN :</span>
+            <span>  @Const.COMP_CINNO </span>
+        </div>
+
+
+        <hr />
+
+
+        <div>
+            <span class="total-bold">Order No. :</span>
+            <span id="order_no"></span>
+        </div>
+
+        <div>
+            <span class="total-bold">Order Date :</span>
+            <span id="doe"> </span>
+        </div>
+        <div>
+            <span class="total-bold">Order Status :</span>
+            <span id="status"></span>
+        </div>
+    </div>
+
+
+
+
+    <div id="company" class="clearfix">
+
+        <div>
+            <span class="total-bold"> Buyer (Bill to) </span>
+        </div>
+        <div class="total-bold">
+            <strong>  <span id="buyer_name" style="font-size: 14px;"></span> </strong>
+        </div>
+        <div>
+            <span id="buyer_full_address" style="display:inline-block;height:40px;width:100%;"></span>
+        </div>
+        <div>
+            <span class="total-bold">Tel : </span>
+            <span id="buyer_mobile"> </span>
+        </div>
+
+        <div>
+            <span class="total-bold">Email:</span>
+            <span></span>
+        </div>
+
+        <div>
+            <span class="total-bold">GSTIN :</span>
+            <span></span>
+        </div>
+
+        <div>
+            <span class="total-bold">State :</span>
+            <span id="buyer_state"></span>
+        </div>
+
+
+
+        <hr />
+        <div>
+            <span class="total-bold" style="width: 100%; font-size: 14px;">Shipping Address : </span>
+            <strong> <span id="shipper_name" style="font-size: 14px;"></span> </strong>    <br />
+
+            <span id="shipper_full_address" style="width: 100%"> </span> <br />
+            <span class="total-bold">Tel : </span>
+            <span id="shipper_mobile"></span> <br />
+        </div>
+
+        <div>
+            <span class="total-bold">State :</span>
+            <span id="shipper_state"></span>
+        </div>
+
+
+    </div>
+</header>
+
+
+
+<table>
+    <thead>
+        <tr style="background: #d1d2d4;">
+            <th class="service total-bold">#</th>
+            <th class="service total-bold">Product Name</th>
+            <th class="desc total-bold">HSN Code</th>
+            @* <th class="total-bold hide-xs">ActQ</th> *@
+            <th class="total-bold hide-xs">Qty</th>
+
+            @* <th class="total-bold hide-xs">MRP</th> *@
+            <th class="total-bold hide-xs">Rate</th>
+            <th class="total-bold hide-xs">Gross</th>
+            <th class="total-bold hide-xs">Tax %</th>
+            <th class="total-bold hide-xs">Tax Rs</th>
+            <th class="total-bold hide-xs">Total Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int totalActQ = 0;
+            int totalQty = 0;
+            decimal totalGross = 0;
+            decimal totalTax = 0;
+            decimal totalAmount = 0;
+            int serialNo = 1;
+        }
+        @foreach (var item in Model)
+        {
+            totalActQ += item.actual_qty ?? 0;
+            totalQty += item.qty ?? 0;
+
+            totalGross += item.gross ?? 0;
+            totalTax += item.gst_amt ?? 0;
+            totalAmount += item.total_amt ?? 0;
+
+            <tr>
+
+                <td class="service">@serialNo</td>
+                <td class="desc">
+                    @item.prod_code - @item.prod_name<br />
+                    Mfg: @item.mfg_date<br />
+                    Exp: @item.exp_date
+                    @if (item.prod_type == 3)
+                    {
+                        <span style="color:forestgreen;">(Sample)</span>
+                    }
+                </td>
+
+                <td class="text-start">@item.hsncode</td>
+               @*  <td class="total hide-xs" style="text-align: center;">@item.actual_qty</td> *@
+                <td class="total hide-xs" style="text-align: center;">@item.qty</td>
+               @*  <td class="total hide-xs" style="text-align: right;">@item.mrp</td> *@
+                <td class="total hide-xs" style="text-align: right;">@item.price</td>
+                <td class="total hide-xs" style="text-align: right;">@item.gross</td>
+                <td class="total hide-xs" style="text-align: center;">@(item.gst) %</td>
+                <td class="total hide-xs" style="text-align: right;">@item.gst_amt</td>
+                <td class="total hide-xs" style="text-align: right;">@item.total_amt</td>
+            </tr>
+            serialNo++;
+        }
+    </tbody>
+    <tfoot class="fw-bold">
+        <tr>
+            <td colspan="3" class="text-end">Total</td>
+            @* <td class="total-bold" style="text-align: right;">@totalActQ</td> *@
+            <td class="total-bold" style="text-align: right;">@totalQty</td>
+            <td class="text-end"></td>
+           @*  <td class="text-end"></td> *@
+            <td class="total-bold" style="text-align: right;">@totalGross</td>
+            <td class="text-end"></td>
+            <td class="total-bold" style="text-align: right;">@totalTax</td>
+            <td class="total-bold" style="text-align: right;">@totalAmount</td>
+        </tr>
+    </tfoot>
+</table>
+
+<div class="clearfix"></div>
+
+<div style="width:68%; float:left;">
+    <div>
+        <div class="total-bold1" style="width: 60%; float: left; margin-top: 26px;">
+           @*  <table style="font-size:12px; margin: 23px 0px;">
+                <tbody>
+                    <tr>
+                        <th class="" style="text-align: center;" colspan="2"><b>UPI ID: 9222101234@okbizaxis</b></th>
+
+                    </tr>
+
+                    <tr>
+                        <td style="text-align: left; width:50%;">Bank Name </td>
+                        <td style="text-align: left; width: 50%;">State Bank of India </td>
+                    </tr>
+
+                    <tr>
+                        <td style="text-align: left;">A/c No </td>
+                        <td style="text-align: left;">34087165108 </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">IFS Code </td>
+                        <td style="text-align: left;">SBIN0009056  </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Branch</td>
+                        <td style="text-align: left;">JEKEGRAM  </td>
+                    </tr>
+                </tbody>
+            </table> *@
+        </div>
+        <div style="width: 38%; float: left; text-align:center; margin-top: 45px;">
+           @*  <img src="~/WebTemplate/images/qr_code.jpg" width="50%" height="116px" />
+            <p style="margin-top:2px; font-size:14px">Scan and Pay</p> *@
+        </div>
+    </div>
+</div>
+<div style="width:30%; float:right; margin-left:2%;">
+    <table class="total_table" style="width:100%">
+        <tbody>
+            <tr>
+                <td style="border-bottom: none;" class="total-bold">Gross Value :</td>
+                <td class="total" style="border-bottom: none; text-align: right;">
+                    <span id="t_gross">0.00</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="border-bottom: none;" class="total-bold">GST :</td>
+
+                <td class="total" style="border-bottom: none; text-align: right;">
+                    <span id="t_tax_rs">0.00</span>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td style="border-bottom: none;" class="total-bold">Discount :</td>
+                <td class="total" style="border-bottom: none; text-align: right;">
+                    <span id="discount">0</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="total-bold" style="border-bottom: none;">Courier Charges</td>
+                <td class="grand total" style="border-bottom: none; text-align: right;">
+                    <span id="del_charge">0</span>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="total-bold">Adjustment Amount :</td>
+                <td class="grand total total-bold" style="text-align: right;">
+                    <span id="adjust_amt">0.00</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="total-bold">Invoice Value(Rs) :</td>
+                <td class="grand total total-bold" style="text-align: right;">
+                    <span id="t_amount">0</span>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="total-bold">Gross Weight :</td>
+                <td class="total-bold" style="text-align: right;">
+                    <span id="gross_weight"> 0.0</span>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+
+<div class="clearfix"></div>
+<hr />
+<div id="notices">
+    <div><b>Terms &amp; Conditions:</b></div>
+    <div class="notice">
+        1. All Disputes are subject to jurisdiction of Thane only.<br />
+        2. Company is not responsible after the goods leave the premises.<br />
+        3. Any inaccuracy in this bill must be notified within 7 days of receipt of Bill.<br />
+        4. Goods provided Free of Cost / Offer, subject to reversal of input tax credit of GST as prevailing.<br />
+        5. Goods bought by the puchaser for self consumption purposes, ITC will not be available.<br />
+    </div>
+
+
+</div>
+<div class="barcode">
+    <div>For</div>
+    <div class="notice">
+
+        <b>
+            <span><strong> @Const.COM_NAME </strong> </span>
+        </b>
+        <br />
+        <br />
+        <br />
+        This is computer generated invoice, thus any physical signature not required.<br />
+    </div>
+</div>
+<div class="clearfix"></div>
+<script src="~/js/jquery-3.7.1.min.js"></script>
+@* <br />
+@await Html.PartialAsync("_DatatableScript") *@
+<script>
+    let URL_LIST = `/print/user-po-seller-detail`;
+    $(function () {
+        const pathSegments = window.location.pathname.split('/');
+        const order_id = pathSegments[pathSegments.length - 1];
+        if(parseInt(order_id)>0){
+            Get_Seller_Details(order_id);
+        }
+    });
+
+
+    function Get_Seller_Details(order_id) {
+        $.ajax({
+            url: URL_LIST + `?order_id=${order_id}`,
+            method: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                if (response.success === true) {
+                     const dataArray = JSON.parse(response.data) || [];
+                     const data = dataArray[0] || {};
+                     debugger;
+
+
+                      $('#order_no').text(data.order_no);
+                      $('#doe').text(data.doe);
+
+
+                      $('#buyer_name').text(data.buyer_name);
+                      $('#buyer_mobile').text(data.buyer_mobile);
+                      $('#buyer_full_address').text(data.buyer_full_address);
+                      $('#buyer_state').text(data.buyer_state);
+
+
+                      $('#shipper_name').text(data.shipper_name);
+                      $('#shipper_mobile').text(data.shipper_mobile);
+                      $('#shipper_state').text(data.shipper_state);
+                      $('#shipper_full_address').text(data.shipper_full_address);
+
+
+                      $('#t_gross').text(data.t_gross);
+                      $('#t_tax_rs').text(data.t_tax_rs);
+                      $('#t_amount').text(data.t_amount);
+
+
+                      if (data.status == 1) {
+                          $('#status').text("OK").removeClass("cancelled").addClass("ok");
+                      }
+                      else if (data.status == 2) {
+                          $('#status').text("CANCELLED").removeClass("ok").addClass("cancelled");
+                      }
+                       
+                 }
+            },
+            error: function (res_error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+            }
+        });
+    }
+</script>
+

@@ -1,0 +1,210 @@
+﻿@{
+    ViewData["Title"] = "Repurchase_Payout_Dispatch_User";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@* <link href="~/webtemplate/gridtbl/datatables.datatables.css" rel="stylesheet" />
+<link href="~/webtemplate/gridtbl/buttons.datatables.css" rel="stylesheet" />
+<link href="~/webtemplate/gridtbl/responsive.datatables.min.css" rel="stylesheet" />
+<link href="~/webtemplate/gridtbl/select2.min.css" rel="stylesheet" />
+
+<!-- Breadcrumb -->
+<section class="content-header">
+    <ol class="breadcrumb pull-left">
+        <li><a asp-action="dashboard" asp-controller="secure"><i class="fa fa-home"></i> Home</a></li>
+        <li><a><i class="fa fa-list"></i>Payout Management</a></li>
+    </ol>
+</section>
+
+<div class="clearfix"></div> *@
+@{
+    var role_name = User.FindFirst("role_name")?.Value;
+}
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Payout Management
+    </h4>
+   
+</section>
+<div class="clearfix"></div>
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="panel-body">
+                <div class="table-responsive mb-4">
+                    <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script src="~/webtemplate/gridtbl/datatables.js"></script>
+<script src="~/webtemplate/gridtbl/datatables.buttons.min.js"></script>
+<script src="~/webtemplate/gridtbl/buttons.html5.min.js"></script>
+<script src="~/webtemplate/gridtbl/buttons.colvis.min.js"></script>
+<script src="~/webtemplate/gridtbl/jszip.min.js"></script>
+<script src="~/webtemplate/gridtbl/select2.min.js"></script>
+
+<script src="~/webtemplate/gridtbl/pdfmake.min.js"></script>
+<script src="~/webtemplate/gridtbl/vfs_fonts.js"></script>
+<script src="~/webtemplate/gridtbl/buttons.print.min.js"></script>
+
+
+<script>
+
+    let table;
+    let token = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(ViewBag.Token?.ToString() ?? ""))';
+    const uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    const URL_LIST = `/payout/get-repurchase-payout-dispatch`;
+    const DOWNLOAD_FILE_NAME = "Matrix_Monthly_payout_dispatch";
+
+
+    $(function () {
+
+    @if (TempData["Success"] != null)
+    {
+        <text>
+                showSuccessMessage(`@Const.SUCCESS_HEADER`, `@Html.Raw(TempData["Success"])`);
+        </text>
+    }
+
+        initializeTable();
+        $('#btnSearch').on('click', function () {  table.ajax.reload(); });
+    });
+
+
+
+    function initializeTable() {
+        table = $('#tblList').DataTable({
+            dom: 'Blfrtip',
+            scrollY: "500px",
+            processing: true,
+            scrollX: true,
+            autoWidth: true,
+            responsive: true,
+            destroy: true,
+            lengthMenu: [[25, 100, -1], [25, 100, "All"]],
+            pageLength: @Const.NO_OF_PAGE_RECORDS,
+            buttons: [
+                { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                { extend: 'copyHtml5', text: 'Copy'},
+                'fullscreenToggle',
+                'colvis',
+            ],
+            ajax: {
+                url: URL_LIST,
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'Authorization': 'Bearer ' + token },
+                data: function (d) {
+                     
+                    if (uid <= 0) {
+                        showErrorLog(`@Const.ERROR_HEADER`, 'Invalid Request.');
+                        return false; // 🚫 stops the request
+                    }
+
+                    return JSON.stringify({
+                        payout_no: null,
+                        uid: uid,
+                        status: null
+                    });
+
+
+                    return JSON.stringify({
+                        payout_no: $('#payout_no').val(),
+                        uid: null,
+                        status: null
+                    });
+                },
+                dataSrc: json => json?.data || []
+            },
+             columns: [
+                 { data: null, title: '#', render: (d, t, r, m) => m.row + m.settings._iDisplayStart + 1 },
+                 // { data: 'payout_no', title: 'Edit',
+                 //      render: (data, type, row) => {
+                 //        return `
+                 //          <div class="d-flex align-items-center justify-content-between" style="gap: 8px;">
+                 //            <a href="/Payout/Edit?payout_no=${data}&uid=${row.uid}" target="_blank" title="Edit">
+                 //              <i class="fa fa-edit text-warning"></i>
+                 //            </a> </div> `;
+                 //     }
+                 // },
+                 { data: 'payout_period', title: 'Payout Period'},
+                 // { data: 'from_date', title: 'From Date',  render: (data) => data ? new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                 // { data: 'to_date', title: 'To Date',  render: (data) => data ? new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                 // { data: 'user_id', title: 'User Id'},
+                 // { data: 'user_name', title: 'Name'},
+
+                 { data: 'inc_1', title: 'Sales Commission', render: d => formatINR(d)  },
+                 { data: 'inc_2', title: 'Sales Diff Comm', render: d => formatINR(d) },
+                 { data: 'inc_3', title: 'Manager Commission', render: d => formatINR(d) },
+
+                 // { data: 'inc_4', title: 'Income 4'},
+                 // { data: 'inc_5', title: 'Income 5'},
+                 // { data: 'inc_6', title: 'Income 6'},
+                 // { data: 'inc_7', title: 'Income 7'},
+                 // { data: 'inc_8', title: 'Income 8'},
+                 // { data: 'inc_9', title: 'Income 9'},
+                 // { data: 'inc_10', title: 'Income 10'},
+
+                 // { data: 'total_inc', title: 'Total Income'},
+                 {
+                    data: 'total_inc',
+                    title: 'Total <br> Income',
+                    render: function (data, type, row) {
+                        if (!data) return ''; // if null or empty
+                            let payout_no = btoa(encodeURIComponent(row.payout_no || ''));
+                            let uid = btoa(encodeURIComponent(row.uid || ''));
+                        return `<a href="/payout/user-income-list?payout_no=${payout_no}&uid=${uid}" target="_blank" style="cursor:pointer; font-weight:bold;">${formatINR(data)}</a>`;
+                    }
+                 },
+                 { data: 'tds', title: 'TDS', render: d => formatINR(d) },
+                 { data: 'hc', title: 'Admin Charge', render: d => formatINR(d) },
+                 { data: 'dispache_inc', title: 'Dispached', render: d => formatINR(d) },
+                 { data: 'collection_amt', title: 'Collection', render: d => formatINR(d) },
+                 { data: 'pan_tax', title: 'Tax (%)', render: (d) => d == null ? '' : d + '%' },
+                 { data: 'pan_verify', title: 'Pan Verify', orderable: false,
+                      render: (d) => {
+                            const s = { 0: ['No', 'text-danger'], 1: ['Yes', 'text-success'] }[+d] || ['Unknown', 'text-secondary'];
+                            return `<span><i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]}</span>`;
+                      }
+                 },
+                 { data: 'bank_verify', title: 'Bank Verify', orderable: false,
+                      render: (d) => {
+                            const s = { 0: ['No', 'text-danger'], 1: ['Yes', 'text-success'] }[+d] || ['Unknown', 'text-secondary'];
+                            return `<span><i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]}</span>`;
+                      }
+                 },
+                 // { data: 'payout_no', title: 'Print',
+                 //      render: (data, type, row) => {
+                 //        return `
+                 //          <div class="d-flex align-items-center justify-content-between" style="gap: 8px;">
+                 //            <a href="/Payout/Print?payout_no=${data}&uid=${row.uid}" target="_blank" title="Print">
+                 //              <i class="fa fa-print text-success"></i>
+                 //            </a>
+                 //          </div>
+                 //        `;
+                 //      }
+                 //  },
+                 //  {
+                 //     data: 'status', title: 'Status', orderable: false,
+                 //     render: function (data) {
+                 //          return data
+                 //         ? '<i class="fa fa-circle text-success" aria-hidden="true" title="Active"></i> <div style="text-align:center; display:none;">' + data + '</div>'
+                 //         : '<i class="fa fa-circle text-danger" aria-hidden="true" title="Inactive"></i> <div style="text-align:center; display:none;">' + data + '</div>';
+                 //     }
+                 // }
+             ],
+        });
+    }
+</script>
+
+<link href="~/datetimepicker-master/build/jquery.datetimepicker.min.css" rel="stylesheet" />
+<script src="~/datetimepicker-master/build/jquery.datetimepicker.full.js"></script>

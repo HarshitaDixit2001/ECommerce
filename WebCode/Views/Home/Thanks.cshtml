@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Home Thanks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ <style>
+    .bg-orange {
+        background: linear-gradient(135deg, #ff7a00, #ff7a00);
+        box-shadow: 0 6px 20px rgba(255,106,0,0.4);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #ff7a00, #ff7a00);
+        border: none;
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 18px;
+        transition: 0.3s;
+    }
+
+ </style>
+<div class="container-fluid px-1 pt-0 mt-0">
+    <div class="row justify-content-center g-0">
+        <div class="col-lg-8 col-md-10 mt-0 pt-0">
+
+            <div class="card shadow-lg border-0 rounded-4 mt-0">
+
+                <!-- Header -->
+                <div class="bg-orange text-white text-center p-4 rounded-top-4">
+                    <i class="fa-solid fa-circle-check fa-3x mb-2"></i>
+                    <h2 class="fw-bold mb-1">Congratulations!!</h2> 
+                    <small>Welcome to @Const.COM_TITLE </small>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4">
+
+                    <div class="alert alert-success text-center fw-semibold mb-4">
+                        🎉 Founder Associate Successfully Registered
+                    </div>
+
+                    <p class="text-center text-muted mb-4">
+                        There is no better way to start this most rewarding business on the planet!
+                    </p>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light">User Name</th>
+                                    <td><span id="name"></span></td>
+                                </tr>
+
+                                <tr>
+                                    <th class="bg-light">User ID</th>
+                                    <td><span id="user_id"></span></td>
+                                </tr>
+                                <tr class="d-none">
+                                    <th class="bg-light">Sponsor ID</th>
+                                    <td><span id="sponsor_id"></span></td>
+                                </tr>
+                                <tr class="d-none">
+                                    <th class="bg-light">Parent ID</th>
+                                    <td><span id="parent_id"></span></td>
+                                </tr>
+                                <tr class="d-none">
+                                    <th class="bg-light">Position</th>
+                                    <td><span class="badge bg-info"><span id="p_side"></span></span></td>
+                                </tr>
+
+                                <tr>
+                                    <th class="bg-light">Mobile No</th>
+                                    <td><span id="mobile"></span></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Email ID</th>
+                                    <td><span id="email_id"></span></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Sign-Up Date</th>
+                                    <td><span id="doe"></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="text-center mt-4">
+                        <a href="/home/Login" class="btn btn-submit px-4 me-2">
+                            <i class="fa fa-sign-in-alt me-1"></i> Login Now
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-light text-center p-3 rounded-bottom-4">
+                    <p class="mb-1">
+                        For any clarification, contact us at
+                        <a href="mailto:" @Const.COM_EMAIL>
+                            @Const.COM_EMAIL
+                        </a>
+                    </p>
+                    <small class="text-muted">
+                        @Const.COM_ADDRESS
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr />
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+
+<script>
+    $(function () {
+         GetUserDetails();
+    });
+
+    function GetUserDetails() {
+        debugger;
+        const urlParams = new URLSearchParams(window.location.search);
+        const user_id = urlParams.get('user_id');
+
+
+        showLoader();
+        $.get(`/common/master-reports?mst_key=GET_USER_TREE_DATA&user_id=${user_id}`, function (resp) {
+            hideLoader();
+            if (resp.success === true) {
+                 const dataArray = JSON.parse(resp.data) || [];
+                 const data = dataArray[0] || {};
+
+                 $('#user_id').html(data.user_id);
+                 $('#name').html(data.name);
+                 $('#mobile').html(data.mobile); 
+                 $('#email_id').html(data.email_id);
+                 $('#p_side').html( data.p_side === "L" ? "Left" : data.p_side === "R" ? "Right" : "-" );
+                 if (data.doe) {
+                     const d = new Date(data.doe);
+                     $('#doe').html(d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).replace(/ /g, '-'));
+                 } else { $('#doe').html('-'); }
+
+                 $('#sponsor_id').html(data.sponsor_id +'  ('+ data.sponsor_name +')');
+                 $('#parent_id').html(data.parent_id +'  ('+ data.parent_name +')');
+            }
+         });
+    }
+
+</script>
+
+
+
+<style>
+    body, main, .container, .container-fluid {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+</style>

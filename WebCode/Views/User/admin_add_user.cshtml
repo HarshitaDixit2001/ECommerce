@@ -1,0 +1,581 @@
+﻿@model AddUpdateUserRequest
+@{
+    ViewData["Title"] = "Edit_User_Profile";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Add User
+    </h4>
+    <a asp-action="admin-user-list" asp-controller="user" class="btn btn-sm btn-outline-success">
+        User List
+    </a>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+
+                <!-- 🔒 User & Nominee & Security -->
+                <div class="tab-content">
+
+                    <form asp-action="admin-add-user" asp-controller="user" method="post" id="FormSubmit"
+                          asp-route-user_id="@Model?.user_id" autocomplete="off" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="uid" />
+                        @Html.AntiForgeryToken()
+                        <h6 class="mb-3 border-bottom pb-2 text-primary">
+                            <i class="fa fa-user me-2"></i> User Details
+                        </h6>
+                        <div class="row mb-3">
+
+
+                            <div class="col-md-2">
+                                @if (Model?.user_id != null)
+                                {
+                                    <label asp-for="user_id" class="form-label"></label>
+                                    <input asp-for="user_id" class="form-control" maxlength="15" readonly />
+                                    <span asp-validation-for="user_id" class="text-danger"></span>
+                                }
+                                else
+                                {
+                                    <label asp-for="user_id" class="form-label"></label>
+                                    <input asp-for="user_id" class="form-control" maxlength="15" />
+                                    <span asp-validation-for="user_id" class="text-danger"></span>
+                                }
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="name" class="form-label"></label>
+                                <input asp-for="name" class="form-control" />
+                                <span asp-validation-for="name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="mobile" class="form-label"></label>
+                                <input asp-for="mobile" class="form-control" maxlength="10" />
+                                <span asp-validation-for="mobile" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="email_id" class="form-label"></label>
+                                <input asp-for="email_id" class="form-control" />
+                                <span asp-validation-for="email_id" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="row mb-3">
+
+
+                            <div class="col-md-2">
+                                <label asp-for="gender" class="form-label"></label>
+                                <select asp-for="gender" class="form-control">
+                                    <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="dob" class="form-label"></label>
+                                <input asp-for="dob" class="form-control" type="text" />
+                                <span asp-validation-for="dob" class="text-danger"></span>
+                            </div>
+
+
+                            <div class="col-md-2">
+                                <label for="upload_pf_img" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                    <i class="fa fa-upload me-1 text-success"></i>Profile Image
+                                </label>
+                                <span asp-validation-for="upload_pf_img" class="text-danger d-block mt-1"></span>
+                                <input type="file" asp-for="upload_pf_img" class="form-control" onchange="previewImage(event, 'pf_img')" accept="image/*" style="display:none;" />
+                                <span asp-validation-for="upload_pf_img" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <img id="pf_img" class="img-thumbnail mt-2" style="max-height: 100px;" src="@(string.IsNullOrWhiteSpace(Model?.pf_img) ? Const.NO_IMAGE : "/" + Model.pf_img)" onclick="showZoom(this.src)" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <!-- 🔘 Submit Button -->
+                                <div class="text-end">
+                                    <label class="form-label"></label><br />
+                                    <button type="submit" class="btn btn-success" onclick="confirmSubmission(event)">
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-6">
+                                <h5 class="fw-bold mb-4" style="color: #ff7a00;">
+                                    <i class="bi bi-truck me-2"></i>Shipping Address
+                                </h5>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-md-end justify-content-start">
+                                <button id="btn_add_shipping_address" class="btn btn-primary" type="button"
+                                        data-bs-toggle="modal" data-bs-target="#ShippingAddressModal">
+                                    <i class="bi bi-tag me-1"></i> Add Shipping Address
+                                </button>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div id="shippingAddressContainer"></div>
+                            </div>
+
+                        </div>
+
+
+
+                        <h6 class="mb-3 border-bottom pb-2 text-primary d-none">
+                            <i class="fa fa-lock me-2"></i> Security Details
+                        </h6>
+
+                        <div class="row mb-3 d-none">
+                            @if (Model?.uid == null)
+                            {
+                                <div class="col-md-3">
+                                    <label asp-for="password" class="form-label"></label>
+                                    <input asp-for="password" class="form-control" type="text" value="***********" />
+                                    <span asp-validation-for="password" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label asp-for="tran_password" class="form-label"></label>
+                                    <input asp-for="tran_password" class="form-control" type="text" value="***********" />
+                                    <span asp-validation-for="tran_password" class="text-danger"></span>
+                                </div>
+                            }
+                        </div>
+
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- Shipping Address Modal -->
+<div class="modal fade" id="ShippingAddressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow rounded-4">
+
+            <!-- Header -->
+            <div class="modal-header border-0 text-white"
+                 style="background: linear-gradient(135deg, #edf7ef, #edf7ef);">
+                <h6 class="modal-title" style="color:#198754;">📦 Add Shipping Address</h6>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+
+                <div class="row g-3">
+
+                    <!-- Name -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input asp-for="s_name" class="form-control" placeholder="Enter Name" />
+                        </div>
+                    </div>
+
+                    <!-- Mobile -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mobile No.</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                            <input asp-for="s_mobile_no" class="form-control" maxlength="10" placeholder="Enter Mobile" />
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <textarea asp-for="address" class="form-control" rows="2"
+                                      placeholder="Enter full address"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- State -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">State</label>
+                        <select asp-for="state_id" asp-items="ViewBag.StateList"
+                                class="form-select" onchange="DistrictSelect()">
+                            <option value="0">Select State</option>
+                        </select>
+                    </div>
+
+                    <!-- District -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">District</label>
+                        <select asp-for="dist_id" asp-items="ViewBag.DistrictList" class="form-select">
+                            <option value="0">Select District</option>
+                        </select>
+                    </div>
+
+                    <!-- City -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">City</label>
+                        <input asp-for="city" class="form-control" placeholder="Enter City" />
+                    </div>
+
+                    <!-- Pincode -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Pin Code</label>
+                        <input asp-for="pin_code" class="form-control" maxlength="6" placeholder="Enter Pincode" />
+                    </div>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"> Cancel  </button>
+
+                    <button type="button" class="btn btn-primary px-4"
+                            onclick="SaveShippingAddress()">
+                        💾 Save Address
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+
+<script>
+    let URL_DROPDOWN_LIST =  `/common/get-master-dropdown`;
+    $(function () {
+        @if (TempData["Error"] != null)
+        {
+                    <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+        }
+        @if (TempData["Success"] != null)
+        {
+                    <text> showSuccessMessage(`@Const.SUCCESS_HEADER`, `@Html.Raw(TempData["Success"])`); </text>
+        }
+        $('#dob').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+        $('.select2').select2({ placeholder: "🔍Select an Option", width:'100%', allowClear: true });
+
+         $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+             localStorage.setItem('activeTab', $(e.target).attr('href'));
+         });
+         var activeTab = localStorage.getItem('activeTab');
+         if (activeTab) {
+             $('#myTab a[href="' + activeTab + '"]').tab('show');
+         }
+
+         loadAddressList();
+
+         $('#s_name').val($('#name').val());
+         $('#s_mobile_no').val($('#mobile').val());
+
+    });
+
+
+
+
+    function loadAddressList() {
+        $.ajax({
+            url: '/cart/get-address-list',
+            data: { uid: $('#uid').val() },
+            type: 'GET',
+            dataType: 'json',
+            success: function (resp) {
+
+                let data = JSON.parse(resp.data || "[]");
+                let selectedId = 0;
+                let html = '';
+
+                if (data.length === 0) {
+                    $('#shippingAddressContainer').html(`
+                        <div class="alert alert-warning mb-0"> No shipping address found. </div>
+                    `);
+                    return;
+                }
+
+                $.each(data, function (i, item) {
+
+                    if (item.active == 1) {
+                        selectedId = item.said;
+                    }
+
+                    html += `
+                        <div class="card shadow-sm mb-3 border" id="card_${item.said}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div class="form-check flex-grow-1">
+                                        <input class="form-check-input" type="radio"
+                                               name="SelectedAddressId" value="${item.said}"
+                                               id="addr_${item.said}" onchange="AddressSelected(${item.said})">
+
+                                        <label class="form-check-label w-100" for="addr_${item.said}">
+                                            <div class="fw-bold">
+                                                ${item.name}
+                                                <span class="text-secondary">
+                                                    (${item.mobile})
+                                                </span>
+                                                ${item.active == 1
+                                                    ? '<span class="badge bg-success ms-2">Active</span>'
+                                                    : ''}
+                                            </div>
+
+                                            <div class="small text-muted mt-1">
+                                                ${item.address},
+                                                ${item.city},
+                                                ${item.district},
+                                                ${item.state}
+                                                - ${item.pin_code}
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="ms-3 text-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                onclick="DeleteShippingAddress(${item.said})">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                $('#shippingAddressContainer').html(html);
+                if (selectedId > 0) {
+                    $(`input[name="SelectedAddressId"][value="${selectedId}"]`).prop("checked", true).closest(".card").addClass("border-success border-2");
+                }
+            },
+            error: function () {
+                $('#shippingAddressContainer').html(`
+                    <div class="alert alert-danger">
+                        Failed to load addresses.
+                    </div>
+                `);
+            }
+        });
+    }
+
+
+    function AddressSelected(id) {
+         let mst_key="tbl_shipping_address";
+         let col_name="active";
+         showLoader();
+         $.ajax({
+             url: `/common/master-update-status?mst_key=${mst_key}&col_name=${col_name}&id=${id}`,
+             type: 'GET',
+             success: function (response) {
+                 hideLoader();
+                 if (response.success === true ) {
+                     loadAddressList();
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+    }
+
+
+    function DeleteShippingAddress(id) {
+         let mst_key="tbl_shipping_address";
+         showLoader();
+         $.ajax({
+             url: `/common/master-delete-table-row?mst_key=${mst_key}&id=${id}`,
+             type: 'GET',
+             success: function (response) {
+                 hideLoader();
+                 if (response.success === true ) {
+                     loadAddressList();
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+    }
+
+
+    function SaveShippingAddress() {
+        let $btn = $('#btnSaveAddress');
+        let data = {
+            said: 0,
+            uid: $('#uid').val(),
+            name: $('#s_name').val().trim(),
+            mobile: $('#s_mobile_no').val().trim(),
+            address: $('#address').val().trim(),
+            state_id: $('#state_id').val(),
+            state: $('#state_id option:selected').text(),
+            dist_id: $('#dist_id').val(),
+            district: $('#dist_id option:selected').text(),
+            city: $('#city').val().trim(),
+            pin_code: $('#pin_code').val().trim()
+        };
+
+
+        // ✅ Basic Validation
+        if (data.name === "") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter Name");
+            $('#s_name').focus();
+            return;
+        }
+
+        if (data.mobile.length !== 10) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter valid Mobile No.");
+            $('#s_mobile_no').focus();
+            return;
+        }
+
+        if (data.address === "") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter Address");
+            $('#address').focus();
+            return;
+        }
+
+        if (data.state_id == "0") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Select State");
+            $('#state_id').focus();
+            return;
+        }
+
+        if (data.dist_id == "0") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Select District");
+            $('#dist_id').focus();
+            return;
+        }
+
+        if (data.city === "") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter City");
+            $('#city').focus();
+            return;
+        }
+
+        if (data.pin_code.length !== 6) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter valid Pincode");
+            $('#pin_code').focus();
+            return;
+        }
+
+
+        const formData = new FormData();
+        formData.append("said", 0);
+        formData.append("uid", uid);
+        formData.append("name", data.name);
+        formData.append("mobile", data.mobile);
+        formData.append("address", data.address);
+        formData.append("state_id", data.state_id);
+        formData.append("state", $('#state_id option:selected').text());
+        formData.append("dist_id", data.dist_id);
+        formData.append("district", $('#dist_id option:selected').text());
+        formData.append("city", data.city);
+        formData.append("pin_code", data.pin_code);
+
+
+        // ✅ Disable button + loader
+        $btn.prop('disabled', true).text('Saving...');
+
+        // ✅ AJAX Call
+         $.ajax({
+             url: '/cart/add-shipping-address',
+             method: 'POST',
+             data: formData,
+             processData: false,
+             contentType: false,
+             success: function (resp) {
+                 if (resp.success) {
+                    // ✅ success message
+                    showSuccessMessage('Success', 'Address Saved Successfully');
+                    // ✅ close modal
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('ShippingAddressModal'));
+                    modal.hide();
+
+                    // ✅ reset form
+                    $('#ShippingAddressModal input, #ShippingAddressModal textarea').val('');
+                    $('#state_id, #dist_id').val('0');
+
+                    // ✅ optional: reload address list
+                    loadAddressList();
+
+                } else {
+                    showErrorLog(`@Const.ERROR_HEADER`, resp.message);
+                }
+             },
+             error: function (res_error) {
+                 $btn.prop('disabled', false).text('Save Address');
+                 showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             },
+             complete: function () {
+                // ✅ enable button again
+                $btn.prop('disabled', false).text('Save Address');
+            }
+         });
+    }
+
+
+    function confirmSubmission(event) {
+        event.preventDefault(); // stop the form from auto-submitting
+        Swal.fire({
+            icon: 'question',
+            title: '⚠️ Are you sure you want to continue?',
+            html: `<div style="text-align: left; white-space: pre-wrap; font-size: 16px;"><strong>${'Do you want to submit the details?'}</strong></div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            customClass: { htmlContainer: 'text-left' },
+            width: '35%'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('FormSubmit').submit(); // ✅ manually submit
+            }
+        });
+    }
+
+
+    function DistrictSelect(dist_id) {
+         const stateId = $('#state_id').val();
+         const $dist = $('#dist_id');
+         const defaultOpt = '<option value="0">🔍 Select District</option>';
+
+         if (!stateId || stateId == 0) {
+             $dist.html(defaultOpt);
+             return;
+         }
+         $dist.html('<option value="0">Loading...</option>');
+         $.get('/common/get-master-dropdown', {
+             mst_key: 'GET_DISTRICT_LIST',
+             id: stateId
+         })
+         .done(res => {
+             const options = (res?.data || []).map(x => `<option value="${x.value}">${x.text}</option>`).join('');
+             $dist.html(defaultOpt + options);
+         })
+         .fail(() => $dist.html(defaultOpt));
+     }
+
+</script>
+

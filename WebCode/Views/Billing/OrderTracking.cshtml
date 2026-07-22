@@ -1,0 +1,197 @@
+﻿@{
+    ViewData["Title"] = "Order Tracking";
+}
+<style>
+    .tracking {
+        position: relative;
+    }
+
+    .tracking-item {
+        position: relative;
+        padding-left: 60px;
+        padding-bottom: 25px;
+    }
+
+        .tracking-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .tracking-item::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: #dee2e6;
+        }
+
+        .tracking-item:last-child::before {
+            display: none;
+        }
+
+    .tracking-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tracking-content {
+        padding-top: 5px;
+    }
+
+    .completed .tracking-content strong {
+        color: #198754;
+    }
+
+    .active .tracking-content strong {
+        color: #fd7e14;
+    }
+</style>
+<!-- ================= BREADCRUMB SECTION ================= -->
+<section class="breadcrumb-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="breadcrumb-title">
+                    🚚 Track Your Order
+                </h1>
+                <p class="breadcrumb-subtitle mb-0">
+                    Stay informed with real-time shipment updates, delivery status, and estimated arrival details.
+                </p>
+            </div>
+            <div class="col-lg-6 text-lg-end">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-lg-end mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="/secure/user-dashboard">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            Track Your Order
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="clearfix"></div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0 fw-bold">🚚 Order Tracking</h5>
+                <small class="text-muted">
+                    Order ID: #ORD10258
+                </small>
+            </div>
+
+            <span class="badge bg-warning text-dark">
+                In Transit
+            </span>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <!-- Product Info -->
+        <div class="d-flex align-items-center mb-4">
+            <img src="/images/noimage.jpg"
+                 alt="Product"
+                 width="70"
+                 height="70"
+                 class="rounded border me-3">
+
+            <div>
+                <h6 class="mb-1">
+                    Herbal Immunity Booster
+                </h6>
+
+                <small class="text-muted">
+                    Qty : 2
+                </small>
+            </div>
+        </div>
+
+        <!-- Tracking Timeline -->
+        <div class="tracking">
+
+            <div class="tracking-item completed">
+                <div class="tracking-icon bg-success">
+                    <i class="bi bi-check-lg text-white"></i>
+                </div>
+
+                <div class="tracking-content">
+                    <strong>Order Placed</strong>
+                    <div class="text-muted small">
+                        20 Aug 2026, 10:30 AM
+                    </div>
+                </div>
+            </div>
+
+            <div class="tracking-item completed">
+                <div class="tracking-icon bg-success">
+                    <i class="bi bi-check-lg text-white"></i>
+                </div>
+
+                <div class="tracking-content">
+                    <strong>Payment Confirmed</strong>
+                    <div class="text-muted small">
+                        20 Aug 2026, 10:35 AM
+                    </div>
+                </div>
+            </div>
+
+            <div class="tracking-item completed">
+                <div class="tracking-icon bg-success">
+                    <i class="bi bi-box-seam text-white"></i>
+                </div>
+
+                <div class="tracking-content">
+                    <strong>Packed</strong>
+                    <div class="text-muted small">
+                        21 Aug 2026, 09:15 AM
+                    </div>
+                </div>
+            </div>
+
+            <div class="tracking-item active">
+                <div class="tracking-icon bg-warning">
+                    <i class="bi bi-truck text-white"></i>
+                </div>
+
+                <div class="tracking-content">
+                    <strong>Out For Delivery</strong>
+                    <div class="text-muted small">
+                        Expected Today
+                    </div>
+                </div>
+            </div>
+
+            <div class="tracking-item">
+                <div class="tracking-icon bg-light">
+                    <i class="bi bi-house-door"></i>
+                </div>
+
+                <div class="tracking-content">
+                    <strong>Delivered</strong>
+                    <div class="text-muted small">
+                        Pending
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+

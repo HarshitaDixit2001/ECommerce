@@ -1,0 +1,320 @@
+﻿@{
+    ViewData["Title"] = "user Company Wallet Request";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Wallet Request
+    </h4>
+    <button class="btn btn-primary" onclick="openWalletModal()">
+       Create Wallet Request
+    </button>
+</section>
+<div class="clearfix"></div>
+<br />
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+
+        <div class="col-sm-3">
+            <select id="status" name="status" class="form-control">
+                <option value="-1">🔍 All Payments</option>
+                <option value="0">🟡 Pending</option>
+                <option value="1">🟢 Approved</option>
+                <option value="2">🔴 Rejected</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <input type="button" id="btnSearch" class="btn btn-info" value="Search" />
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="col-sm-12">
+            <div class="table-responsive mb-4">
+                <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+            </div>
+        </div>
+
+        <div class="modal fade" id="walletModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="z-index: 1055;">
+
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="fa fa-wallet me-2"></i> Wallet Request
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" onclick="closeWalletModal()"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- 🔽 Your existing form HTML goes here -->
+                       @*  <hr />
+                        <h4 class="header-title">
+                            <i class="fa fa-project-diagram me-2"></i> Wallet Request
+                        </h4> *@
+                        <form id="SubmitForm">
+                            <input type="hidden" id="wallet_req_id" name="wallet_req_id" value="0" />
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">Payment Type <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <select id="payment_type" name="payment_type" class="form-control">
+                                        <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                        <option value="CashOffice">Cash deposit at office</option>
+                                        <option value="CashBank">Cash deposit at bank</option>
+                                        <option value="Cheque">Cheque/Draft</option>
+                                        <option value="NEFT">NEFT/RTGS</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">Amount <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input id="amount" name="amount" class="form-control" onkeypress="return onlyInteger(event)" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">Company's Bank Name <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <select id="comp_ac_no" name="comp_ac_no" asp-items="ViewBag.AdminBankList" class="form-control">
+                                        <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">User's Bank A/C No.</label>
+                                <div class="col-sm-8">
+                                    <input id="user_ac_no" name="user_ac_no" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">User's Bank Name</label>
+                                <div class="col-sm-8">
+                                    <select id="user_bank" name="user_bank" asp-items="ViewBag.BankList" class="form-control select2">
+                                        <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">Cheque No / DD No / Transaction UTR No <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input id="bank_tran_no" name="bank_tran_no" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">Remarks</label>
+                                <div class="col-sm-8">
+                                    <textarea id="remark" name="remark" class="form-control" rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 align-items-center">
+                                <label class="col-sm-4 col-form-label">Image URL</label>
+                                <div class="col-sm-8">
+                                    <input type="file" name="upload_slip_img" onchange="previewImage(event, 'slip_img')" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                                    <img id="slip_img" class="img-thumbnail mt-2" style="max-height: 100px;" onclick="showZoom(this.src)" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 text-end">
+                                    <button type="submit" id="saveBtn" class="btn btn-primary">Submit</button>
+                                    <a id="cancelBtn" class="btn btn-danger" href="javascript:void(0);">Cancel</a>
+                                </div>
+                            </div>
+                        </form>
+                         
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_Sweetalert")
+
+<script>
+    let token = "";
+    const DOWNLOAD_FILE_NAME="WalletRequest_";
+    const uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    $(function () {
+        token = "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(ViewBag.Token?.ToString()))";
+        BindTableData();
+        $('#btnSearch').on('click', function () {  BindTableData(); });
+    });
+
+
+
+    function openWalletModal() {
+        new bootstrap.Modal(document.getElementById('walletModal')).show();
+    }
+        function closeWalletModal() {
+        bootstrap.Modal.getInstance(document.getElementById('walletModal')).hide();
+    }
+
+
+     function BindTableData() {
+          showLoader();
+          const formData = new FormData();
+          formData.append('uid', uid);
+          formData.append('status', $('#status').val());
+          $.ajax({
+             url: '/wallet/get-user-company-wallet-request-list',
+             type: 'POST',
+             data: formData,
+             processData: false,
+             contentType: false,
+             success: function (response) {
+                 hideLoader();
+                 if (response.success === true ) {
+                      const data = response.data || [];
+                     $('#tblList').DataTable({
+                         dom: 'Blfrtip',
+                             // scrollY: "500px",
+                             scrollX: true,
+                             scrollCollapse: true,
+                             destroy: true,
+                             responsive: true,
+                             autoWidth: false,
+                             language: { emptyTable: "No records found" },
+                             "lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]],
+                             "pageLength": 15,
+                             buttons: [
+                                 { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                                 { extend: 'copyHtml5', text: 'Copy'},
+                             ],
+                             data: data,
+                             columns: [
+                             { data: null, title: '#', render: (d, t, r, m) => m.row + m.settings._iDisplayStart + 1 },
+                             {
+                                  data: 'status',
+                                  title: 'Status',
+                                  orderable: false,
+                                  render: d =>
+                                      d == 1 ? '<i class="fa fa-circle text-success"></i> Approved' :
+                                      d == 2 ? '<i class="fa fa-circle text-danger"></i> Rejected' :
+                                               '<i class="fa fa-circle text-warning"></i> Pending'
+                             },
+                             { data: 'amount',          title: 'Amount' },
+                             { data: 'bank_tran_no',    title: 'Transaction No.' },
+                             { data: 'payment_type',    title: 'Payment Mode' },
+                             { data: 'user_ac_no',      title: 'User A/C No.' },
+                             { data: 'user_bank',       title: 'User Bank' },
+                             { data: 'remark',          title: 'Remarks' },
+                             { data: 'response',        title: 'Bank Response' },
+
+                             { data: 'doe', title: 'Transaction Date',  render: (data) => data ? new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                             { data: 'approved_date', title: 'Approval Date',  render: (data) => data ? new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                             {
+                                data: 'slip_img',
+                                title: 'Payment Slip',
+                                render: function (d) {
+                                    const imgSrc = d ? `/${d}` : '@Const.NO_IMAGE';
+                                    return `<img src="${imgSrc}" onclick="showZoom(this.src)"
+                                             class="img-thumbnail"
+                                             style="max-height:90px; cursor:zoom-in;" />`;
+                                }
+                             },
+                             { data: 'comp_ac_no',      title: 'Company A/C No.' },
+                             { data: 'comp_bank',       title: 'Company Bank' },
+
+                         ],
+                     });
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+     }
+
+
+
+
+    $('#SubmitForm').submit(function (e) {
+        e.preventDefault();
+        if($('#payment_type').val().trim() === '0') {
+             showErrorLog(`@Const.ERROR_HEADER`, "Select Payment Type");  return;
+        }
+        if($('#comp_ac_no').val().trim() === '0') {
+             showErrorLog(`@Const.ERROR_HEADER`, "Select Company Account.");  return;
+        }
+       if($('#amount').val().trim() === '' || $('#amount').val().trim() === '0') {
+             showErrorLog(`@Const.ERROR_HEADER`, "Please Enter Amount .");  return;
+        }
+         if($('#bank_tran_no').val().trim() === '') {
+             showErrorLog(`@Const.ERROR_HEADER`, "Enter Transaction No.");  return;
+        }
+        const formData = new FormData(this);
+
+        formData.append('mst_key', 'ADD');
+        formData.append('uid', uid); 
+        formData.append('wallet_req_id', 0);
+        formData.append('status', 0);
+        formData.append('tran_password', '');
+        formData.append('response', ''); 
+        formData.append('login_user_id', '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value');
+        showLoader();
+        $.ajax({
+            url: '/wallet/user-company-wallet-request',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                hideLoader();
+                if(response.success == true ){
+                    showToastSuccess('Data save successfully');
+                    closeWalletModal();
+                    $('#SubmitForm')[0].reset();
+                    $('#saveBtn').text('Submit');
+                    //$('#project_id').val(0);
+                    $('#slip_img').attr('src', '@Const.NO_IMAGE');
+                    BindTableData();
+                }else{
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                }
+            },
+            error: function (res_error) {
+               showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+            }
+        });
+    });
+
+    $('#cancelBtn').on('click', function (e) {
+        e.preventDefault();
+        closeWalletModal();
+        $('#SubmitForm')[0].reset();
+        $('#saveBtn').text('Submit');
+        $('#project_id').val(0);
+       $('#slip_img').attr('src', '@Const.NO_IMAGE');
+    });
+
+</script>
+
+<style>
+    .modal-backdrop {
+        z-index: 1050 !important;
+    }
+
+    .modal {
+        z-index: 1055 !important;
+    }
+</style>

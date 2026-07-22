@@ -1,0 +1,700 @@
+﻿@model GenerateInvoiceDto
+@{
+    ViewData["Title"] = "Generate Order";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+@* <!-- Breadcrumb -->
+<section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a><i class="fa fa-list"></i>Generate Franchise Invoice / Purchase Order</a></li>
+
+    </ol>
+    <a id="selectProductBtn" onclick="GetSelectProductData()" class="btn btn-success pull-right">
+        <i class="fa fa-list"></i> Select Product
+    </a>
+</section>
+
+<div class="clearfix"></div> *@
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Generate Franchise Invoice / Purchase Order
+    </h4>
+    <a id="selectProductBtn" onclick="GetSelectProductData()" class="btn btn-sm btn-outline-success">
+        <i class="fa fa-list"></i> Select Product
+    </a>
+</section> 
+<div class="clearfix"></div>
+<br />
+
+
+<form asp-action="generate-fran-order" asp-controller="billing" id="FormSubmit" method="post" autocomplete="off">
+    @Html.AntiForgeryToken()
+    <!-- Main Content -->
+    <section class="content">
+
+        <div class="row mb-12">
+            <div class="col-md-3">
+                <select asp-for="cart_id" class="form-control" onchange="ChangeCart()">
+                    <option value="10">✅ Franchise Inv.</option>
+                    <option value="11">🛒 Purchase Order</option>
+                    <option value="9">🎁 Free Sample</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select asp-for="buyer_uid" asp-items="ViewBag.BuyerList"
+                        onchange="GetName()" class="form-control select2">
+                    <option value="0">🔍 Search Franchise</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select id="pid" asp-items="ViewBag.ProductList"
+                        onchange="GetProduct()" class="form-control select2">
+                    <option value="0">🔍 Search products</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <div class="table-responsive mb-4">
+                    <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%">
+                        <tfoot>
+                            <tr>
+                                <th colspan="2" class="text-end">Total:</th>
+                                <th></th> <!-- Price -->
+                                <th></th> <!-- Qty -->
+                                <th></th> <!-- Gross -->
+                                <th></th> <!-- GST -->
+                                <th></th> <!-- TAX -->
+                                <th></th> <!-- Total Amount -->
+                                <th></th> <!-- Delete -->
+                                @* <th></th> *@
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div id="divScheme" class="table-responsive mb-4">
+                    <table id="tblSchemeList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+                </div>
+            </div>
+        </div>
+        <div id="div_order_detail" class="row">
+            <div class="col-sm-6">
+                <h5 class="mb-4 text-primary fw-bold">📦 Shipping Detail</h5>
+
+                <div class="row mb-12">
+
+                    <div class="col-sm-6">
+                        <input asp-for="s_name" class="form-control" type="text" placeholder="User Id." maxlength="25" />
+                        <span asp-validation-for="s_name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input asp-for="s_mobile_no" class="form-control" type="text" placeholder="Mobile No." maxlength="10" />
+                        <span asp-validation-for="s_mobile_no" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <textarea asp-for="s_address" class="form-control" type="text" placeholder="Address" maxlength="200" rows="2"></textarea>
+                        <span asp-validation-for="s_address" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <select id="state_id" name="state_id" asp-for="state_id" asp-items="ViewBag.StateList"
+                                onchange="DistrictSelect()" class="form-control select2">
+                            <option value="0">🔍Select state</option>
+                        </select>
+                        <span asp-validation-for="state_id" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <select id="dist_id" name="dist_id" asp-for="dist_id" asp-items="ViewBag.DistrictList"
+                                class="form-control select2">
+                            <option value="0">🔍Select district</option>
+                        </select>
+                        <span asp-validation-for="dist_id" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input asp-for="s_city" class="form-control" type="text" placeholder="City" maxlength="70" />
+                    </div>
+                    <div class="col-sm-6">
+                        <input asp-for="s_pincode" class="form-control" type="text" placeholder="Pincode" maxlength="6" />
+                        <span asp-validation-for="s_pincode" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <input asp-for="gst_no" class="form-control" type="text" placeholder="GST No." maxlength="25" />
+                        <span asp-validation-for="gst_no" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+
+
+
+                <h5 class="text-primary">
+                    <i class="fa fa-credit-card me-2"></i> Payment Detail
+                </h5>
+
+                <div class="row mb-12">
+
+                    <div class="col-sm-6">
+                        <select id="pay_id" name="pay_id" asp-for="pay_id" onchange="PaymentOption()" class="form-control">
+                            <option value="0">🔍 Payment Option</option>
+                            <option value="1">💵 Cash</option>
+                            <option value="2">📦 COD</option>
+                            <option value="3">📲 UPI</option>
+                            <option value="4">🏦 Net Banking</option>
+                            <option value="5">🧾 Cheque</option>
+                            <option value="6">💳 Credit Card</option>
+                            <option value="7">💳 Debit Card</option>
+                            <option value="8">📄 DD</option>
+                            <option value="9">👛Company Wallet</option>  
+                        </select>
+                        <span asp-validation-for="pay_id" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input asp-for="bank_name" class="form-control" type="text" placeholder="Bank name" maxlength="50" />
+                        <span asp-validation-for="bank_name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input asp-for="check_no" class="form-control" type="text" placeholder="DD/Cheque/UPI/Tran No." maxlength="35" />
+                        <span asp-validation-for="check_no" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input asp-for="checkdate" class="form-control" type="date" placeholder="Ckeque Date" maxlength="20" />
+                        <span asp-validation-for="checkdate" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="row mb-12">
+                    <div class="col-md-12">
+                        <h5 class="text-uppercase font-weight-bold mb-3 text-primary">Terms & Conditions</h5>
+                        <ol class="pl-1">
+                            <li>Goods once sold will not be taken back.</li>
+                            <li>Warranty will be undertaken by the manufacturer only.</li>
+                            <li>All disputes are subject to jurisdiction.</li>
+                            <li>Company is not responsible after the goods leave the premises.</li>
+                            <li>Any inaccuracy in this bill must be notified immediately on its receipt.</li>
+                            <li>This is a computer generated invoice. No signature required.</li>
+                        </ol>
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            <!-- Right Column: Order Summary -->
+            <div class="col-sm-6">
+
+                <h5 class="mb-4 text-primary fw-bold">📦 Order Summary</h5>
+
+                <div class="d-flex justify-content-between fw-bold fs-5 mb-4" style="display:none;">
+                    <input type="text" class="form-control" id="coupon" placeholder="Enter Coupon Code">
+                    <button class="btn btn-primary" type="button" onclick="ApplyCoupon()">Apply</button>
+                </div>
+                <table class="table table-striped table-hover display nowrap cell-border dataTable">
+                    <tr>
+                        <td>Gross</td>
+                        <td><span id="lbl_Gross">0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td>GST</td>
+                        <td><span id="lbl_GST">0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td>Delivery Charge</td>
+                        <td> <span id="del_charge">0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td> Net Delivery Charge</td>
+                        <td> <span id="net_delivery_charge">0.00</span> </td>
+                    </tr>
+                    <tr>
+                        <td>Adjustment</td>
+                        <td> <span id="adjust_amt">0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td>Gross Weight</td>
+                        <td> <span id="lbl_GrossWeight">0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td>Order Amount (Rs.)</td>
+                        <td><span id="lbl_Total" class="text-primary">0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td>Wallet Balance</td>
+                        <td><span id="lbl_walletBalance">0.00</span></td>
+                    </tr>
+
+                </table>
+
+
+                <div class="d-flex justify-content-between mb-2" style="display:none;">
+                    <div class="col-sm-6 col-md-6"> @Const.M_BV </div>
+                    <div class="col-sm-6 col-md-6"> <span id="lbl_BV">0.00</span> </div>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2" style="display:none;">
+                    <div class="col-sm-6"> Scheme  </div>
+                    <div class="col-sm-6"> <span id="scheme">0.00</span> </div>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2" style="display:none;">
+                    <div class="col-sm-6"> Discount  </div>
+                    <div class="col-sm-6"> <span id="discount">0.00</span> </div>
+                </div>
+
+
+
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success" onclick="confirmSubmission(event)">🚀 Submit  </button>
+                </div>
+                <hr />
+            </div>
+        </div>
+
+    </section>
+</form>
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+@await Html.PartialAsync("_ValidationScriptsPartial")  
+ 
+<script>
+    // Initialize Select2 dropdown with a placeholder and allow clearing the selection
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+    const login_uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+  
+
+    let URL_ADD_CART = `/cart/add-cart-data`;
+    let URL_CART_LIST = `/cart/get-cart-data`;
+    let URL_CART_SCHEME_LIST = `/cart/get-cart-scheme-data`;
+    let URL_DELETE_CART = `/cart/delete-cart-data`;
+    let URL_SPONSOR_NAME =  `/common/get-basic-user-data`;
+    let URL_PROD_LIST =   `/product/get-billing-product-list`;
+    let URL_DROPDOWN_LIST =  `/common/get-master-dropdown`;
+    let token="";
+
+    $(function () {
+        @if (TempData["Error"] != null)
+        {
+                    <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); PaymentOption(); </text>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <text>  showSuccessMessage(`@Const.SUCCESS_HEADER`, `@Html.Raw(TempData["Success"])`); </text>
+        } 
+        //token = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(ViewBag.Token?.ToString() ?? ""))';
+        //GetName();
+        Bind_product();
+        BindTableData();
+    });
+
+
+
+
+     function BindTableData() {
+          showLoader();
+          $.ajax({
+              url: URL_CART_LIST,
+              data: { cart_id: $('#cart_id').val(), uid: login_uid },
+              type: 'GET',
+              //headers: { 'Authorization': 'Bearer ' + token },
+              success: function (response) {
+                   hideLoader();
+                  if (response.success === true) {
+
+                      const data = JSON.parse(response.data) || [];
+                      if(data.length > 0)
+                          $('#div_order_detail').show();
+                      else
+                          $('#div_order_detail').hide();
+
+                      $('#tblList').DataTable({
+                          dom: 't',
+                          scrollY: "500px",
+                          scrollCollapse: true,
+                          destroy: true,
+                          responsive: true,
+                          autoWidth: false,
+                          pageLength: -1,
+                          language: { emptyTable: "No records found" },
+                          data: data,
+                          columns: [
+                              { title: '#',  data: null, render: function (data, type, row, meta) { return meta.row + 1; } },
+                              { data: null, title: 'Product',
+                                 render: function (data, type, row) {
+                                        return `<strong>${row.prod_code}</strong><br><small>${row.prod_name}</small>`;
+                                 }
+                              },
+                              // { data: 'price', title: 'Rate' },
+                              {
+                                  data: 'price',
+                                  title: 'Rate',
+                                  orderable: false,
+                                  render: function (price, __, row) {
+                                      const cartId = Number($('#cart_id').val());
+                                      const disabled = [10, 11].includes(cartId) ? "disabled" : ""; 
+                                      return `
+                                          <input type="number" min="0" value="${price}"
+                                                 class="form-control text-center"
+                                                 id="rate-${row.cid}"
+                                                 onchange="changeRate(${row.cid}, this.value)"
+                                                 style="width: 15ch;" ${disabled} />
+
+                                          <input type="hidden" id="pid-${row.pid}" value="${row.pid}" />
+                                          <input type="hidden" id="prod_type-${row.pid}" value="${row.prod_type}" />
+                                      `;
+                                  }
+                              },
+                              { data: 'qty', title: 'Quantity', orderable: false,
+                                    render: function (qty, type, row) {
+                                        const cid = row.cid;
+                                        return ` <div class="input-group input-group-sm" style="max-width: 130px;">
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeQty(${cid}, -1)">−</button>
+                                                <input type="number" min="1" value="${qty}" class="form-control text-center"
+                                                id="qty-${cid}" onchange="changeQtyDirect(${cid}, this.value)" maxlength="6" style="width: 10ch;"/>
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeQty(${cid}, 1)">+</button>
+                                            </div>
+                                            <input type="hidden" id="pid-${row.pid}" value="${row.pid}" />
+                                            <input type="hidden" id="rate-${cid}" value="${row.price}" />
+                                            `;
+                                    }
+                              },
+                              { data: 'gross', title: 'Gross' },
+                              { data: 'gst', title: 'GST', render: gst => `${gst}%` },
+                              { data: 'gst_amt', title: 'TAX' },
+                              { data: 't_amount', title: 'Amount' },
+                              //{ data: 't_b_bv', title: '@Const.M_BV' },
+                              { data: 'cid', title: 'ACT', orderable: false,  render: function (id) { return `<i class="fa fa-trash text-danger" aria-hidden="true" onclick="Delete_By_Id(${id})" style="cursor:pointer; padding:2px; margin:2px;"></i>`; } },
+                              // {
+                              //   data: 'prod_type', title: 'Prod Type',
+                              //   render: p => p == 1
+                              //       ? '<span class="text-success">🟢 Normal</span>'
+                              //       : p == 3
+                              //           ? '<span class="text-primary">🧪 Sample</span>'
+                              //           : p
+                              // }
+                          ],
+                          "footerCallback": function (row, data, start, end, display) {
+                              const api = this.api();
+                              function getTotal(index) { return api.column(index, { page: 'current' }).data().reduce((a, b) => { const x = parseFloat(a) || 0; const y = parseFloat(b) || 0; return x + y; }, 0); }
+
+                              // ✅ Store sums in variables
+                               const totalQty = getTotal(3);        // Qty
+                               const totalGross = getTotal(4);         // Gross
+                               const totalTax= getTotal(6);       // GST
+                               const totalAmount= getTotal(7);         // Total Amount
+                               //const totalBV= getTotal(8);      // BV
+
+                               // ✅ Assign to footer
+                               $(api.column(3).footer()).html(totalQty.toFixed(0));
+                               $(api.column(4).footer()).html(totalGross.toFixed(2));
+                               $(api.column(6).footer()).html(totalTax.toFixed(2));
+                               $(api.column(7).footer()).html(totalAmount.toFixed(2));
+                               //$(api.column(8).footer()).html(totalBV.toFixed(2));
+
+                               // ✅ You can now use these values elsewhere if needed
+                               $('#lbl_Gross').text(totalGross.toFixed(2));
+                               $('#lbl_GST').text(totalTax.toFixed(2));
+                               //$('#lbl_BV').text(totalBV.toFixed(2));
+                               $('#scheme').text("0.00");
+                               $('#discount').text("0.00");
+                               $('#del_charge').text("0.00");
+                               $('#net_delivery_charge').text("0.00");
+                               $('#adjust_amt').text("0.00");
+                               $('#lbl_GrossWeight').text("0.00");
+                               $('#lbl_Total').text(Math.round(totalAmount));
+                          }
+                      });
+                      BindSchemeData();
+                  }
+              },
+              error: function (xhr, status, error) {
+                  showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+              }
+          });
+     }
+
+
+
+     function BindSchemeData() {
+        $.ajax({
+            url: URL_CART_SCHEME_LIST,
+            data: { cart_id: $('#cart_id').val(), uid: login_uid },
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function (res) {
+                const data = res.success ? JSON.parse(res.data || '[]') : [];
+                if (data.length === 0) return $('#divScheme').hide();
+
+                $('#divScheme').show();
+                $('#tblSchemeList').show().DataTable({
+                    dom: 't',
+                    scrollY: "500px",
+                    scrollCollapse: true,
+                    destroy: true,
+                    responsive: true,
+                    autoWidth: false,
+                    language: { emptyTable: "No records found" },
+                    data: data,
+                    columns: [
+                        { title: '#', data: null, render: (d, t, r, m) => m.row + 1 },
+                        { title: 'Product', orderable: false, render: (q, t, r) => r.prod_code + ' - ' + r.prod_name },
+                        { data: 'qty', title: 'Quantity' },
+                        { title: 'Status', orderable: false, render: () => '<span style="color:green;">Scheme</span>' }
+                    ]
+                });
+            },
+            error: () => showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.')
+        });
+    }
+
+
+
+     function GetProduct(){
+        const pid = $('#pid').val();
+        if (parseInt(pid) > 0) {
+             const pidOld = document.getElementById(`pid-${pid}`)?.value;
+             if (pidOld === pid) {
+                 showToastSuccess("⚠️ Product already exists in the list.");
+             } else {
+                 updateQty(0, $('#pid').val(), 0, 1);
+             }
+        }
+     }
+
+
+
+     function updateQty(cid, pid, rate, qty){
+          if(pid === "0"){ return; }
+          $.ajax({
+              url: URL_ADD_CART,
+              type: 'GET',
+              data: {cart_id:$('#cart_id').val(), uid: login_uid, rate, prod_type : 1, pid, cid, qty},
+              success: function (response) {
+                  if(response.success == true){
+                      showToastSuccess('Saved successfully.');
+                      BindTableData();
+                  }else{
+                      showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                  }
+              },
+              error: function (res_error) {
+                   showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+              }
+          });
+     }
+
+
+
+     function changeQty(cid, delta) {
+            let rate = parseFloat(document.getElementById(`rate-${cid}`)?.value) || 0;
+            let input = document.getElementById(`qty-${cid}`);
+            let newQty = (parseInt(input?.value) || 1) + delta;
+            input.value = Math.min(Math.max(newQty, 1), 999999);
+            updateQty(cid, 0, rate, input.value);
+     }
+
+
+
+    function changeQtyDirect(cid, value) {
+        const rate = parseFloat(document.getElementById(`rate-${cid}`)?.value) || 1;
+        const newQty = Math.min(Math.max(parseInt(value) || 1, 1), 999999);
+        document.getElementById(`qty-${cid}`).value = newQty;
+        updateQty(cid, 0, rate, newQty);
+    }
+
+
+    function changeRate(cid, value) {
+       
+        const qty = parseFloat(document.getElementById(`qty-${cid}`)?.value || "1");
+        const rate = parseFloat(value || "0");
+
+        if (qty <= 0) document.getElementById(`qty-${cid}`).value = 1;
+        if (rate < 0) document.getElementById(`rate-${cid}`).value = 0;
+
+        updateQty(cid, 0, rate < 0 ? 0 : rate, qty <= 0 ? 1 : qty, 0);
+    }
+
+
+    function Delete_By_Id(id){
+           $.ajax({
+               url: URL_DELETE_CART,
+               data: { id: id },
+               type: 'GET',
+               contentType: 'application/json',
+               success: function (response) {
+                   if(response.success == true){ BindTableData(); }
+                   else{ showErrorLog(`@Const.ERROR_HEADER`, response.message); }
+               },
+               error: function (res_error) { showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); }
+           });
+     }
+
+
+
+
+    function Bind_product() {
+        const $d = $('#pid').empty().append('<option value="0">Loading...</option>');
+        $.get(`${URL_DROPDOWN_LIST}?id=0&mst_key=GET_VENDOR_PURCHASE_PRODUCT_LIST`)
+            .done(res => {
+                $d.empty().append(`<option value="0">🔍 Search products</option>`);
+                res.data.forEach(i => $d.append(`<option value="${i.value}">${i.text}</option>`));
+            })
+            .fail(() => $d.empty().append(`<option value="0" selected>🔍 Search products</option>`));
+    }
+
+
+
+     function ChangeCart(){
+          GetName();
+          BindTableData();
+     }
+
+
+    function GetName() {
+        let URL_LIST = `/common/master-reports`;
+        let mst_key="GET_BASIC_USER_DATA";
+        let cart_id = $('#cart_id').val();
+        let uid=0;
+        if(cart_id == "11")
+        {
+           uid =login_uid;
+        }else{
+            if($('#buyer_uid').val() == "0"){
+                //showToastError('Please Select Franchise.');
+                return;
+            }
+            uid=$('#buyer_uid').val();
+        } 
+        $.ajax({
+            url: URL_LIST + `?id=${uid}&mst_key=${mst_key}`,
+            type: 'GET',
+            success: function (response) {
+               if(response.success === true){
+                    const dataArray = JSON.parse(response.data) || [];
+                    const data = dataArray[0] || {};
+
+                    $('#s_name').val(data.name);
+                    $('#s_mobile_no').val(data.mobile);
+                    $('#state_id').val(data.state_id).trigger('change.select2');
+                    DistrictSelect(data.dist_id);
+
+                    $('#dist_id').val(data.dist_id).trigger('change.select2');
+                    $('#s_city').val(data.city);
+                    $('#s_address').val(data.address);
+                    $('#s_pincode').val(data.pin_code);
+
+                    $('#lbl_walletBalance').text('0.00');
+                    if (parseFloat(data.company_wallet) > 0) {
+                        $('#lbl_walletBalance').text(parseFloat(data.company_wallet).toFixed(2));
+                    }
+                }
+            },
+            error: function () {
+            }
+        });
+
+    }
+
+
+    function PaymentOption(){
+        let pay_id=$('#pay_id').val();
+        if(pay_id =="0" || pay_id =="1" || pay_id =="2" || pay_id =="9" || pay_id =="10"){
+            $('#bank_name').hide();
+            $('#check_no').hide();
+            $('#checkdate').hide();
+        }
+        else
+        {
+            $('#bank_name').show();
+            $('#check_no').show();
+            $('#checkdate').show();
+        }
+        // $('#lbl_walletBalance').text('0.00');
+        // if(pay_id == "9" || pay_id == "10"){
+        //     BindBalance();
+        // }
+        $('#pay_id').valid();
+    }
+
+
+    function BindBalance(){
+        let pay_id=$('#pay_id').val();
+        $('#lbl_walletBalance').text('Loading...');
+        $.ajax({
+            url: `${URL_SPONSOR_NAME}?user_id=${login_uid}`,
+            type: 'GET',
+            success: function (response) {
+                const dataArray = JSON.parse(response.data) || [];
+                const data = dataArray[0] || {};
+               if(response.data !==null){
+                    if(pay_id == "9"){ $('#lbl_walletBalance').text(data.company_wallet.toFixed(2)); }
+                    if(pay_id == "10"){ $('#lbl_walletBalance').text(data.payout_wallet.toFixed(2)); }
+                }
+                else{  $('#lbl_walletBalance').text('0.00'); }
+            },
+            error: function () { $('#lbl_walletBalance').text('0.00');  }
+        });
+     }
+
+
+    function DistrictSelect(selected_dist_id) {
+        let state_id=$('#state_id').val()
+        $('#dist_id').empty().append('<option selected value="0">Loading...</option>');
+        $.ajax({
+            url: `${URL_DROPDOWN_LIST}?id=${state_id}&mst_key=GET_DISTRICT_LIST`,
+            type: 'GET',
+            success: function (response) {
+                $('#dist_id').empty().append('<option selected value="0">🔍Select District</option>');
+                PopulateControl(response.data, $('#dist_id'));
+                $('#dist_id').val(selected_dist_id).trigger('change');
+            },
+            error: function () { $('#dist_id').empty().append('<option selected value="0">🔍Select District</option>'); }
+        });
+    }
+
+
+    function PopulateControl(list, control) {
+        if (list && list.length > 0) {
+            control.removeAttr("disabled");
+            $.each(list, function (i, item) {
+                control.append($('<option></option>').val(item.value).text(item.text));
+            });
+        } else {  control.empty().append('<option selected value="0">Not available</option>'); }
+    }
+
+
+    function confirmSubmission(event) {
+        event.preventDefault(); // stop the form from auto-submitting
+        Swal.fire({
+            icon: 'question',
+            title: '⚠️ Are you sure you want to continue?',
+            html: `<div style="text-align: left; white-space: pre-wrap; font-size: 16px;"><strong>${'⚠️ Are you sure you want to continue?'}</strong></div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            customClass: { htmlContainer: 'text-left' },
+            width: '35%'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('FormSubmit').submit(); // ✅ manually submit
+            }
+        });
+    }
+
+
+    function GetSelectProductData() {
+        var cart_id=$('#cart_id').val();
+        window.location.href = `/bulk/select-product-for-cart?cart_id=${cart_id}`;
+    }
+</script>

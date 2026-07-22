@@ -1,0 +1,190 @@
+﻿@model List<CategoryViewModel>
+<style>
+
+    /* =================================
+                           CATEGORY HORIZONTAL SCROLLER
+         ================================= */
+
+    .category-scroll {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px 5px 15px;
+        scroll-behavior: smooth;
+    }
+
+        .category-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .category-scroll::-webkit-scrollbar-track {
+            background: #edf7ef;
+            border-radius: 50px;
+        }
+
+        .category-scroll::-webkit-scrollbar-thumb {
+            background: #198754;
+            border-radius: 50px;
+        }
+
+    /* Category Item */
+    .category-item {
+        min-width: 180px;
+        flex: 0 0 auto;
+        cursor: pointer;
+    }
+
+    /* Category Box */
+    .category-box {
+        background: #ffffff;
+        border: 1px solid #d8eadc;
+        border-radius: 18px;
+        padding: 15px;
+        text-align: center;
+        transition: all .3s ease;
+        box-shadow: 0 4px 15px rgba(25,135,84,.08);
+        height: 100%;
+    }
+
+        .category-box:hover {
+            transform: translateY(-5px);
+            border-color: #198754;
+            box-shadow: 0 10px 25px rgba(25,135,84,.18);
+        }
+
+    /* Icon Circle */
+    .category-icon-box {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #edf7ef, #d8eadc );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .3s ease;
+    }
+
+        .category-icon-box i {
+            font-size: 30px;
+            color: #198754;
+            transition: all .3s ease;
+        }
+
+    /* Category Name */
+    .category-box h6 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1d5a34;
+        line-height: 1.4;
+    }
+
+    /* Hover Effect */
+    .category-box:hover .category-icon-box {
+        background: linear-gradient( 135deg, #198754, #2e7d32 );
+    }
+
+        .category-box:hover .category-icon-box i {
+            color: #ffffff;
+        }
+
+    /* =================================
+                       ACTIVE CATEGORY - AYURVEDIC THEME
+     ================================= */
+
+    .category-item.active .category-box {
+        background: linear-gradient( 135deg, #e8f5e9, #d7f0dc );
+        border: 2px solid #4caf50;
+        box-shadow: 0 8px 20px rgba(76,175,80,.20);
+    }
+
+    .category-item.active .category-icon-box {
+        background: linear-gradient( 135deg, #4caf50, #66bb6a );
+        border: none;
+    }
+
+        .category-item.active .category-icon-box i {
+            color: #ffffff;
+        }
+
+    .category-item.active h6 {
+        color: #1b5e20;
+        font-weight: 700;
+    }
+
+    /* Active Hover */
+    .category-item.active .category-box:hover {
+        background: linear-gradient( 135deg, #dff3e2, #cdeed4 );
+        transform: translateY(-5px);
+    }
+
+    /* =================================
+         MOBILE
+    ================================= */
+
+    @@media (max-width:768px) {
+        .category-item {
+            min-width: 140px;
+        }
+
+        .category-icon-box {
+            width: 55px;
+            height: 55px;
+        }
+
+            .category-icon-box i {
+                font-size: 24px;
+            }
+
+        .category-box h6 {
+            font-size: 13px;
+        }
+    }
+</style>
+ 
+<section class="bg-light" style="padding-top:0 !important;">
+    <div class="container-fluid px-4">
+        <div class="category-scroll">
+            @foreach (var item in Model)
+            {
+                <div class="category-item" data-id="@item.cat_id">
+                    <a asp-controller="product" asp-action="" asp-route-cat_id="@item.cat_id"
+                       asp-route-cat_name="@item.cat_name" class="text-decoration-none">
+                        <div class="category-box">
+                            <div class="category-icon-box">
+                                <i class="bi @item.cat_icon"></i>
+                            </div>
+                            <h6>@item.cat_name</h6>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+ 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script src="~/js/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Previously selected category load
+        var selectedCategoryId = localStorage.getItem("SelectedCategoryId");
+        if (selectedCategoryId) {
+            $('.category-item').removeClass('active');
+            $('.category-item[data-id="' + selectedCategoryId + '"]').addClass('active');
+        }
+
+        // Category Click
+        $('.category-item').on('click', function () {
+            $('.category-item').removeClass('active');
+            $(this).addClass('active');
+            var categoryId = $(this).data('id');
+            // Save selected category
+            localStorage.setItem("SelectedCategoryId", categoryId);
+            //console.log("Selected Category Id : " + categoryId);
+        });
+    });
+</script>

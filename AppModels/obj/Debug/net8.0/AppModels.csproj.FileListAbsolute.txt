@@ -1,0 +1,12 @@
+D:\Shopping\AppModels\bin\Debug\net8.0\AppModels.deps.json
+D:\Shopping\AppModels\bin\Debug\net8.0\AppModels.dll
+D:\Shopping\AppModels\bin\Debug\net8.0\AppModels.pdb
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.csproj.AssemblyReference.cache
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.GeneratedMSBuildEditorConfig.editorconfig
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.AssemblyInfoInputs.cache
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.AssemblyInfo.cs
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.csproj.CoreCompileInputs.cache
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.dll
+D:\Shopping\AppModels\obj\Debug\net8.0\refint\AppModels.dll
+D:\Shopping\AppModels\obj\Debug\net8.0\AppModels.pdb
+D:\Shopping\AppModels\obj\Debug\net8.0\ref\AppModels.dll

@@ -1,0 +1,527 @@
+/*html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}*/
+
+
+
+:root {
+    --primary: #1565C0;
+    --accent: #1565C0;
+    --muted: #6b7280;
+    --card-radius: 12px;
+    --card-shadow: 0 10px 30px rgba(15,23,42,0.06);
+    --bg-light: #F5F5F5;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    background: #F5F5F5;
+    color: #0f172a;
+}
+
+/* -------- Clean E-commerce Header (Screenshot Style) -------- */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.site-header .navbar {
+    min-height: 80px;
+}
+
+/* Logo & Brand */
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary) !important;
+    transition: opacity 0.2s ease;
+    padding: 0.5rem 0;
+}
+
+.navbar-brand:hover {
+    opacity: 0.9;
+}
+
+.navbar-brand img {
+    transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.03);
+}
+
+/* Dropdown Menu Styling */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(21,101,192,0.08);
+    color: #1565C0;
+}
+
+/* Navigation Links - Screenshot Style */
+.nav-main-link {
+    color: #0f172a !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.nav-main-link:hover {
+    color: #1565C0 !important;
+    background-color: rgba(21,101,192,0.05);
+}
+
+.nav-main-link.dropdown-toggle::after {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    vertical-align: 0.15em;
+}
+
+/* User Account Dropdown */
+.user-account-link {
+    padding: 0.4rem 0.75rem !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.user-account-link:hover {
+    background-color: rgba(21,101,192,0.05) !important;
+}
+
+.user-dropdown-menu {
+    padding: 0.5rem 0;
+}
+
+.user-dropdown-menu .dropdown-item {
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    margin: 0.15rem 0.5rem;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background-color: rgba(21,101,192,0.08);
+    color: #1565C0;
+}
+
+/* Categories Dropdown */
+.categories-dropdown {
+    padding: 0.75rem 0;
+}
+
+.categories-dropdown .dropdown-item {
+    transition: all 0.2s ease;
+    margin: 0.1rem 0.5rem;
+}
+
+.categories-dropdown .dropdown-item:hover {
+    background-color: rgba(21,101,192,0.08);
+    color: #1565C0;
+    transform: translateX(4px);
+}
+
+/* Utility Icons - Screenshot Style */
+.btn-icon {
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    position: relative;
+}
+
+.btn-icon:hover {
+    background-color: rgba(0,0,0,0.05) !important;
+}
+
+.btn-icon i {
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover i {
+    color: #1565C0 !important;
+    transform: scale(1.1);
+}
+
+/* Cart Badge - Green like screenshot */
+.cart-badge {
+    background-color: #4CAF50 !important;
+    color: #ffffff;
+    font-weight: 600;
+    border: 2px solid #ffffff;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991.98px) {
+    .navbar-search-wrapper {
+        max-width: 100%;
+        margin: 0.5rem 0 !important;
+    }
+    
+    .site-header .navbar {
+        min-height: auto;
+        padding: 0.75rem 0;
+    }
+    
+    .navbar-brand {
+        min-width: auto;
+    }
+    
+    .navbar-brand img {
+        height: 40px;
+    }
+}
+
+
+
+
+/* Cart btn badge */
+.cart-badge {
+    position: absolute;
+    top: 0.1rem;
+    right: 0.1rem;
+    font-size: 0.65rem;
+    z-index: 99999;
+}
+
+/* Offcanvas (cart) tweaks */
+.offcanvas-end {
+    width: 420px;
+    max-width: 100%;
+    z-index: 99999;
+}
+
+.cart-item-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.cart-item-card img {
+    transition: transform 0.2s ease;
+}
+
+.cart-item-card:hover img {
+    transform: scale(1.05);
+}
+
+
+
+/* -------- Mega menu & submenus -------- */
+.mega-menu {
+    width: 360px;
+    min-width: 240px;
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+    .dropdown-submenu > .dropdown-menu {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin-top: -6px;
+        min-width: 220px;
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        display: none;
+    }
+
+    .dropdown-submenu > a::after {
+        content: "�";
+        float: right;
+        opacity: .6;
+        margin-left: 8px;
+    }
+
+/* show on hover for desktop */
+@media (min-width: 992px) {
+    .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-submenu:hover > .dropdown-menu {
+        display: block;
+    }
+}
+
+/* -------- Hero banner -------- */
+.hero {
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    background: linear-gradient(180deg, rgba(21,101,192,0.08), rgba(21,101,192,0.03));
+    background-color: #ffffff;
+}
+
+.hero .carousel-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+    .hero .carousel-caption {
+        left: 5%;
+        right: auto;
+        bottom: 3.5rem;
+        text-align: left;
+    }
+
+/* -------- Products -------- */
+.product-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform .22s ease, box-shadow .22s ease;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.04);
+}
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--card-shadow);
+    }
+
+.price-mrp {
+    text-decoration: line-through;
+    color: var(--muted);
+    font-size: .92rem;
+}
+
+.price-dp {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1.03rem;
+}
+
+/* -------- Footer -------- */
+footer {
+    background: linear-gradient(135deg, #00E5FF, #00BCD4);
+    color: #fff;
+    padding: 48px 0;
+    margin-top: 48px;
+    border-radius: 12px 12px 0 0;
+}
+
+.footer-card {
+    background: rgba(255,255,255,0.15);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* Mobile Menu Enhancements */
+@media (max-width: 991.98px) {
+    #mainNav {
+        background: #ffffff;
+        margin-top: 1rem;
+        padding: 1rem;
+        border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    #mainNav .nav-main-link {
+        padding: 0.75rem 1rem !important;
+        border-radius: 6px;
+        margin: 0.25rem 0;
+        text-align: left;
+    }
+    
+    #mainNav .nav-main-link:hover {
+        background-color: rgba(21,101,192,0.08);
+    }
+    
+    .navbar-toggler {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 4px;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.25rem rgba(21,101,192,0.25);
+    }
+    
+    .site-header .navbar {
+        min-height: auto;
+        padding: 0.75rem 0;
+    }
+    
+    .navbar-brand {
+        gap: 1rem !important;
+    }
+    
+    .navbar-brand img {
+        height: 40px !important;
+    }
+    
+    .navbar-brand div span {
+        font-size: 1.3rem !important;
+    }
+}
+
+/* responsive tweaks */
+@media (max-width:575px) {
+    .mega-menu {
+        width: 100% !important;
+    }
+
+    .dropdown-submenu > .dropdown-menu {
+        position: relative;
+        left: 0;
+        top: 0;
+        margin-top: 6px;
+        display: none;
+    }
+
+    .hero .carousel-caption {
+        display: none;
+    }
+
+    .offcanvas-end {
+        width: 100% !important;
+    }
+    
+    .navbar-brand {
+        min-width: auto !important;
+    }
+    
+    .navbar-search-wrapper {
+        margin: 0.75rem 0 !important;
+    }
+}
+
+/* small helper */
+.small-muted {
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+/* Button styles with theme colors */
+.btn-primary {
+    color: #fff;
+    background-color: #1565C0;
+    border-color: #1565C0;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #0d47a1;
+    border-color: #0d47a1;
+    color: #fff;
+}
+
+.btn-outline-primary {
+    color: #1565C0;
+    border-color: #1565C0;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: #1565C0;
+    border-color: #1565C0;
+    color: #fff;
+}
+
+/* Hero section enhancements */
+.hero .btn-lg {
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* Product section background */
+#products {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    margin-top: 2rem;
+}
+
+/* Carousel controls */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #1565C0;
+    border-radius: 50%;
+    padding: 1rem;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+}
+
+/* Override Bootstrap primary colors */
+.bg-primary {
+    background-color: #1565C0 !important;
+}
+
+.text-primary {
+    color: #1565C0 !important;
+}
+
+.border-primary {
+    border-color: #1565C0 !important;
+}
+
+/* Link colors */
+a.text-primary,
+a.text-primary:hover {
+    color: #1565C0 !important;
+}
+
+/* Input focus states */
+.form-control:focus,
+.form-select:focus {
+    border-color: #1565C0;
+    box-shadow: 0 0 0 0.25rem rgba(21, 101, 192, 0.25);
+}
+
+/* Badge primary */
+.badge.bg-primary {
+    background-color: #1565C0 !important;
+}
+
+/*@font-face {
+    font-family: "bootstrap-icons";
+    src: url("fonts/bootstrap-icons.woff2") format("woff2"), url("fonts/bootstrap-icons.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}*/

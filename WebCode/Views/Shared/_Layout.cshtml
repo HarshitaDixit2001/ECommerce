@@ -1,0 +1,1016 @@
+﻿@{
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var last_login = User.FindFirst("last_login")?.Value;
+    var pf_img = User.FindFirst("pf_img")?.Value;
+    string profileImg = string.IsNullOrEmpty(pf_img) ? "/images/noimage.jpg" : pf_img;
+    var role_name = User.FindFirst("role_name")?.Value;
+    var sub_role_name = User.FindFirst("sub_role_name")?.Value;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @Const.COM_NAME</title>
+
+    <!-- Bootstrap CSS (latest 5.x) -->
+    <link href="~/css/bootstrap.min.css?v=11.3" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Animate -->
+    <link href="~/css/animate.min.css?v=1.1" rel="stylesheet" />
+    <link id="theme-style" href="~/css/site.css?v=11.32" rel="stylesheet">
+    <style>
+        .user-dropdown-menu {
+            width: 320px;
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+            /* Optional - Modern Scrollbar */
+            .user-dropdown-menu::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .user-dropdown-menu::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            .user-dropdown-menu::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 10px;
+            }
+
+                .user-dropdown-menu::-webkit-scrollbar-thumb:hover {
+                    background: #999;
+                }
+    </style>
+</head>
+<body>
+    @{
+        var action = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower();
+        var currentCatId = Context.Request.Query["cat_id"].ToString();
+    }
+
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top custom-navbar">
+        <div class="container">
+
+            <!-- Logo -->
+            <a class="navbar-brand" href="#">
+                <img src="@Const.LOGO" height="45">
+            </a>
+
+            <!-- Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Search -->
+            <div class="search-box me-3 d-none d-lg-block">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="form-control" placeholder="Search...">
+            </div>
+
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link nav-main-link" href="/">Home</a>
+                    </li>
+
+
+                    <li class="nav-item dropdown product-dropdown">
+                        <a class="nav-link nav-main-link dropdown-toggle @(controller == "product" ? "active" : "")"
+                           id="productDropdown" href="#" role="button" data-bs-toggle="dropdown">
+                            Products
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            @if (ViewBag.Categories != null)
+                            {
+                                foreach (var category in ViewBag.Categories)
+                                {
+                                    var isActive = currentCatId == category.Value;
+                                    <li>
+                                        <a class="dropdown-item @(isActive ? "active fw-bold text-warning" : "")"
+                                           asp-controller="product" asp-action="" asp-route-cat_id="@category.Value">
+                                            <i class="bi bi-grid me-2"></i>
+                                            @category.Text
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item fw-bold text-primary" href="/product">
+                                    View All Products →
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link nav-main-link" href="/home/contact">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-main-link" href="/home/aboutus">About</a>
+                    </li>
+
+                    <!-- User -->
+                    @if (string.IsNullOrEmpty(userId))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link nav-main-link" href="/home/adduser">Create Account</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-main-link" href="/home/login">Sign In</a>
+                        </li>
+                    }
+                    else
+                    {
+
+                        <li class="nav-item dropdown product-dropdown">
+                            <a class="nav-link nav-main-link dropdown-toggle"
+                               href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person me-2"></i> @userName.ToUpper()
+                            </a>
+                            @*    <ul class="dropdown-menu"> *@
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0 user-dropdown-menu" style="width:320px;">
+                                <li class="px-3 py-3 border-bottom bg-light">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@profileImg"
+                                             width="50"
+                                             height="50"
+                                             class="rounded-circle me-3"
+                                             style="object-fit:cover">
+
+                                        <div>
+                                            <div class="fw-semibold">@userName</div>
+                                            <small class="text-muted">
+                                                User ID : @userId
+                                            </small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- Dashboard -->
+                                <li>
+                                    <a class="dropdown-item py-2"
+                                       asp-controller="secure"
+                                       asp-action="user-dashboard">
+                                        <i class="bi bi-speedometer2 me-2"></i>
+                                        Dashboard
+                                    </a>
+                                </li>
+
+                                <!-- Shopping -->
+                                <li>
+                                    <h6 class="dropdown-header text-primary">
+                                        Shopping
+                                    </h6>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="cart" asp-action="view-cart">
+                                        <i class="bi bi-cart3 me-2"></i>
+                                        My Cart
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="cart" asp-action="wish-list">
+                                        <i class="bi bi-heart me-2"></i>
+                                        Wishlist
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="billing" asp-action="user-order-list">
+                                        <i class="bi bi-bag-check me-2"></i>
+                                        My Orders
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="billing" asp-action="order-tracking">
+                                        <i class="bi bi-truck me-2"></i>
+                                        Order Tracking
+                                    </a>
+                                </li>
+
+                                <!-- Wallet -->
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <h6 class="dropdown-header text-success">
+                                        Wallet & Rewards
+                                    </h6>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="wallet" asp-action="user-company-wallet-tran">
+                                        <i class="bi bi-wallet2 me-2"></i>
+                                        Wallet History
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="wallet" asp-action="cashback-history">
+                                        <i class="bi bi-cash-coin me-2"></i>
+                                        Cashback History
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="wallet" asp-action="user-payout-wallet-tran">
+                                        <i class="bi bi-gift me-2"></i>
+                                        Reward Points
+                                    </a>
+                                </li>
+                                <!-- Coupons -->
+                                <li>
+                                    <a class="dropdown-item" asp-controller="wallet" asp-action="user-coupons">
+                                        <i class="bi bi-ticket-perforated me-2"></i>
+                                        Coupons
+                                    </a>
+                                </li>
+
+                                <!-- Account -->
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <h6 class="dropdown-header text-info">
+                                        Account
+                                    </h6>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="user" asp-action="user-profile">
+                                        <i class="bi bi-person me-2"></i>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        Address Book
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="user" asp-action="user-profile">
+                                        <i class="bi bi-patch-check me-2"></i>
+                                        KYC Documents
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="user" asp-action="change-password">
+                                        <i class="bi bi-key me-2"></i>
+                                        Change Password
+                                    </a>
+                                </li>
+
+                                <!-- Referral -->
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <h6 class="dropdown-header text-warning">
+                                        Referral
+                                    </h6>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="home" asp-action="referral-link">
+                                        <i class="bi bi-link-45deg me-2"></i>
+                                        Referral Link
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="home" asp-action="refer-earn">
+                                        <i class="bi bi-people me-2"></i>
+                                        Refer & Earn
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="home" asp-action="referral-history">
+                                        <i class="bi bi-clock-history me-2"></i>
+                                        Referral History
+                                    </a>
+                                </li>
+
+                                <!-- Support -->
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <h6 class="dropdown-header text-danger">
+                                        Support
+                                    </h6>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="home" asp-action="support-tickets">
+                                        <i class="bi bi-headset me-2"></i>
+                                        Support Tickets
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" asp-controller="home" asp-action="raise-complaint">
+                                        <i class="bi bi-exclamation-circle me-2"></i>
+                                        Raise Complaint
+                                    </a>
+                                </li>
+
+                                <!-- Logout -->
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <a class="dropdown-item text-danger py-2"
+                                       asp-controller="home"
+                                       asp-action="logout">
+                                        <i class="bi bi-box-arrow-right me-2"></i>
+                                        Logout
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li> 
+                    }
+
+                    <li class="nav-item">
+                        <!-- Wishlist -->
+                        <a href="/cart/wish-list" class="btn-icon btn-wishlist">
+                            <i class="bi bi-heart"></i>
+                        </a> 
+                    </li>
+                    <li class="nav-item">
+                        <!-- Cart -->
+                        <button id="cartBtn" class="btn-icon position-relative"
+                                data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                            <i class="bi bi-cart3"></i>
+                            <span id="CartCount" class="cart-badge">0</span>
+                        </button>
+
+                    </li>
+                </ul>
+
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- spacer to account for fixed header -->
+    <div style="height: 50px;"></div>
+
+    <!-- Main content -->
+    <main class="container-fluid pb-5 px-1">
+        @RenderBody()
+    </main>
+
+
+    <!-- ===== Orange Theme Cart Offcanvas ===== -->
+    <!-- ===== AYURVEDIC CART OFFCANVAS ===== -->
+    <div class="offcanvas offcanvas-end cart-ayurvedic" tabindex="-1"
+         id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+
+        <!-- Header -->
+        <div class="offcanvas-header cart-header">
+
+            <h5 class="offcanvas-title fw-bold mb-0" id="cartOffcanvasLabel">
+                🛒 Shopping Cart
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"> </button>
+        </div>
+
+        <!-- Body -->
+        <div class="offcanvas-body d-flex flex-column p-0">
+
+            <!-- Cart Items -->
+            <div id="cartItems" class="cart-items flex-grow-1"> </div>
+
+            <!-- Footer -->
+            <div class="cart-footer">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <span class="fw-semibold">
+                        Total Amount
+                    </span>
+
+                    <span class="cart-price"
+                          id="cartSubtotal">
+                        ₹0.00
+                    </span>
+
+                </div>
+
+                <div class="d-grid">
+
+                    <a asp-action="view-cart"
+                       asp-controller="cart"
+                       class="btn btn-checkout">
+
+                        Proceed to Checkout
+                        <i class="bi bi-arrow-right-circle ms-2"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <footer class="footer-orange py-5">
+        <div class="container">
+
+            <div class="row gy-4">
+
+                <!-- Company Information -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-title">@Const.COM_NAME</h5>
+
+                    <p class="footer-text">
+                        Your trusted destination for premium Ayurvedic and wellness products.
+                        We are committed to providing quality products, secure shopping,
+                        and exceptional customer service.
+                    </p>
+
+                    <div class="footer-contact small">
+                        <p class="mb-2">
+                            <i class="bi bi-envelope-fill me-2"></i>
+                            @Const.COM_EMAIL
+                        </p>
+
+                        <p class="mb-2">
+                            <i class="bi bi-telephone-fill me-2"></i>
+                            @Const.COM_CONTACT
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-title">Quick Links</h5>
+
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/home/aboutus">About Us</a></li>
+                        <li><a href="/product">All Products</a></li>
+                        <li><a href="/home/contact">Contact Us</a></li>
+                        <li><a href="/home/blog">Health Blogs</a></li>
+                        <li><a href="/home/news">News</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-title">Customer Support</h5>
+
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="/home/faq">FAQ</a></li>
+                        <li><a href="/home/privacy-policy">Privacy Policy</a></li>
+                        <li><a href="/home/terms-conditions">Terms &amp; Conditions</a></li>
+                        <li><a href="/home/refund-policy">Refund Policy</a></li>
+                        <li><a href="/home/shipping-policy">Shipping Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Enquiry -->
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="footer-title">Quick Enquiry</h5>
+
+                    <div class="footer-card">
+
+                        <form id="enquiryForm">
+
+                            <div class="mb-2">
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       placeholder="Full Name *"
+                                       required>
+                            </div>
+
+                            <div class="mb-2">
+                                <input type="text"
+                                       maxlength="10"
+                                       class="form-control form-control-sm"
+                                       placeholder="Mobile Number *"
+                                       required>
+                            </div>
+
+                            <div class="mb-2">
+                                <select class="form-select form-select-sm">
+                                    <option>Select Enquiry Type</option>
+                                    <option>Product Purchase</option>
+                                    <option>Order Support</option>
+                                    <option>Technical Support</option>
+                                    <option>Business Inquiry</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <textarea class="form-control form-control-sm"
+                                          rows="3"
+                                          placeholder="Message *"
+                                          required></textarea>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-footer w-100">
+                                <i class="bi bi-send-fill me-1"></i>
+                                Submit Enquiry
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="footer-divider my-4">
+
+            <!-- Bottom Footer -->
+            <div class="row align-items-center">
+
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 small">
+                        © @DateTime.Now.Year @Const.COM_NAME.
+                        All Rights Reserved.
+                    </p>
+                </div>
+
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+
+                    <a href="/home/privacy-policy"
+                       class="text-light text-decoration-none me-3">
+                        Privacy Policy
+                    </a>
+
+                    <a href="/home/terms-conditions"
+                       class="text-light text-decoration-none me-3">
+                        Terms
+                    </a>
+
+                    <a href="/home/refund-policy"
+                       class="text-light text-decoration-none me-3">
+                        Refund
+                    </a>
+
+                    <a href="/home/shipping-policy"
+                       class="text-light text-decoration-none">
+                        Shipping
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- FLOAT ENQUIRY BUTTON -->
+    <a href="/Home/Contact"
+       class="float-btn bg-primary animate__animated animate__pulse animate__infinite">
+        <i class="fa fa-comment"></i>
+    </a>
+
+    <!-- SCROLL BUTTON -->
+    <button id="scrollTop" class="btn btn-primary">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <!-- 🔍 Zoom Image Modal -->
+    <div id="zoomModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+         background-color:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+        <img id="zoomedImage" style="max-width:90%; max-height:90%; border:5px solid white; border-radius:10px;" />
+    </div>
+
+    <!-- JS -->
+    @await RenderSectionAsync("Scripts", required: false)
+    @await Html.PartialAsync("_Sweetalert") 
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js?v=1.4" asp-append-version="true"></script>
+
+    <script>
+        let URL_ADD_CART = `/cart/add-cart-data`;
+        let URL_COUNT_CART = `/cart/get-count-cart-data`;
+        const cart_id=3;
+
+        function AddToCart(cid, pid, qty, callback){
+             let uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+             if(uid =="")
+             {
+                 const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                 loginModal.show();
+             }
+             else{
+                 $.ajax({
+                     url: URL_ADD_CART,
+                     method: 'GET',
+                     data: { cart_id :cart_id, uid: uid, pid: pid, cid: cid, qty: qty},
+                     contentType: 'application/json',
+                     success: function (response) {
+                         if(response.success == true){
+                             //showRightSideCart();
+                             updateMstCartUI();
+                             showToastSuccess('Item Added.');
+
+                             // 🔥 update cart count + shake
+                             let $badge = $('#CartCount');
+                             $badge.removeClass('cart-animate');
+                             void $badge[0].offsetWidth;
+                             $badge.addClass('cart-animate');
+                             flyToCart(pid);
+
+                             if (typeof callback === 'function') {
+                                 callback();
+                             }
+
+                         }else{
+                              showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                         }
+                     },
+                     error: function (xhr) { showErrorLog(`@Const.ERROR_HEADER`, xhr); }
+                 });
+             }
+        }
+
+
+        function flyToCart(pid) {
+
+            let $btn = $('#' + pid);
+            let $card = $btn.closest('.product-card');
+            let $img = $card.find('.product-img');
+            let $cart = $('#cartBtn');
+            let $badge = $('#CartCount');
+
+            if ($img.length === 0 || $cart.length === 0) return;
+
+            let imgOffset = $img.offset();
+            let cartOffset = $cart.offset();
+
+            let startX = imgOffset.left + ($img.width() / 2);
+            let startY = imgOffset.top + ($img.height() / 2);
+
+            let endX = cartOffset.left + ($cart.width() / 2);
+            let endY = cartOffset.top + ($cart.height() / 2);
+
+            // create clone
+            let $clone = $img.clone()
+                .appendTo('body')
+                .css({
+                    position: 'fixed',
+                    top: startY,
+                    left: startX,
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    zIndex: 9999,
+                    pointerEvents: 'none'
+                });
+
+            // 🔥 animate with curve
+            $clone.animate({
+                left: endX,
+                top: endY
+            }, {
+                duration: 700,
+                easing: 'swing',
+                step: function (now, fx) {
+
+                    if (fx.prop === "top") {
+                        let progress = fx.pos;
+                        let curve = Math.sin(progress * Math.PI) * -80;
+                        $(this).css("top", now + curve);
+                    }
+
+                    let scale = 1 - (fx.pos * 0.7);
+                    $(this).css({
+                        transform: "translate(-50%, -50%) scale(" + scale + ")",
+                        opacity: 1 - fx.pos
+                    });
+                },
+
+                complete: function () {
+                    $(this).remove();
+
+                    // ✅ AFTER animation → update cart UI
+
+
+                    // 2. Show badge if hidden
+                    $badge.show();
+
+                    // 3. Shake animation
+                    $badge.removeClass('cart-animate');
+                    void $badge[0].offsetWidth;
+                    $badge.addClass('cart-animate');
+
+                    // 4. Optional: cart icon bounce
+                    $cart.addClass('cart-animate');
+                    setTimeout(() => $cart.removeClass('cart-animate'), 700);
+                }
+            });
+        }
+
+
+
+        function UserLogin(){
+            let login_id=$('#mst_login_id').val();
+            let password=$('#mst_password').val();
+            let Sum_input=$('#Sum_input').val();
+            let Num1=$('#Num1').val();
+            let Num2=$('#Num2').val();
+            if(login_id ==""){
+                showErrorLog(`@Const.ERROR_HEADER`, "Please enter user id.!");
+                return;
+            }
+            if(password ==""){
+                showErrorLog(`@Const.ERROR_HEADER`, "Please enter password.!");
+                return;
+            }
+            if(Sum_input ==""){
+                showErrorLog(`@Const.ERROR_HEADER`, "Please enter captcha.!");
+                return;
+            }
+            var payload = {
+                login_id: login_id,
+                password: password,
+                Sum_input: Sum_input,
+                Num1: Num1,
+                Num2: Num2
+            };
+            $.ajax({
+                url: "/home/MasterLogin",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (response) {
+                    if(response =="1"){
+                         showToastSuccess('✅ User logged in successfully!');
+                         setTimeout(function () { location.reload(); }, 1000);
+                    }else{  showErrorLog(`@Const.ERROR_HEADER`, response); }
+                },
+                error: function (xhr) {  showErrorLog(`@Const.ERROR_HEADER`, xhr); }
+            });
+        }
+
+
+        function updateMstCartUI(){
+            const $items = $('#cartItems').empty();
+            let uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+            if(uid !=""){
+                $.ajax({
+                   url: `/cart/get-cart-data`,
+                   data: { cart_id: cart_id, uid: uid },
+                   type: 'GET',
+                   success: function (response) {
+                       if (response.success === true) {
+                            const cart = JSON.parse(response.data) || [];
+                            if (cart.length === 0) {
+                                $items.append(`
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-cart-x" style="font-size: 3rem; color: #d1d5db;"></i>
+                                        <p class="text-muted mt-3 mb-0" style="font-size: 1rem;">Your cart is empty</p>
+                                        <a href="/product" class="btn btn-primary btn-sm mt-3" style="background-color: #1565C0; border-color: #1565C0;">
+                                            <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+                                        </a>
+                                    </div>
+                                `);
+                                $('#cartSubtotal').text(formatINR(0));
+                                $('#CartCount').text(0);
+                                return;
+                            }
+
+                            let subtotal = 0;
+                            let str_line =``;
+                            cart.forEach(item => {
+                                let img = item.img1 ? `/${item.img1}` : `/images/noimage.jpg`;
+                                subtotal += (item.t_amount);
+                                const prodName = item.prod_name.length > 30 ? item.prod_name.substring(0, 30) + "..." : item.prod_name;
+                                const line = `
+                                    <div class="cart-item-card mb-3 p-3 border rounded-3" style="background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                        <div class="d-flex gap-3 align-items-start">
+                                            <img src="${img}" width="80" height="80" style="object-fit:cover; border-radius: 8px;" class="border" alt="${prodName}">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold mb-1" style="color: #0f172a; font-size: 0.95rem; line-height: 1.3;">${prodName}</div>
+                                                <div class="small text-muted mb-2">Code: ${item.prod_code}</div>
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <div>
+
+                                                        <div class="small text-muted">Qty: ${item.qty}</div>
+                                                    </div>
+                                                    <div class="text-end">
+
+                                                        <div class="fw-bold text-success" style="font-size: 0.95rem;">${formatINR(item.t_amount)}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-2 mt-2">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                         <button class="btn btn-outline-danger" type="button" onclick="mst_changeQty(${item.cid}, -1)" style="border-color: #dc3545; color: #dc3545;">
+                                                            <i class="bi bi-dash"></i>
+                                                        </button>
+                                                        <input type="number" min="1" maxlength="7" value="${item.qty}" class="form-control cart-qty-input text-center"
+                                                         id="mst_qty-${item.cid}" style="width: 60px;" oninput="this.value = this.value.slice(0, 7);"
+                                                         onchange="mst_changeQtyDirect(${item.cid}, this.value)" />
+                                                        <button class="btn btn-outline-success" type="button" onclick="mst_changeQty(${item.cid}, 1)" style="border-color: #4CAF50; color: #4CAF50;">
+                                                            <i class="bi bi-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-link text-danger p-0 ms-auto" onclick="Delete_By_Id('MST',${item.cid})" style="text-decoration: none; font-size: 0.85rem;">
+                                                        <i class="bi bi-trash me-1"></i>Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                               str_line +=line;
+                            });
+                            //$items.empty();
+                            $items.empty().append(str_line);
+
+                            $('#cartSubtotal').text(formatINR(subtotal));
+                            $('#CartCount').text(cart.length);
+                        }
+                   },
+                   error: function (xhr, status, error) {
+                       //window.location.href = `@Const.LOGOUT`; return;
+                   }
+                });
+            }
+        }
+
+
+        function mst_changeQty(cid, value) {
+              let mst_input = document.getElementById(`mst_qty-${cid}`);
+              let mst_currentQty = parseInt(mst_input.value) || 1;
+              let mst_newQty = mst_currentQty + value;
+              mst_newQty = Math.min(Math.max(mst_newQty, 1), 999999);
+              mst_input.value = mst_newQty;
+              AddToCart(cid, 0, mst_newQty, updateMstCartUI);
+        }
+
+
+        function mst_changeQtyDirect(cid, value) {
+             let mst_newQty = parseInt(value) || 1;
+             mst_newQty = Math.min(Math.max(mst_newQty, 1), 999999);
+             document.getElementById(`mst_qty-${cid}`).value = mst_newQty;
+             AddToCart(cid, 0, mst_newQty, updateMstCartUI);
+        }
+
+
+        function Delete_By_Id(type, id){
+              $.ajax({
+                  url: `/cart/delete-cart-data`,
+                  data: { id: id },
+                  type: 'GET',
+                  contentType: 'application/json',
+                  success: function (response) {
+                       if(response.success == true){
+                           if(type =="CART"){
+                               BindTableData();
+                           }
+                           updateMstCartUI();
+                       }
+                      else{ showErrorLog(`@Const.ERROR_HEADER`, response.message); }
+                  },
+                  error: function (res_error) {
+                  }
+              });
+          }
+    </script>
+
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-md">
+
+            <div class="modal-content rounded-4 shadow-lg overflow-hidden">
+
+                <!-- Header -->
+                <div class="modal-herbal-header px-4 py-4 text-center">
+
+                    <h4 class="mb-2">
+                        🌿 Secure Sign In
+                    </h4>
+
+                    <p class="mb-0">
+                        Access your wellness account safely and securely
+                    </p>
+
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-4">
+
+                    <!-- Login ID -->
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Login ID
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text herbal-icon">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+
+                            <input type="text" id="mst_login_id" name="mst_login_id"
+                                   class="form-control herbal-input" maxlength="30" required>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Password
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text herbal-icon">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+
+                            <input type="password" id="mst_password" name="mst_password"
+                                   class="form-control herbal-input" maxlength="30" required>
+                        </div>
+
+                    </div>
+
+                    <!-- Captcha -->
+                    <div class="captcha-box mb-3">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="fw-semibold">
+                                Security Check:
+                            </span>
+
+                            <span class="fw-bold text-success">
+                                @ViewBag.Num1 + @ViewBag.Num2 =
+                            </span>
+
+                            <input type="number" id="Sum_input" name="Sum_input"
+                                   class="form-control form-control-sm"
+                                   style="width:120px;" placeholder="Answer" required>
+
+                        </div>
+
+                        <input type="hidden" id="Num1" value="@ViewBag.Num1">
+                        <input type="hidden" id="Num2" value="@ViewBag.Num2">
+
+                    </div>
+
+                    <!-- Login Button -->
+                    <div class="d-grid">
+
+                        <button type="button" class="btn btn-herbal btn-lg" onclick="UserLogin()">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Login
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer justify-content-between px-4 py-3">
+                    <a href="/" class="text-decoration-none">
+                        ← Back to Home
+                    </a>
+
+                    <div>
+                        <small class="text-muted">
+                            New Customer?
+                        </small>
+                        <a asp-controller="Home" asp-action="AddUser" class="text-decoration-none ms-1">
+                            Register Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     
+</body>
+</html>
+

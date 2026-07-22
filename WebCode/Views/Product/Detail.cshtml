@@ -1,0 +1,1982 @@
+﻿@model ProductDetailViewModel
+@{
+    ViewData["Title"] = "Product Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .product-image-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.08);
+        border: 1px solid #ececec;
+        position: relative;
+    }
+
+    .product-actions {
+        position: absolute;
+        top: 18px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 100;
+    }
+
+    .action-btn {
+        width: 46px;
+        height: 46px;
+        border: none;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(0,0,0,.15);
+        transition: .3s;
+        font-size: 18px;
+    }
+
+        .action-btn:hover {
+            background: #198754;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+    .main-image-wrapper {
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+
+    .product-main-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: .35s;
+        cursor: zoom-in;
+    }
+
+        .product-main-image:hover {
+            transform: scale(1.12);
+        }
+
+    .thumbnail-gallery {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .product-thumb {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border: 2px solid #e8e8e8;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: .3s;
+        padding: 4px;
+        background: #fff;
+    }
+
+        .product-thumb:hover {
+            border-color: #198754;
+            transform: translateY(-5px);
+        }
+
+        .product-thumb.active {
+            border: 2px solid #198754;
+            box-shadow: 0 0 0 4px rgba(25,135,84,.15);
+        }
+
+
+
+    /* Common Button Style */
+    .product-action-btn,
+    .action-btn {
+        position: absolute;
+        top: 0px;
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        font-size: 20px;
+        color: #198754;
+        background: #ffffff;
+        border: 2px solid #198754;
+        box-shadow: 0 8px 20px rgba(25,135,84,.15);
+        transition: all .3s ease;
+        /* position: absolute;
+                                    top: 0;
+                                    width: 46px;
+                                    height: 46px;
+                                    border: none;
+                                    border-radius: 50%;
+                                    background: #fff;
+                                    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 18px;
+                                    cursor: pointer;
+                                    transition: all .3s ease; */
+    }
+
+    /* Share Button - Left */
+    .share-btn {
+        left: 18px;
+    }
+
+    .wishlist-btn {
+        right: 18px;
+    }
+
+    /* Hover Effect */
+    .product-action-btn:hover,
+    .action-btn:hover {
+        background: #198754;
+        color: #fff;
+        transform: translateY(-3px);
+    }
+
+    /* Active Wishlist */
+    .wishlist-btn.active {
+        background: #dc3545;
+        color: #fff;
+    }
+
+
+    @@media(max - width:992px) {
+        .main-image-wrapper {
+            height: 420px;
+        }
+
+        .product-thumb {
+            width: 75px;
+            height: 75px;
+        }
+    }
+
+    @@media(max - width:768px) {
+        .main-image-wrapper {
+            height: 320px;
+        }
+
+        .product-thumb {
+            width: 65px;
+            height: 65px;
+        }
+
+
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+    }
+
+    @@media(max - width:576px) {
+        .main-image-wrapper {
+            height: 280px;
+        }
+
+        .product-thumb {
+            width: 55px;
+            height: 55px;
+        }
+
+        .product-image-card {
+            position: relative;
+        }
+    }
+
+
+
+    .share-btn {
+        top: 0;
+        left: 18px;
+    }
+
+</style>
+
+<style>
+
+    /*=========================================================
+                    BEST SELLING PRODUCTS
+                    =========================================================*/
+
+    .best-selling-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .marquee-container {
+        width: 100%;
+        overflow: hidden;
+        padding: 10px 55px;
+    }
+
+    .marquee-track {
+        display: flex;
+        align-items: stretch;
+        gap: 20px;
+        width: max-content;
+        animation: marqueeScroll 40s linear infinite;
+    }
+
+    .marquee-container:hover .marquee-track {
+        animation-play-state: paused;
+    }
+
+    .marquee-item {
+        flex: 0 0 auto;
+        width: 280px;
+    }
+
+    /*=========================================================
+                                                                                    PRODUCT CARD
+                                                                =========================================================*/
+
+    .product-card {
+        position: relative;
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 18px;
+        overflow: hidden;
+        transition: .35s;
+        box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 35px rgba(0,0,0,.15);
+        }
+
+    /*=========================================================
+                                                                                    PRODUCT CODE
+                                                                =========================================================*/
+
+    .product-code-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: #198754;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 30px;
+        z-index: 5;
+        box-shadow: 0 4px 10px rgba(0,0,0,.18);
+    }
+
+    /*=========================================================
+                                                                                    WISHLIST
+                                                                =========================================================*/
+
+    .bs-wishlist-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        transition: .3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,.15);
+    }
+
+        .bs-wishlist-btn i {
+            font-size: 18px;
+        }
+
+        .bs-wishlist-btn:hover {
+            background: #dc3545;
+            color: #fff;
+            transform: scale(1.08);
+        }
+
+    /*=========================================================
+                                                                                    PRODUCT IMAGE
+                                                                =========================================================*/
+
+    .product-img {
+        width: 100%;
+        height: 250px;
+        object-fit: contain;
+        padding: 18px;
+        transition: .35s;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.05);
+    }
+
+    /*=========================================================
+                                                                                    PRODUCT DETAILS
+                                                                =========================================================*/
+
+    .product-info {
+        padding: 16px;
+    }
+
+    .product-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #222;
+        line-height: 1.45;
+        min-height: 44px;
+        overflow: hidden;
+    }
+
+    .product-price-box {
+        margin-top: 10px;
+    }
+
+        .product-price-box .mrp {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .product-price-box .dp {
+            font-size: 18px;
+            color: #198754;
+            font-weight: 700;
+        }
+
+    .badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 12px;
+        border-radius: 30px;
+    }
+
+    .btn-cart-sm {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 50%;
+        background: #198754;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .3s;
+    }
+
+        .btn-cart-sm i {
+            font-size: 18px;
+        }
+
+        .btn-cart-sm:hover {
+            background: #146c43;
+            transform: scale(1.08);
+        }
+
+    /*=========================================================
+                                                                                    NAVIGATION BUTTONS
+                                                                =========================================================*/
+
+    .marquee-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 50%;
+        background: #198754;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        cursor: pointer;
+        z-index: 20;
+        transition: .3s;
+        box-shadow: 0 10px 25px rgba(0,0,0,.18);
+    }
+
+        .marquee-btn:hover {
+            background: #146c43;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+    .marquee-prev {
+        left: 5px;
+    }
+
+    .marquee-next {
+        right: 5px;
+    }
+
+    /*=========================================================
+                                                                                    ANIMATION
+                                                                =========================================================*/
+
+    @@keyframes marqueeScroll {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    /*=========================================================
+                                                                                    RESPONSIVE
+                                                                =========================================================*/
+
+    @@media(max - width:992px) {
+        .marquee-item {
+            width: 240px;
+        }
+
+        .product-img {
+            height: 220px;
+        }
+    }
+
+    @@media(max - width:768px) {
+        .marquee-container {
+            padding: 10px 45px;
+        }
+
+        .marquee-item {
+            width: 200px;
+        }
+
+        .product-img {
+            height: 180px;
+        }
+
+        .marquee-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+    }
+
+    @@media(max - width:576px) {
+        .marquee-container {
+            padding: 10px 35px;
+        }
+
+        .marquee-item {
+            width: 180px;
+        }
+
+        .product-img {
+            height: 160px;
+        }
+
+        .product-title {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<style>
+    .review-section {
+        background: #F9FCF7;
+    }
+
+    .review-summary {
+        border: 1px solid #E8F5E9;
+    }
+
+    .review-card {
+        background: #fff;
+        border: 1px solid #E8F5E9;
+        border-radius: 18px;
+        padding: 25px;
+        transition: .3s;
+        margin-bottom: 20px;
+    }
+
+        .review-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(46,125,50,.12);
+        }
+
+    .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #E8F5E9;
+        color: #2E7D32;
+        font-size: 22px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .progress {
+        height: 8px;
+        background: #E8F5E9;
+        border-radius: 30px;
+    }
+
+    .progress-bar {
+        border-radius: 30px;
+    }
+
+    .btn-success {
+        background: #2E7D32;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background: #1B5E20;
+        }
+
+    .verified {
+        background: #E8F5E9;
+        color: #2E7D32;
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .review-card p {
+        color: #555;
+        line-height: 1.8;
+    }
+
+    .rating-bars small {
+        font-weight: 600;
+    }
+
+    .form-select {
+        border-radius: 50px;
+        min-width: 180px;
+    }
+
+    @@media(max - width:768px) {
+        .review-summary {
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+        }
+
+        .review-card {
+            padding: 18px;
+        }
+    }
+</style>
+
+<style>
+    .review-section .form-control,
+    .review-section .form-select {
+        border-radius: 12px;
+        border: 1px solid #d8e7d4;
+    }
+
+        .review-section .form-control:focus,
+        .review-section .form-select:focus {
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 .2rem rgba(46,125,50,.15);
+        }
+
+    .modal-content {
+        overflow: hidden;
+    }
+
+    .rating-stars {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+        .rating-stars input {
+            display: none;
+        }
+
+        .rating-stars label {
+            font-size: 34px;
+            color: #d7d7d7;
+            cursor: pointer;
+            transition: .25s;
+            margin-right: 6px;
+        }
+
+            .rating-stars label:hover,
+            .rating-stars label:hover ~ label {
+                color: #ffc107;
+                transform: scale(1.12);
+            }
+
+        .rating-stars input:checked ~ label {
+            color: #ffc107;
+        }
+
+    .modal-header {
+        background: linear-gradient(135deg,#2e7d32,#43a047);
+    }
+
+    .modal-footer {
+        background: #f7fbf5;
+    }
+
+    .form-label {
+        color: #2e7d32;
+    }
+
+    .btn-success {
+        background: #2e7d32;
+        border-color: #2e7d32;
+    }
+
+        .btn-success:hover {
+            background: #256428;
+        }
+
+    input[type=file]::file-selector-button {
+        background: #2e7d32;
+        color: #fff;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 8px;
+        margin-right: 12px;
+    }
+
+        input[type=file]::file-selector-button:hover {
+            background: #256428;
+        }
+</style>
+
+
+<!-- ================= BREADCRUMB SECTION ================= -->
+<section class="breadcrumb-section py-5 bg-light border rounded-4 shadow">
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+                <h1 class="breadcrumb-title">
+                    🍃 Best Selling Ayurvedic Products
+                </h1>
+
+                <p class="breadcrumb-subtitle mb-0">
+                    | Trusted Herbal Solutions for Everyday Wellness
+                </p>
+            </div>
+
+            <div class="col-lg-6 text-lg-end">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-lg-end mb-0">
+
+                        <li class="breadcrumb-item">
+                            <a href="/">Home</a>
+                        </li>
+
+                        <li class="breadcrumb-item">
+                            <a href="/product">Products</a>
+                        </li>
+
+                        <li class="breadcrumb-item active">
+                            @Model.cat_name
+                        </li>
+                    </ol>
+                </nav>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+
+<!-- ================= PRODUCT SECTION ================= -->
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="row g-5">
+
+            <!-- LEFT SIDE -->
+            <div class="col-lg-5">
+
+                <input type="hidden" value="@Model.pid" id="pid" />
+                @{
+                    var mainImg = !string.IsNullOrEmpty(Model.img1)
+                    ? Url.Content("~/" + Model.img1) : Url.Content(@Const.NO_IMAGE);
+                }
+
+                <div class="product-image-card">
+
+                    <!-- Floating Actions -->
+                    <div class="product-actions">
+
+                        <!-- Wishlist -->
+                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">
+                            <i class="bi bi-heart"></i>
+                        </button>
+
+                        <!-- Share -->
+                        <button class="action-btn share-btn" onclick="shareProduct()" title="Share">
+                            <i class="bi bi-share"></i>
+                        </button>
+                    </div>
+
+                    <!-- Main Image -->
+                    <div class="main-image-wrapper">
+                        <img id="mainImage" src="@mainImg" class="product-main-image"
+                             alt="@Model.prod_name" loading="lazy" style="cursor:zoom-in;"
+                             onclick="showZoom('@mainImg')" />
+                    </div>
+
+                    <!-- Thumbnail Gallery -->
+                    @if (Model.ImageList != null && Model.ImageList.Any())
+                    {
+                        <div class="thumbnail-gallery">
+
+                            @foreach (var img in Model.ImageList)
+                            {
+                                var thumb = !string.IsNullOrEmpty(img) ? Url.Content("~/" + img.TrimStart('/')) : Url.Content(Const.NO_IMAGE);
+                                <img src="@thumb" class="product-thumb" onclick="updateMainImage('@thumb')">
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col-lg-7">
+                <div class="product-details-scroll">
+                    <!-- ========================================= -->
+                    <!-- Product Summary -->
+                    <!-- ========================================= -->
+
+                    <div class="product-header">
+
+                        <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                            <small class="text-muted">
+                                Code : <strong>@Model.prod_code</strong>
+                            </small>
+                            <span class="badge rounded-pill bg-light text-success border px-3 py-2">
+                                <i class="bi bi-stars me-1"></i>
+                                Premium Quality Product
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+                            <h2 class="product-name mb-0 flex-grow-1 me-3">
+                                @Model.prod_name
+                            </h2>
+                            <div class="hsn-badge">
+                                <i class="bi bi-upc-scan me-1"></i>
+                                <span>HSN :</span>
+                                <strong>@Model.hsncode</strong>
+                            </div>
+                        </div>
+
+
+                        <!-- Rating -->
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="text-warning">
+                                @{
+                                    decimal rating = Convert.ToDecimal(Model.rating);
+                                }
+
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (rating >= i)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    else if (rating >= i - 0.5m)
+                                    {
+                                        <i class="bi bi-star-half"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star"></i>
+                                    }
+                                }
+                            </div>
+
+                            <span class="text-muted small">
+                                <strong>@Model.rating</strong>/5
+                                <span class="mx-1">|</span>
+                                <i class="bi bi-chat-dots-fill me-1 text-success"></i>
+                                @Model.review Reviews
+                            </span>
+
+                        </div>
+
+
+
+
+                        <div class="row align-items-center g-3">
+
+                            @{
+                                decimal mrp = Model.mrp ?? 0;
+                                decimal price = Model.price ?? 0;
+                                decimal save = mrp - price;
+                                decimal discount = mrp > 0 ? (save * 100 / mrp) : 0;
+                            }
+
+                            <!-- Price Details -->
+                            <div class="col-lg-8 col-md-7">
+                                <div class="d-flex flex-wrap align-items-center gap-4">
+                                    
+                                    <div>
+                                        <small class="text-muted d-block">Selling Price</small>
+                                        <h2 class="mb-0 fw-bold text-success">
+                                            ₹@price.ToString("0.00")
+                                        </h2>
+                                    </div>
+
+                                    <div>
+                                        <small class="text-muted d-block">MRP</small>
+                                        <h5 class="mb-0 text-muted text-decoration-line-through">
+                                            ₹@mrp.ToString("0.00")
+                                        </h5>
+                                    </div>
+
+                                    <div>
+                                        <small class="text-muted d-block">Discount</small>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2">
+                                            @discount.ToString("0")% OFF
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <small class="text-muted d-block">You Save</small>
+                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                                            <i class="bi bi-piggy-bank-fill me-1"></i>
+                                            ₹@save.ToString("0.00")
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Add To Cart -->
+                            <div class="col-lg-4 col-md-5">
+                                <input type="hidden" id="qty" value="1" />
+                                @if (Model.product_qty > 0)
+                                {
+                                    <button type="button"
+                                            class="btn btn-success btn-lg w-100"
+                                            onclick="AddToCart(0,@Model.pid,$('#qty').val(),'')">
+                                        <i class="bi bi-cart3 me-2"></i>
+                                        Add to Cart
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="btn btn-danger btn-lg w-100"
+                                            disabled>
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        Out of Stock
+                                    </button>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.size) || !string.IsNullOrEmpty(Model.color_name))
+                            {
+                                <div class="mb-3 d-flex align-items-center flex-wrap gap-3">
+
+                                    @if (!string.IsNullOrEmpty(Model.size))
+                                    {
+                                        <div>
+                                            <label class="form-label fw-semibold me-2">Size</label>
+                                            <select class="form-select form-select-sm w-auto d-inline-block">
+                                                <option>@Model.size</option>
+                                            </select>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(Model.color_name))
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <label class="form-label fw-semibold me-2 mb-0">Color</label>
+
+                                            <div class="form-check form-check-inline mb-0">
+                                                <input class="form-check-input" type="radio" checked />
+                                                <label class="form-check-label">@Model.color_name</label>
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(Model.color_code))
+                                            {
+                                                <span class="ms-2 rounded-circle border"
+                                                      style="width:20px;height:20px;background:@Model.color_code;"></span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                        </div>
+
+                        <hr />
+
+
+
+                        <!-- ========================================= -->
+                        <!-- Product Description -->
+                        <!-- ========================================= -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-header bg-success text-white py-3">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Description
+                                </h5>
+                            </div>
+
+                            <div class="card-body">
+                                @if (!string.IsNullOrWhiteSpace(Model.prod_desc))
+                                {
+                                    <div class="product-description-content">
+                                        @Html.Raw(Model.prod_desc)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted text-center py-3">
+                                        <i class="bi bi-exclamation-circle me-2"></i>
+                                        Product description is not available.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+                        <!-- ========================================= -->
+                        <!-- Product Highlights -->
+                        <!-- ========================================= -->
+                        <div class="row g-3 mt-4">
+
+                            <div class="col-md-6">
+                                <div class="product-option h-100">
+                                    <div class="d-flex align-items-center">
+
+                                        <i class="bi bi-patch-check-fill text-success fs-2 me-3"></i>
+
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                100% Genuine Product
+                                            </h6>
+
+                                            <small class="text-muted">
+                                                Original Ayurvedic formulation.
+                                            </small>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="product-option h-100">
+                                    <div class="d-flex align-items-center">
+
+                                        <i class="bi bi-truck text-success fs-2 me-3"></i>
+
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                Free Shipping
+                                            </h6>
+
+                                            <small class="text-muted">
+                                                Available on eligible orders.
+                                            </small>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="product-option h-100">
+                                    <div class="d-flex align-items-center">
+
+                                        <i class="bi bi-credit-card-2-front-fill text-success fs-2 me-3"></i>
+
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                Secure Payment
+                                            </h6>
+
+                                            <small class="text-muted">
+                                                100% Safe & Secure Checkout.
+                                            </small>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="product-option h-100">
+                                    <div class="d-flex align-items-center">
+
+                                        <i class="bi bi-arrow-repeat text-success fs-2 me-3"></i>
+
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                Easy Returns
+                                            </h6>
+
+                                            <small class="text-muted">
+                                                Hassle-free replacement policy.
+                                            </small>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- Product Features -->
+                        <!-- ========================================= -->
+
+                        <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+                            <div class="card-header bg-success text-white">
+
+                                <h5 class="mb-0">
+
+                                    <i class="bi bi-stars me-2"></i>
+
+                                    Product Features
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+
+                                        <ul class="list-unstyled">
+
+                                            <li class="mb-3">
+                                                ✅ 100% Herbal Ingredients
+                                            </li>
+
+                                            <li class="mb-3">
+                                                ✅ No Artificial Chemicals
+                                            </li>
+
+                                            <li class="mb-3">
+                                                ✅ GMP Certified
+                                            </li>
+
+                                            <li class="mb-3">
+                                                ✅ Ayurvedic Formula
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <ul class="list-unstyled">
+
+                                            <li class="mb-3">
+                                                🌿 Clinically Trusted
+                                            </li>
+
+                                            <li class="mb-3">
+                                                🚚 Fast Delivery
+                                            </li>
+
+                                            <li class="mb-3">
+                                                💳 Secure Payments
+                                            </li>
+
+                                            <li class="mb-3">
+                                                📞 Customer Support
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- Delivery Information -->
+                        <!-- ========================================= -->
+
+                        <div class="card shadow-sm border-0 rounded-4 mt-4">
+
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-box-seam text-success"></i>
+                                    Delivery Information
+                                </h5>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>
+                                            <i class="bi bi-truck text-success me-2"></i>
+                                            Delivery in 3–7 Working Days
+                                        </p>
+                                        <p>
+                                            <i class="bi bi-cash text-success me-2"></i>
+                                            Cash on Delivery Available
+                                        </p>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <p>
+                                            <i class="bi bi-arrow-repeat text-success me-2"></i>
+                                            Easy Replacement Policy
+                                        </p>
+                                        <p>
+                                            <i class="bi bi-shield-lock text-success me-2"></i>
+                                            Secure Packaging
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <!-- ========================================= -->
+                        <!-- Tab Feature -->
+                        <!-- ========================================= -->
+                        <div class="card shadow-sm border-0 rounded-4 mt-4">
+                            @{
+                                var tabItems = new List<(string Title, string ContentHtml)>
+                                    {
+                                    (Model.t1, Model.d1),
+                                    (Model.t2, Model.d2),
+                                    (Model.t3, Model.d3),
+                                    (Model.t4, Model.d4),
+                                    (Model.t5, Model.d5)
+                                    }.Where(t => !string.IsNullOrWhiteSpace(t.Title)).ToList();
+                            }
+
+                            @if (tabItems.Any())
+                            {
+                                <div class="accordion shadow-sm rounded-4 bg-white" id="productAccordion">
+                                    @for (int i = 0; i < tabItems.Count; i++)
+                                    {
+                                        <div class="accordion-item border-0 border-bottom">
+                                            <h2 class="accordion-header" id="heading-@i">
+                                                <button class="accordion-button fw-semibold @(i != 0 ? "collapsed" : "")" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-@i"
+                                                        aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="collapse-@i">
+                                                    @tabItems[i].Title
+                                                </button>
+                                            </h2>
+                                            <div id="collapse-@i" class="accordion-collapse collapse @(i == 0 ? "show" : "")"
+                                                 aria-labelledby="heading-@i" data-bs-parent="#productAccordion">
+                                                <div class="accordion-body">
+                                                    @Html.Raw(tabItems[i].ContentHtml)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================= -->
+<!-- Key Ingredients -->
+<!-- ========================================= -->
+<div id="div_ingredientContainer" class="card shadow-sm border-0 rounded-4 mt-4">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-flower1 me-2"></i>
+            @Model.ingredient_title
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="row g-4" id="ingredientContainer"> </div>
+    </div>
+</div>
+
+
+
+<!-- ===== Best selling products ===== -->
+<section class="py-5 bg-light border rounded-4 shadow">
+    <div class="container-fluid px-4">
+        <div class="best-selling-wrapper">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-success mb-1">
+                        🔥 Best Selling Products
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Explore Our Most Loved & Best Selling Collection
+                    </p>
+                </div>
+            </div>
+            <button class="marquee-btn marquee-prev" id="prevBtn">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <div class="marquee-container" id="marqueeContainer">
+                <div class="marquee-track" id="marqueeTrack"></div>
+            </div>
+            <button class="marquee-btn marquee-next" id="nextBtn">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+
+<!-- ===== Customer Reviews and Product Reviews ===== -->
+<section class="review-section py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-2">
+                    🌿 Customer Experience
+                </span>
+                <h2 class="fw-bold text-success">
+                    Customer Reviews
+                </h2>
+                <p class="text-muted mb-0">
+                    Real experiences from customers using our Ayurvedic products.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- LEFT -->
+            <div class="col-lg-3">
+                <div class="card review-summary shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-body text-center">
+                        <h1 class="display-2 fw-bold text-success">
+                            5.0
+                        </h1>
+
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+
+                        <h5>Based on 3 Reviews</h5>
+
+                        <hr>
+
+                        <!-- Rating -->
+
+                        <div class="rating-bars">
+                            <div class="d-flex align-items-center mb-2">
+                                <small class="me-2">5★</small>
+                                <div class="progress flex-grow-1">
+                                    <div class="progress-bar bg-success" style="width:100%"></div>
+                                </div>
+                                <small class="ms-2 text-success">100%</small>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-2">
+                                <small class="me-2">4★</small>
+                                <div class="progress flex-grow-1"></div>
+                                <small class="ms-2">0%</small>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-2">
+                                <small class="me-2">3★</small>
+                                <div class="progress flex-grow-1"></div>
+                                <small class="ms-2">0%</small>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-2">
+                                <small class="me-2">2★</small>
+                                <div class="progress flex-grow-1"></div>
+                                <small class="ms-2">0%</small>
+                            </div>
+
+                            <div class="d-flex align-items-center">
+                                <small class="me-2">1★</small>
+                                <div class="progress flex-grow-1"></div>
+                                <small class="ms-2">0%</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-0">
+                        <div class="text-center">
+                            <h5 class="fw-bold">
+                                Share Your Experience
+                            </h5>
+                            <p class="text-muted small">
+                                Help others choose the right Ayurvedic product.
+                            </p>
+                            <button class="btn btn-success rounded-pill w-100 py-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reviewModal">
+                                <i class="fas fa-edit me-2"></i>
+                                Write Review
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="col-lg-9">
+                <div class="d-flex flex-wrap justify-content-between mb-4 gap-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-success rounded-pill">
+                            All
+                        </button>
+                        <button class="btn btn-light border rounded-pill">
+                            📷 Photos
+                        </button>
+
+                        <select class="form-select rounded-pill">
+                            <option>All Ratings</option>
+                        </select>
+                    </div>
+
+                    <select class="form-select rounded-pill w-auto">
+                        <option>Most Helpful</option>
+                        <option>Newest</option>
+                    </select>
+                </div>
+
+                <!-- Review -->
+                <div class="review-card">
+                    <div class="d-flex">
+                        <div class="avatar">
+                            P
+                        </div>
+
+                        <div class="ms-3 w-100">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="fw-bold mb-1">
+                                    Customer
+                                </h5>
+                                <span class="verified">
+                                    ✔ Verified Purchase
+                                </span>
+                            </div>
+
+                            <div class="mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+
+                            <p>
+                                I tried this Ayurvedic medicine after seeing it at a medical shop.
+                                Within a few days my morning sneezing and nasal blockage reduced
+                                significantly. Highly recommended.
+                            </p>
+
+                            <small class="text-muted">
+                                Reviewed on 10 June 2026
+                            </small>
+
+                            <div class="mt-3">
+                                <button class="btn btn-outline-success btn-sm rounded-pill">
+                                    👍 Helpful (0)
+                                </button>
+                                <button class="btn btn-link text-muted">
+                                    Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- =========================
+     Customer Review Modal
+========================== -->
+
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+
+            <!-- Header -->
+
+            <div class="modal-header bg-success text-white border-0 rounded-top-4">
+
+                <div>
+                    <h4 class="mb-1 fw-bold">
+                        🌿 Write Your Review
+                    </h4>
+
+                    <small>
+                        Share your genuine experience with this Ayurvedic product.
+                    </small>
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- Body -->
+
+            <div class="modal-body p-4">
+
+                <form>
+
+                    <!-- Customer Name -->
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Full Name
+                        </label>
+
+                        <input type="text"
+                               class="form-control form-control-lg rounded-3"
+                               placeholder="Enter your name">
+                    </div>
+
+                    <!-- Email -->
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Email Address
+                        </label>
+
+                        <input type="email"
+                               class="form-control form-control-lg rounded-3"
+                               placeholder="example@email.com">
+                    </div>
+
+                    <!-- Rating -->
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold d-block">
+                            Product Rating
+                        </label>
+
+                        <div class="rating-stars">
+
+                            <input type="radio" id="star5" name="rating" value="5">
+                            <label for="star5">
+                                <i class="fas fa-star"></i>
+                            </label>
+
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4">
+                                <i class="fas fa-star"></i>
+                            </label>
+
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3">
+                                <i class="fas fa-star"></i>
+                            </label>
+
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2">
+                                <i class="fas fa-star"></i>
+                            </label>
+
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1">
+                                <i class="fas fa-star"></i>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Review Title -->
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Review Title
+                        </label>
+
+                        <input type="text"
+                               class="form-control form-control-lg rounded-3"
+                               placeholder="Example: Excellent Ayurvedic Medicine">
+                    </div>
+
+                    <!-- Review -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Your Experience
+                        </label>
+
+                        <textarea class="form-control rounded-3"
+                                  rows="5"
+                                  placeholder="Describe how this product helped you..."></textarea>
+
+                    </div>
+
+                    <!-- Upload -->
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+                            Upload Images (Optional)
+                        </label>
+
+                        <input class="form-control rounded-3"
+                               type="file"
+                               multiple>
+
+                        <small class="text-muted">
+                            JPG, PNG (Maximum 5 Images)
+                        </small>
+
+                    </div>
+
+                    <!-- Recommend -->
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold d-block">
+                            Would you recommend this product?
+                        </label>
+
+                        <div class="form-check form-check-inline">
+
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="recommend"
+                                   checked>
+
+                            <label class="form-check-label">
+                                👍 Yes
+                            </label>
+
+                        </div>
+
+                        <div class="form-check form-check-inline">
+
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="recommend">
+
+                            <label class="form-check-label">
+                                👎 No
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- Footer -->
+
+            <div class="modal-footer border-0 bg-light rounded-bottom-4">
+
+                <button class="btn btn-light border rounded-pill px-4"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+
+                <button type="button" id="btnSubmitReview"
+                        class="btn btn-success rounded-pill px-5">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    Submit Review
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Zoom Modal -->
+@*   <div class="modal fade" id="zoomModal" tabindex="-1" aria-labelledby="zoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center p-0 position-relative">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2 rounded-circle" data-bs-dismiss="modal" aria-label="Close"></button>
+                <img id="zoomedImage" src="@Model.img1" class="img-fluid rounded shadow" style="max-height: 90vh;" alt="Zoomed Product Image" />
+            </div>
+        </div>
+    </div>
+</div> *@
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+@* <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script> *@
+
+@section Scripts {
+    <script>
+
+             $(document).ready(function () {
+                 BindBestSellingProduct();
+                 BindIngredients();
+             });
+
+
+
+             function BindBestSellingProduct() {
+                $.ajax({
+                     url: "/product/get-product",
+                    type: "GET",
+                    data: {
+                        cart_id: 0,
+                        fetch_type: "HOME_BEST_SELLING"
+                    },
+                    success: function (response) {
+
+                        if (!response || !response.success)
+                            return;
+
+                        let products = response.data || [];
+                        let html = "";
+
+                        // Duplicate products for infinite marquee
+                        for (let r = 0; r < 2; r++) {
+                            $.each(products, function (i, product) {
+                                // Product Image
+                                let img = "/images/noimage.jpg";
+                                if (product.img1 && product.img1.trim() !== "") {
+                                    img = "/" + product.img1.replace(/^\/+/, "");
+                                }
+
+                                // Product Name
+                                let name = product.prod_name || "";
+
+                                if (name.length > 25) {
+                                    name = name.substring(0, 25) + "...";
+                                }
+
+                                // Product Details
+                                let code = product.prod_code || "";
+                                let mrp = Number(product.mrp || 0).toFixed(2);
+                                let price = Number(product.price || 0).toFixed(2);
+                                let discount = Number(product.discount || 0).toFixed(0);
+
+                                html += `
+                                    <div class="marquee-item">
+                                        <div class="product-card">
+                                            <!-- Product Code -->
+                                            <div class="product-code-badge"> ${code}  </div>
+                                            <!-- Wishlist -->
+                                            <div class="bs-wishlist-btn"
+                                                 title="Wishlist">
+                                                <i class="bi bi-heart"></i>
+                                            </div>
+
+                                            <!-- Product Image -->
+                                            <a href="/product/${product.seo_url}">
+                                                <img src="${img}" class="product-img" alt="${product.prod_name}" loading="lazy">
+                                            </a>
+
+                                            <!-- Product Information -->
+                                            <div class="product-info">
+                                                <h6 class="product-title mb-2"> ${name} </h6>
+                                                <div class="product-price-box d-flex justify-content-between align-items-center">
+                                                    <span class="mrp"> MRP ₹${mrp}  </span>
+                                                    <span class="dp"> Rs.${price} </span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                                    <span class="badge bg-warning text-dark">
+                                                        ${discount}% OFF
+                                                    </span>
+
+                                                    <button class="btn-cart-sm" type="button" onclick="AddToCart(0,${product.pid},1,'')">
+                                                        <i class="bi bi-cart-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                            });
+                        }
+
+                        $("#marqueeTrack").html(html);
+
+                        // Restart marquee
+                        if (typeof InitializeMarquee === "function") {
+                            InitializeMarquee();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading products:", error);
+                    }
+                });
+
+            }
+
+
+        function BindIngredients() {
+            showLoader();
+            $("#ingredientContainer").html("");
+            let mst_key = "GET_INGREDIENT_LIST";
+            let pid = $("#pid").val();
+            $.ajax({
+                url: `/common/master-reports?mst_key=${mst_key}&id=${pid}`,
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    hideLoader();
+                    if (!response || response.success !== true) {
+                        $("#ingredientContainer").html("");
+                        $("#div_ingredientContainer").hide();
+                        return;
+                    }
+
+                    let data = [];
+                    try {
+                        data = JSON.parse(response.data);
+                    }
+                    catch (e) {
+                        console.log(e);
+                    }
+
+                    if (!data || data.length === 0) {
+                        $("#ingredientContainer").html("");
+                        $("#div_ingredientContainer").hide();
+                        return;
+                    }
+
+                    $("#div_ingredientContainer").show();
+                    let html = "";
+
+                    $.each(data, function (index, item) {
+
+                        let img = "@Const.NO_IMAGE";
+                        if (item.ingredient_img && item.ingredient_img.trim() !== "") {
+                            img = "/" + item.ingredient_img.replace(/^\/+/, "");
+                        }
+
+                        let ingredientName = item.ingredient_name || "";
+                        let ingredientDesc = item.ingredient_desc || "";
+                        html += `
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+                            <div class="ingredient-card">
+                                <div class="ingredient-image">
+                                    <img src="${img}" class="img-fluid" alt="${ingredientName}"
+                                         loading="lazy" onclick="showZoom('${img}')">
+                                </div>
+                                <div class="ingredient-body">
+                                    <h5 class="ingredient-title">
+                                        <i class="bi bi-flower1 text-success me-2"></i> ${ingredientName}
+                                    </h5>
+                                    <p class="ingredient-desc"> ${ingredientDesc} </p>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    });
+                    $("#ingredientContainer").html(html);
+                },
+                error: function () {
+                    hideLoader();
+                    $("#ingredientContainer").html("");
+                    $("#div_ingredientContainer").hide();
+                }
+            });
+        }
+
+
+
+
+
+              // Highlight active thumbnail
+             document.querySelectorAll(".img-thumbnail").forEach(thumb => {
+                 thumb.addEventListener("click", function () {
+                     document.querySelectorAll(".img-thumbnail").forEach(t => t.classList.remove("border-primary"));
+                     this.classList.add("border-primary");
+                 });
+             });
+
+             // Sync zoomed image with main image
+             document.getElementById("mainImage").addEventListener("click", function () {
+                 document.getElementById("zoomedImage").src = this.src;
+             });
+
+             // Function to update both images and highlight thumbnails
+             function updateMainImage(src) {
+                 document.getElementById("mainImage").src = src;
+                 document.getElementById("zoomedImage").src = src;
+
+                 document.querySelectorAll(".img-thumbnail").forEach(t => t.classList.remove("border-primary"));
+                 const activeThumb = Array.from(document.querySelectorAll(".img-thumbnail")).find(t => t.src === src);
+                 if (activeThumb) activeThumb.classList.add("border-primary");
+             }
+
+             // Close modal if clicking outside the zoomed image
+             document.getElementById("zoomModal").addEventListener("click", function (e) {
+                 const image = document.getElementById("zoomedImage");
+                 if (!image.contains(e.target)) {
+                     const modal = bootstrap.Modal.getInstance(document.getElementById("zoomModal"));
+                     modal.hide();
+                 }
+             });
+
+
+             $(function () {
+                 var container = $("#marqueeContainer");
+                 var timer;
+                 function startAutoScroll() {
+                     timer = setInterval(function () {
+                         var maxScroll = container[0].scrollWidth - container.innerWidth();
+                         if (container.scrollLeft() >= maxScroll) {
+                             container.scrollLeft(0);
+                         } else {
+                             container.scrollLeft(container.scrollLeft() + 1);
+                         }
+                     }, 20);
+                 }
+
+                 function stopAutoScroll() {
+                     clearInterval(timer);
+                 }
+
+                 startAutoScroll();
+                 container.hover(function () {
+                     stopAutoScroll();
+                 }, function () {
+                     startAutoScroll();
+                 });
+
+                 $("#nextBtn").click(function () {
+                     stopAutoScroll();
+                     container.stop().animate({
+                         scrollLeft: container.scrollLeft() + 320
+                     }, 400);
+                     startAutoScroll();
+                 });
+
+                 $("#prevBtn").click(function () {
+                     stopAutoScroll();
+                     container.stop().animate({
+                         scrollLeft: container.scrollLeft() - 320
+                     }, 400);
+                     startAutoScroll();
+                 });
+             });
+
+
+             function shareProduct() {
+                 if (navigator.share) {
+                     navigator.share({
+                         title: document.title,
+                         text: '@Model.prod_name',
+                         url: window.location.href
+                     });
+                 } else {
+                     navigator.clipboard.writeText(window.location.href);
+                     alert("Product link copied.");
+                 }
+             }
+
+            // $('.wishlist-btn').click(function () {
+            //     $(this).toggleClass('active');
+            //     $(this).find('i').toggleClass('bi-heart').toggleClass('bi-heart-fill');
+            // });
+
+            $("#btnSubmitReview").click(function () {
+
+                // Center Boom
+                setTimeout(function () {
+                    confetti({
+                        particleCount: 250,
+                        spread: 140,
+                        startVelocity: 60,
+                        origin: {
+                            x: 0.5,
+                            y: 0.5
+                        }
+                    });
+                }, 250);
+
+                // Success Message
+                Swal.fire({
+                    icon: "success",
+                    title: "🎉 Thank You!",
+                    html: `
+                        <h5 class="text-success mb-2">
+                            Your review has been submitted successfully.
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Thank you for sharing your experience with our Ayurvedic product.
+                        </p>
+                    `,
+                    confirmButtonColor: "#2e7d32",
+                    confirmButtonText: "Awesome!"
+                }).then(() => {
+
+                    // Close Modal
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
+                    if (modal)
+                        modal.hide();
+
+                    // Optional: Reset Form
+                    $("#reviewModal form")[0].reset();
+                });
+            });
+
+    </script>
+
+}
+
+

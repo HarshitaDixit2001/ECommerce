@@ -1,0 +1,1303 @@
+﻿@model GenerateOrderDto
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* =====================================
+           AYURVEDIC CART PAGE THEME
+        ===================================== */
+
+    /* ===== HEADER ===== */
+    .cart-page-header {
+        background: linear-gradient(135deg, #198754, #2e7d32);
+        color: #fff;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 16px 16px;
+    }
+
+    /* ===== TABLE HEADER ===== */
+    .table thead th {
+        background: #edf7ef;
+        color: #198754;
+        font-weight: 600;
+        border-bottom: 2px solid #d6eadb;
+    }
+
+    /* ===== INPUT FOCUS ===== */
+    .form-control:focus,
+    .form-select:focus,
+    .cart-qty-input:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25,135,84,.15);
+    }
+
+    /* ===== HEADINGS ===== */
+    h5,
+    .fw-bold {
+        color: #1d5a34 !important;
+    }
+
+    /* ===== PRODUCT LINK ===== */
+    .product-link {
+        color: #212529;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .product-link:hover {
+            color: #198754;
+        }
+
+    /* ===== PRIMARY BUTTON ===== */
+    .btn-primary {
+        background: #198754;
+        border-color: #198754;
+    }
+
+        .btn-primary:hover {
+            background: #146c43;
+            border-color: #146c43;
+        }
+
+    /* ===== SUCCESS BUTTON ===== */
+    .btn-success {
+        background: linear-gradient(135deg,#198754,#2e7d32);
+        border: none;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(25,135,84,.25);
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg,#146c43,#1b5e20);
+            color: #fff;
+        }
+
+    /* ===== SUMMARY TEXT ===== */
+    #lbl_Total {
+        color: #198754 !important;
+        font-weight: 700;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+        border: 1px solid #e6f2e8;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.05);
+    }
+
+    /* ===== PANEL ===== */
+    .cart-panel {
+        border-left: 4px solid #198754;
+    }
+
+    /* ===== MAIN BUTTON ===== */
+    .btn-theme {
+        background: linear-gradient(135deg,#198754,#2e7d32);
+        border: none;
+        color: #fff !important;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: .3px;
+        transition: .3s;
+        box-shadow: 0 5px 15px rgba(25,135,84,.25);
+    }
+
+        .btn-theme:hover {
+            background: linear-gradient(135deg,#146c43,#1b5e20);
+            color: #fff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(25,135,84,.35);
+        }
+
+        .btn-theme:active {
+            transform: scale(.98);
+        }
+
+    /* ===== PRODUCT IMAGE CARD ===== */
+    .img-card {
+        display: inline-block;
+        padding: 8px;
+        border-radius: 14px;
+        background: linear-gradient(145deg,#f4fbf5,#eaf7ee);
+        border: 1px solid #d8eadc;
+        box-shadow: 0 6px 14px rgba(0,0,0,.08);
+        transition: .3s;
+    }
+
+        .img-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,.12);
+        }
+
+    /* ===== PRODUCT IMAGE ===== */
+    .img-preview {
+        max-height: 100px;
+        border-radius: 10px;
+        cursor: zoom-in;
+        transition: .3s;
+    }
+
+        .img-preview:hover {
+            transform: scale(1.05);
+        }
+
+    /* ===== ORDER SUMMARY BOX ===== */
+    .order-summary {
+        background: #f8fcf8;
+        border: 1px solid #d8eadc;
+        border-radius: 15px;
+    }
+
+    /* ===== PRICE TEXT ===== */
+    .price-text {
+        color: #198754;
+        font-weight: 700;
+    }
+
+    /* ===== REMOVE BUTTON ===== */
+    .btn-remove {
+        color: #dc3545;
+        border: 1px solid #f1c0c7;
+        background: #fff;
+    }
+
+        .btn-remove:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+    /* ===== QUANTITY BUTTON ===== */
+    .qty-btn {
+        background: #edf7ef;
+        border: 1px solid #d8eadc;
+        color: #198754;
+        font-weight: 600;
+    }
+
+        .qty-btn:hover {
+            background: #198754;
+            color: #fff;
+        }
+
+    /* ===== BADGES ===== */
+    .badge-ayurvedic {
+        background: #e8f5ec;
+        color: #198754;
+        border: 1px solid #cfe8d6;
+        font-weight: 600;
+        padding: 6px 12px;
+    }
+
+    /* ===== MOBILE ===== */
+    @@media(max - width:768px) {
+        .cart-page-header {
+            padding: 1.5rem 0;
+        }
+
+        .img-preview {
+            max-height: 80px;
+        }
+
+        .btn-theme {
+            font-size: 14px;
+            padding: 12px;
+        }
+    }</style>
+
+<!-- ================= BREADCRUMB SECTION ================= -->
+<section class="breadcrumb-section">
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+                <h1 class="breadcrumb-title">
+                    🛒 Shopping Cart
+                </h1>
+
+                <p class="breadcrumb-subtitle mb-0">
+                    | Review your selected items before checkout
+                </p>
+            </div>
+
+            <div class="col-lg-6 text-lg-end">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-lg-end mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="/secure/user-dashboard">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item"> Shopping Cart </li>
+                    </ol>
+                </nav>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<div class="clearfix"></div>
+
+
+<form asp-action="view-cart" asp-controller="cart" id="FormSubmit" method="post" autocomplete="off">
+    @Html.AntiForgeryToken()
+
+    <!-- Main Content -->
+    <section class="content">
+        <div class="container-fluid px-4">
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div id="div_table_detail" class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="tblList" class="table cart-table table-hover display nowrap w-100">
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" class="text-end">Total:</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th> <!-- Qty -->
+                                            <th></th> <!-- Total Amount -->
+                                            @* <th></th> <!-- BV --> *@
+                                            <th></th> <!-- Delete -->
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div id="div_order_detail" class="col-lg-12 mb-4">
+                        <!-- Shipping & Payment Detail -->
+                        <div class="card">
+                            <div class="card-body">
+
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <h5 class="fw-bold mb-4" style="color: #ff7a00;">
+                                            <i class="bi bi-truck me-2"></i>Shipping Address
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-6 d-flex justify-content-md-end justify-content-start">
+                                        <button id="btn_add_shipping_address" class="btn btn-primary" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#ShippingAddressModal">
+                                            <i class="bi bi-tag me-1"></i> Add Shipping Address
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div id="shippingAddressContainer"></div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4" style="border-color: #e5e7eb;" />
+
+                                <h5 class="fw-bold mb-4" style="color: #ff7a00;">
+                                    <i class="bi bi-credit-card me-2"></i>Payment Details
+                                </h5>
+                                <div id="div_payment_detail" class="row g-3">
+                                    <div class="col-sm-6">
+                                        <select asp-for="pay_id" class="form-select" onchange="PaymentOption()">
+                                            <option value="0">🔍 Payment Option</option>
+                                            <option value="3" selected>📲 Pay via UPI (Scan QR Code)</option>
+                                            <option value="1">💵 Cash</option>
+                                            <option value="2">📦 COD</option>
+                                            @* <option value="4">🏦 Net Banking</option>
+                                            <option value="5">🧾 Cheque</option>
+                                            <option value="6">💳 Credit Card</option>
+                                            <option value="7">💳 Debit Card</option>
+                                            <option value="8">📄 DD</option> *@
+                                            <option value="9">👛 Company Wallet</option>
+                                            <option value="10">👛 Payout Wallet</option>
+                                        </select>
+                                        <span asp-validation-for="pay_id" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input asp-for="bank_name" class="form-control" placeholder="Bank Name" maxlength="50" />
+                                        <span asp-validation-for="bank_name" class="text-danger"></span>
+                                    </div>
+                                    <div id="div_check_no" class="col-sm-6">
+                                        <input asp-for="check_no" class="form-control" placeholder="Enter UTR No." maxlength="12" />
+                                        <span asp-validation-for="check_no" class="text-danger"></span>
+                                        <div class="form-text text-primary fw-semibold">
+                                            <small class="text-muted text-nowrap d-block">
+                                                💡 Example: <span class="text-danger fw-bold">760581962240</span>
+                                                <span class="ms-2 text-secondary">(12 digits only)</span>
+                                            </small>
+                                            <!-- ✅ Moved outside -->
+                                            <div id="div_img_progress" style="display:none;" class="text-center mt-2">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <input asp-for="checkdate" class="form-control" type="text" />
+                                        <span asp-validation-for="checkdate" class="text-danger"></span>
+                                    </div>
+                                    <div id="div_upload_pay_slip" class="col-md-2">
+                                        <label for="upload_pay_slip" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                            <i class="fa fa-upload me-1 text-success"></i>Payment Slip
+                                        </label>
+                                        <span asp-validation-for="upload_pay_slip" class="text-danger d-block mt-1"></span>
+                                        <input type="file" asp-for="upload_pay_slip" class="form-control" onchange="uploadSlip(event)" accept="image/*" style="display:none;" />
+                                        <span asp-validation-for="upload_pay_slip" class="text-danger"></span>
+                                    </div>
+                                    <div id="div_img_name" class="col-md-4">
+                                        <img id="img_name" class="img-preview mt-4" style="max-height: 150px; max-width: 150px;" src="@(string.IsNullOrWhiteSpace(Model?.img_name) ? Const.NO_IMAGE : "/" + Model.img_name)" onclick="showZoom(this.src)" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <!-- 🔹 TERMS -->
+                    <div id="div_order_T_and_C" class="col-lg-12 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row g-4">
+                                    <div class="col-12 col-lg-12">
+                                        @await Component.InvokeAsync("TcInvoice")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <!-- Order Summary -->
+                    <div class="card" style="position: sticky; top: 100px;">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-4" style="color: #ff7a00;">
+                                <i class="bi bi-receipt me-2"></i>Order Summary
+                            </h5>
+
+                            <div class="row small mb-2" style="display:none;">
+                                <div class="col-6">Billing Value:</div>
+                                <div class="col-6 text-end" id="lbl_Gross">0.00</div>
+                            </div>
+                            <div class="row small mb-2" style="display:none;">
+                                <div class="col-6">GST:</div>
+                                <div class="col-6 text-end" id="lbl_GST">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom d-none">
+                                <div class="col-6 small text-muted">@Const.M_BV:</div>
+                                <div class="col-6 text-end fw-semibold" id="lbl_BV">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom" style="display:none;">
+                                <div class="col-6 small text-muted">Scheme:</div>
+                                <div class="col-6 text-end fw-semibold" id="scheme">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom d-none">
+                                <div class="col-6 small text-muted">Discount:</div>
+                                <div class="col-6 text-end fw-semibold text-success" id="discount">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom">
+                                <div class="col-6 small text-muted">Delivery Charge:</div>
+                                <div class="col-6 text-end fw-semibold" id="del_charge">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom">
+                                <div class="col-6 small text-muted">Net Delivery Charge:</div>
+                                <div class="col-6 text-end fw-semibold" id="net_delivery_charge">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom d-none">
+                                <div class="col-6 small text-muted">Adjustment:</div>
+                                <div class="col-6 text-end fw-semibold" id="adjust_amt">0.00</div>
+                            </div>
+                            <div class="row mb-3 pb-2 border-bottom">
+                                <div class="col-6 small text-muted">Gross Weight:</div>
+                                <div class="col-6 text-end fw-semibold" id="lbl_GrossWeight">0.00</div>
+                            </div>
+                            <!-- Coupon Section -->
+                            <div id="div_coupon" class="input-group mb-4">
+                                <input type="text" class="form-control coupon-input"
+                                       id="coupon" placeholder="Enter Coupon Code" readonly>
+
+                                <button class="btn btn-herbal" type="button" onclick="ApplyCoupon()">
+                                    <i class="bi bi-tag-fill me-1"></i> Apply
+                                </button>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="row align-items-center total-box">
+                                <div class="col-6">
+                                    <span class="total-label"> Total Amount </span>
+                                </div>
+
+                                <div class="col-6 text-end">
+                                    <span class="total-price" id="lbl_Total">
+                                        ₹0.00
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div id="div_wallet_balance" class="row mb-3 pb-2 border-bottom">
+                                <div class="col-6 small text-muted">Wallet Balance:</div>
+                                <div class="col-6 text-end fw-semibold text-success" id="lbl_walletBalance">₹0.00</div>
+                            </div>
+                            <!-- 🔹 QR -->
+                            <div id="div_QR" class="col-12 border-0 rounded-4 text-center p-3 h-100">
+                                <h6 class="fw-bold text-theme mb-3">📲 Scan & Pay</h6>
+                                <div class="qr-wrapper mb-3">
+                                    <img id="qrImage" src="/images/loader.gif" class="img-fluid" style="max-width:190px;" />
+                                </div>
+                                <div class="fw-semibold">
+                                    Amount: ₹<span id="qrAmount">0</span>
+                                </div>
+                                <div class="fw-bold text-dark">
+                                    👤 @Const.COMP_UPI_NAME
+                                </div>
+                                <div class="text-muted">
+                                    UPI ID: @Const.COMP_UPI_ID
+                                </div>
+                            </div>
+
+                            <div id="div_save_progress" style="display:none;" class="text-center mt-2">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <!-- 🟢 PRIMARY: Place Order -->
+                                <button type="submit" id="saveBtn" class="btn btn-primary btn-lg fw-semibold">
+                                    <i class="bi bi-check-circle-fill me-2"></i> Confirm & Place Order
+                                </button>
+
+                                <!-- 🔵 SECONDARY: Checkout -->
+                                <a href="javascript:void(0)" id="btn_checkout" onclick="SetPageEvent('CHECKOUT')"
+                                   class="btn btn-primary btn-lg fw-semibold">
+                                    <i class="bi bi-credit-card-2-front me-2"></i> Proceed to Checkout
+                                </a>
+
+                                <!-- ⚪ TERTIARY: Back -->
+                                <a href="javascript:void(0)" id="btn_BackToCart" onclick="SetPageEvent('CART')"
+                                   class="btn btn-outline-secondary btn-lg">
+                                    <i class="bi bi-arrow-left me-2"></i> Back to Cart
+                                </a>
+                                <!-- 🟡 CONTINUE SHOPPING -->
+                                <a href="/product" id="btn_continue_shopping"
+                                   class="btn btn-outline-primary btn-lg">
+                                    <i class="bi bi-bag me-2"></i> Continue Shopping
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <input type="hidden" id="img_utr_no" value="" />
+    <input type="hidden" id="img_utr_amount" value="" />
+    <input type="hidden" id="img_utr_date" value="" />
+    <input type="hidden" id="img_utr_full_text" value="" />
+    <input type="hidden" id="img_utr_sender_name" value="" />
+    <input type="hidden" id="img_utr_upi_id" value="" />
+
+</form>
+
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+<input type="hidden" id="hdn_page_value" value="" />
+
+<script>
+    // Initialize Select2 dropdown with a placeholder and allow clearing the selection
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+    const uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    const user_id = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+    $(function () {
+        @if (TempData["Error"] != null)
+        {
+                <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+        }
+        @if (TempData["Success"] != null)
+        {
+                <text> showSuccessMessage(`@Const.SUCCESS_HEADER`, '@TempData["Success"]'); </text>
+        }
+    });
+
+    let URL_CART_LIST = `/cart/get-cart-data`;
+    let URL_SPONSOR_NAME = `/common/master-reports`;
+    let URL_PROD_LIST = `/product/get-billing-product-list`;
+    let URL_DROPDOWN_LIST = `/common/get-master-dropdown`;
+
+
+    $(function () {
+        $('#user_id').val(user_id);
+
+        BindTableData();
+        //GetName();
+        generateQr();
+
+        PaymentOption();
+        loadAddressList();
+
+        SetPageEvent('CART');
+    });
+
+
+    function SetPageEvent(value){
+         localStorage.setItem('page_value', value);
+         BindPage();
+    }
+
+
+    function BindPage(){
+        let page_value = localStorage.getItem('page_value');
+        if (!page_value) {
+            localStorage.setItem('page_value', 'CART');
+        }
+
+
+        if(page_value == 'CART'){
+           $('#div_table_detail').show();
+           $('#btn_checkout').show();
+
+           $('#saveBtn').hide();
+           $('#btn_BackToCart').hide();
+           $('#div_order_detail').hide();
+           $('#div_QR').hide();
+           $('#div_order_T_and_C').hide();
+           $('#div_coupon').hide();
+        }
+
+
+
+        if(page_value == 'CHECKOUT'){
+            $('#saveBtn').show();
+            $('#btn_BackToCart').show();
+            $('#div_order_detail').show();
+            $('#div_QR').show();
+            $('#div_order_T_and_C').show();
+            $('#div_coupon').show();
+
+            $('#div_table_detail').hide();
+            $('#btn_checkout').hide();
+        }
+    }
+
+
+    function generateQr() {
+        // 🔹 Get amount from label if not passed
+        let text = $("#lbl_Total").html();
+        let amount = text.replace(/[^\d.]/g, ''); // remove ₹ and text
+        // 🔹 Default fallback
+        amount = parseFloat(amount);
+        if (isNaN(amount) || amount <= 0) {
+            amount = 1;
+        }
+        // 🔹 API URL
+        let qrUrl = "/api/upi/qr?amount=" + amount;
+        // 🔹 Show loader first
+        $("#qrImage").attr("src", "/images/loader.gif");
+        // 🔹 Load QR with slight delay (smooth UX)
+        setTimeout(function () {
+            $("#qrImage").attr("src", qrUrl);
+        }, 200);
+        // 🔹 Update amount text
+        $("#qrAmount").text(amount.toFixed(2));
+    }
+
+
+
+
+    function uploadSlip(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        // Reset UI
+        // const div_img_progress = document.getElementById("div_img_progress");
+        // div_img_progress.innerHTML = "<div class='spinner-solid'></div> Waiting for upload...";
+
+        $("#div_img_progress").show();
+        // ✅ IMAGE PREVIEW
+        var reader = new FileReader();
+        reader.onload = function () {
+            $("#img_name").attr("src", reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        // ✅ FORM DATA
+        var formData = new FormData();
+        formData.append("file", file); // controller parameter name
+        // ✅ API CALL
+        $.ajax({
+            url: "/cart/upload-slip",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+
+                $("#div_img_progress").hide();
+                //div_img_progress.innerHTML  = "";
+                $("#check_no").val('');
+                $("#img_utr_no").val('');
+                $("#img_utr_amount").val('');
+                $("#img_utr_date").val('');
+                $("#img_utr_full_text").val('');
+                $("#img_utr_sender_name").val('');
+                $("#img_utr_upi_id").val('');
+                if (res.utr_no) {
+                    $("#check_no").val(res.utr_no);
+                    $("#img_utr_no").val(res.utr_no);
+                    $("#img_utr_amount").val(res.utr_amount);
+                    $("#img_utr_date").val(res.utr_doe);
+                    $("#img_utr_full_text").val(res.utr_fullText);
+                    $("#img_utr_sender_name").val(res.utr_senderName);
+                    $("#img_utr_upi_id").val(res.utr_upiId);
+                }
+            },
+            error: function (err) {
+               $("#div_img_progress").hide();
+               // div_img_progress.innerHTML  = "";
+                //console.error(err);
+            }
+        });
+        previewImage(event, 'img_name');
+    }
+
+
+
+    function BindTableData() {
+          showLoader();
+          $.ajax({
+              url: URL_CART_LIST,
+              data: { cart_id: cart_id, uid: uid },
+              type: 'GET',
+              success: function (response) {
+                   hideLoader();
+                  if (response.success === true) {
+                      const data = JSON.parse(response.data) || [];
+
+                      $('#tblList').DataTable({
+                          dom: 't',
+                          scrollCollapse: true,
+                          destroy: true,
+                          responsive: true,
+                          autoWidth: false,
+                          pageLength: -1,
+                          //language: { emptyTable: "Your cart is empty....." },
+                           language: {
+                                emptyTable: "<div style='color:blue; font-weight:bold; text-align:center;'>Your cart is empty.....</div>"
+                            },
+                          data: data,
+                          columns: [
+                              { title: '#',  data: null, render: function (data, type, row, meta) { return meta.row + 1; } },
+
+                              { title: 'Image', orderable: false, className: 'text-center',
+                                   render: function (data, type, row) {
+                                       let imgUrl = row.img1 && row.img1 !== '' ? '/' + row.img1 : '/images/noimage.jpg';
+                                       return `  <a href="/home/ProdDetail?pid=${row.pid}&size_id=0&color_id=0" target="_blank">
+                                               <img src="${imgUrl}"  alt="Product Image" style="width:50px; height:50px; object-fit:cover; border-radius:6px; cursor:pointer;" />
+                                           </a> `;
+                                   }
+                                },
+                              // { title: 'Product', orderable: false,  render: function (qty, type, row) { return row.prod_code + ' - ' + row.prod_name; } },
+                                {
+                                    title: 'Product',
+                                    orderable: false,
+                                    render: function (qty, type, row) {
+                                        return `<a href="/home/ProdDetail?pid=${row.pid}&size_id=0&color_id=0"
+                                                   target="_blank"
+                                                   class="product-link">
+                                                   ${row.prod_code} - ${row.prod_name}
+                                                </a>`;
+                                    }
+                               },
+
+                              { data: 'weight', visible: false },
+                              // { data: 'gst', title: 'GST' },
+                              { data: 'qty', title: 'Quantity', orderable: false,
+                                    render: function (qty, type, row) {
+                                        const cid = row.cid;
+                                        return `
+                                          <div class="input-group input-group-sm justify-content-center">
+                                              <button class="btn btn-outline-danger" type="button" onclick="changeQty(${cid}, -1)">−</button>
+                                              <input type="number" min="1" maxlength="7" value="${qty}" class="form-control cart-qty-input text-center"
+                                                     id="qty-${cid}" style="width: 60px;" oninput="this.value = this.value.slice(0, 7);"
+                                                     onchange="changeQtyDirect(${cid}, this.value)" />
+                                              <button class="btn btn-outline-success" type="button" onclick="changeQty(${cid}, 1)">+</button>
+                                          </div>`;
+                                    }
+                              },
+                              // { data: 'gross', title: 'Bill Value' },
+                              // { data: 'gst', title: 'GST' },
+                              // { data: 'gst_amt', title: 'TAX' },
+                              { data: 't_amount', title: 'Price' },
+                              // { data: 't_m_bv', title: '@Const.M_BV' },
+                              { data: 'cid', title: 'Del', orderable: false,  render: function (id) { return `<i class="fa fa-trash text-danger" aria-hidden="true" onclick="Delete_By_Id('CART',${id})" style="cursor:pointer; padding:2px; margin:2px;"></i>`; } }
+                          ],
+                          "footerCallback": function (row, data, start, end, display) {
+                              const api = this.api();
+                              function getTotal(index) { return api.column(index, { page: 'current' }).data().reduce((a, b) => { const x = parseFloat(a) || 0; const y = parseFloat(b) || 0; return x + y; }, 0); }
+
+                              // ✅ Store sums in variables
+                               const totalWeight = getTotal(3);
+                               const totalQty = getTotal(4);
+                               // const totalGross = getTotal(4);
+                               // const totalTax= getTotal(6);
+                               const totalAmount= getTotal(5);
+                               const totalBV= getTotal(6);
+
+                               //
+
+                               // ✅ Assign to footer
+                               $(api.column(3).footer()).html(totalWeight.toFixed(2));
+                               $(api.column(4).footer()).html(totalQty);
+                               // $(api.column(4).footer()).html(totalGross.toFixed(2));
+                               // $(api.column(6).footer()).html(totalTax.toFixed(2));
+                               $(api.column(5).footer()).html(totalAmount.toFixed(2));
+                              // $(api.column(6).footer()).html(totalBV.toFixed(2));
+                               // ✅ You can now use these values elsewhere if needed
+                               //$('#lbl_Gross').text(totalGross.toFixed(2));
+                              // $('#lbl_GST').text(totalTax.toFixed(2));
+                               $('#lbl_BV').text(totalBV.toFixed(2));
+                               $('#scheme').text("0.00");
+                               $('#discount').text("0.00");
+                               $('#del_charge').text("0.00");
+                               $('#net_delivery_charge').text("0.00");
+                               $('#adjust_amt').text("0.00");
+                               $('#lbl_GrossWeight').text(totalWeight.toFixed(2));
+                               $('#lbl_Total').text(totalAmount.toFixed(2));
+                               generateQr();
+                          }
+                      });
+                  }
+              },
+              error: function (xhr, status, error) {
+              }
+          });
+      }
+
+
+
+    function changeQty(cid, delta) {
+           const input = document.getElementById(`qty-${cid}`);
+           let currentQty = parseInt(input.value) || 1;
+           let newQty = currentQty + delta;
+           newQty = Math.min(Math.max(newQty, 1), 999999);
+           input.value = newQty;
+           AddToCart(cid, 0, newQty, BindTableData);
+     }
+
+
+
+    function changeQtyDirect(cid, value) {
+          let newQty = parseInt(value) || 1;
+          newQty = Math.min(Math.max(newQty, 1), 999999);
+          document.getElementById(`qty-${cid}`).value = newQty;
+          AddToCart(cid, 0, newQty, BindTableData);
+     }
+
+
+    function PaymentOption(){
+        let pay_id=$('#pay_id').val();
+        $('#lbl_walletBalance').text('0.00');
+        if(pay_id =="0" || pay_id =="1" || pay_id =="2"){
+            $('#bank_name').hide();
+            $('#div_check_no').hide();
+            $('#checkdate').hide();
+            $('#div_QR').hide();
+            $('#div_upload_pay_slip').hide();
+            $('#div_img_name').hide();
+            $('#div_wallet_balance').hide();
+        }
+        else if(pay_id == "9" || pay_id == "10"){
+            $('#bank_name').hide();
+            $('#div_check_no').hide();
+            $('#checkdate').hide();
+            $('#div_QR').hide();
+            $('#div_upload_pay_slip').hide();
+            $('#div_img_name').hide();
+            $('#div_wallet_balance').show();
+            BindBalance();
+        }
+        else if(pay_id == "3"){
+            $('#bank_name').hide();
+            $('#checkdate').hide();
+            $('#div_check_no').show();
+            $('#div_QR').show();
+            $('#div_upload_pay_slip').show();
+            $('#div_img_name').show();
+            $('#div_wallet_balance').hide();
+        }
+        else
+        {
+            $('#bank_name').show();
+            $('#div_check_no').show();
+            $('#checkdate').show();
+            $('#div_QR').hide();
+            $('#div_upload_pay_slip').hide();
+            $('#div_img_name').hide();
+            $('#div_wallet_balance').hide();
+        }
+    }
+
+
+    function BindBalance(){
+         let pay_id=$('#pay_id').val();
+         let mst_key="GET_BASIC_USER_DATA";
+         $('#lbl_walletBalance').text('Loading...');
+         $.ajax({
+             url: `${URL_SPONSOR_NAME}?id=${uid}&mst_key=${mst_key}`,
+             type: 'GET',
+             success: function (response) {
+                 if(user_id ==""){ $('#lbl_walletBalance').text('0.00'); }
+                 else if(response.success === true){
+                      const dataArray = JSON.parse(response.data) || [];
+                      const data = dataArray[0] || {};
+                      $('#lbl_walletBalance').text('0.00');
+                      if(pay_id == "9"){ $('#lbl_walletBalance').text(data.company_wallet); }
+                      if(pay_id == "10"){ $('#lbl_walletBalance').text(response.data.payout_wallet); }
+                 }
+                 else{  $('#lbl_walletBalance').text('0.00'); }
+             },
+             error: function () { $('#lbl_walletBalance').text('0.00');  }
+         });
+     }
+
+
+    function DistrictSelect(dist_id) {
+         const stateId = $('#state_id').val();
+         const $dist = $('#dist_id');
+         const defaultOpt = '<option value="0">🔍 Select District</option>';
+
+         if (!stateId || stateId == 0) {
+             $dist.html(defaultOpt);
+             return;
+         }
+         $dist.html('<option value="0">Loading...</option>');
+         $.get('/common/get-master-dropdown', {
+             mst_key: 'GET_DISTRICT_LIST',
+             id: stateId
+         })
+         .done(res => {
+             const options = (res?.data || [])
+                 .map(x => `<option value="${x.value}">${x.text}</option>`)
+                 .join('');
+             $dist.html(defaultOpt + options);
+         })
+         .fail(() => $dist.html(defaultOpt));
+     }
+
+
+    $('#FormSubmit').on('submit', function (e) {
+        e.preventDefault();
+        let Name = $('#s_name').val();
+        let Mobile = $('#s_mobile_no').val();
+        let BV = $('#lbl_BV').text();
+        let OrderAmount = $('#lbl_Total').text();
+        let PayModeValue = parseInt($('#pay_id').val());
+        let PayModeText = $('#pay_id option:selected').text();
+        let UTR = $('#check_no').val();
+
+        let img_utr_no = $('#img_utr_no').val();
+        let img_utr_amount = $('#img_utr_amount').val();
+        let img_utr_date = $('#img_utr_date').val();
+        let img_utr_full_text = $('#img_utr_full_text').val();
+        let img_utr_sender_name = $('#img_utr_sender_name').val();
+        let img_utr_upi_id = $('#img_utr_upi_id').val();
+
+        let said = $('input[name="SelectedAddressId"]:checked').val();
+        if (!said) {
+            showErrorLog('Shipping Address Required','Please select a shipping address before proceeding.');
+            return false;
+        }
+
+        // ✅ Validation for Pay Mode
+        if (!PayModeValue || PayModeValue === 0) {
+            showErrorLog(`Pay Mode Required`, `Please select a payment mode before generating the order.`);
+            return false;
+        }
+
+        // ✅ Confirmation Message
+        Swal.fire({
+            icon: 'question',
+            title: 'Confirm Order Submission',
+            html: `
+                <div style="text-align:left; font-size:15px; line-height:1.8;">
+                    <b>Name:</b> ${Name} <br>
+                    <b>Mobile:</b> ${Mobile} <br>
+                    <b>Order Amount:</b> ${OrderAmount} <br>
+                    <b>Payment Mode:</b> ${PayModeText} <br>
+                    <b>UTR No.:</b> ${UTR} <br><br>
+                    <span style="color:#d63384; font-weight:600;">
+                        Do you want to generate this order?
+                    </span>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Generate Order',
+            cancelButtonText: 'Cancel',
+            width: '420px'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                const $btn = $('#saveBtn');
+                // Prevent multiple click
+                if ($btn.prop('disabled')) return;
+                // Save original button text
+                const originalText = $btn.html();
+                // Disable button + loader
+                $btn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-2"></i> Processing...');
+                showLoader();
+                const formData = new FormData(this);
+                formData.append("said", said);
+                debugger;
+
+                formData.append("img_utr_no", img_utr_no);
+                formData.append("img_utr_amount", img_utr_amount);
+                formData.append("img_utr_date", img_utr_date);
+                formData.append("img_utr_full_text", img_utr_full_text);
+                formData.append("img_utr_sender_name", img_utr_sender_name);
+                formData.append("img_utr_upi_id", img_utr_upi_id);
+
+                $('#div_save_progress').show();
+                $.ajax({
+                    url: '/cart/view-cart',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // ✅ Re-enable button after success
+                        $('#div_save_progress').hide();
+                        $btn.prop('disabled', false).html(originalText);
+                        hideLoader();
+                        if(response.success == true ){
+
+                            window.location = "/cart/ord-inv-success?inv_gen=" + response.inv_gen +"&ord_inv_no="+ response.message;
+
+                            /*
+                            if (PayModeValue == 9 || PayModeValue == 10)
+                            {
+                                showSuccessMessage('Success',
+                                'Your invoice has been generated. Your invoice number is : '+ response.message);
+                            }
+                            else if (PayModeValue == 3 && response.inv_gen =="1")
+                            {
+                                showSuccessMessage('Success',
+                                'Your invoice has been generated. Your invoice number is : '+ response.message);
+                            }
+                            else if (PayModeValue > 0 || PayModeValue <= 8)
+                            {
+                                showSuccessMessage('Success',
+                                'Your purchase order has been generated. Your order  number is : '+ response.message);
+                            }
+
+                            $('#pay_id').val(0);
+                            $('#FormSubmit')[0].reset();
+                            $('#div_QR').hide();
+                            BindTableData();
+                            */
+                        }else{
+                            showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                        }
+                    },
+                    error: function (res_error) {
+                        // ✅ Re-enable button after success
+                        $('#div_save_progress').hide();
+                        $btn.prop('disabled', false).html(originalText);
+                        showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+                    }
+                });
+            }
+
+        });
+    });
+
+
+    function SaveShippingAddress() {
+
+        let $btn = $('#btnSaveAddress');
+
+        let data = {
+            said: 0,
+            uid: uid,
+            name: $('#s_name').val().trim(),
+            mobile: $('#s_mobile_no').val().trim(),
+            address: $('#s_address').val().trim(),
+            state_id: $('#state_id').val(),
+            state: $('#state_id option:selected').text(),
+            dist_id: $('#dist_id').val(),
+            district: $('#dist_id option:selected').text(),
+            city: $('#s_city').val().trim(),
+            pin_code: $('#s_pincode').val().trim()
+        };
+
+
+        // ✅ Basic Validation
+        if (data.name === "") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter Name");
+            $('#s_name').focus();
+            return;
+        }
+
+        if (data.mobile.length !== 10) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter valid Mobile No.");
+            $('#s_mobile_no').focus();
+            return;
+        }
+
+        if (data.address === "") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter Address");
+            $('#s_address').focus();
+            return;
+        }
+
+        if (data.state_id == "0") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Select State");
+            $('#state_id').focus();
+            return;
+        }
+
+        if (data.dist_id == "0") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Select District");
+            $('#dist_id').focus();
+            return;
+        }
+
+        if (data.city === "") {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter City");
+            $('#s_city').focus();
+            return;
+        }
+
+        if (data.pin_code.length !== 6) {
+            showErrorLog(`@Const.ERROR_HEADER`, "Enter valid Pincode");
+            $('#s_pincode').focus();
+            return;
+        }
+
+
+        const formData = new FormData();
+        formData.append("said", 0);
+        formData.append("uid", uid);
+        formData.append("name", data.name);
+        formData.append("mobile", data.mobile);
+        formData.append("address", data.address);
+        formData.append("state_id", data.state_id);
+        formData.append("state", $('#state_id option:selected').text());
+        formData.append("dist_id", data.dist_id);
+        formData.append("district", $('#dist_id option:selected').text());
+        formData.append("city", data.city);
+        formData.append("pin_code", data.pin_code);
+
+
+        // ✅ Disable button + loader
+        $btn.prop('disabled', true).text('Saving...');
+
+        // ✅ AJAX Call
+         $.ajax({
+             url: '/cart/add-shipping-address',
+             method: 'POST',
+             data: formData,
+             processData: false,
+             contentType: false,
+             success: function (resp) {
+                 if (resp.success) {
+                    // ✅ success message
+                    showSuccessMessage('Success', 'Address Saved Successfully');
+                    // ✅ close modal
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('ShippingAddressModal'));
+                    modal.hide();
+
+                    // ✅ reset form
+                    $('#ShippingAddressModal input, #ShippingAddressModal textarea').val('');
+                    $('#state_id, #dist_id').val('0');
+
+                    // ✅ optional: reload address list
+                    loadAddressList();
+
+                } else {
+                    showErrorLog(`@Const.ERROR_HEADER`, resp.message);
+                }
+             },
+             error: function (res_error) {
+                 $btn.prop('disabled', false).text('Save Address');
+                 showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             },
+             complete: function () {
+                // ✅ enable button again
+                $btn.prop('disabled', false).text('Save Address');
+            }
+         });
+    }
+
+
+    function loadAddressList() {
+        $.ajax({
+            url: `/cart/get-address-list`,
+            data: {uid: uid },
+            type: 'GET',
+            success: function (resp) {
+                let data = JSON.parse(resp.data) || [];
+                let selectedId=0;
+                let html = '';
+                if (!data.length) {
+                    $('#shippingAddressContainer').html(`<div class="text-muted">No address found</div>`);
+                    return;
+                }
+
+                $.each(data, function (i, item) {
+                    html += `
+                        <div class="card-body p-1 border-top">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="SelectedAddressId" value="${item.said}" id="addr_${item.said}">
+                                <label class="form-check-label w-100" for="addr_${item.said}">
+                                    <div class="fw-semibold">${item.name} (${item.mobile})</div>
+                                    <div class="small text-muted">
+                                        ${item.address}, ${item.city}, ${item.district}, ${item.state} - ${item.pin_code}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                     `;
+
+                    if(item.active == 1)
+                    {
+                        selectedId=item.said;
+                    }
+                });
+                $('#shippingAddressContainer').html(html);
+                $(`input[name="SelectedAddressId"][value="${selectedId}"]`).prop('checked', true);
+            },
+            error: function () {
+                $('#shippingAddressContainer').html('<div class="text-danger">Failed to load addresses</div>');
+            }
+        });
+    }
+
+</script>
+@await Html.PartialAsync("_DatePicker")
+<script>
+    $(function () {
+         const formatDate = date => date.toLocaleDateString('en-GB').split('/').join('-');
+         const today = new Date();
+         //$('#checkdate').val(formatDate(today));
+         $('#checkdate').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+    });
+</script>
+
+
+
+<!-- Shipping Address Modal -->
+<div class="modal fade" id="ShippingAddressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow rounded-4">
+
+            <!-- Header -->
+            <div class="modal-header border-0 text-white"
+                 style="background: linear-gradient(135deg, #edf7ef, #edf7ef);">
+                <h6 class="modal-title" style="color:#198754;">📦 Add Shipping Address</h6>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+
+                <div class="row g-3">
+
+                    <!-- Name -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input asp-for="s_name" class="form-control" placeholder="Enter Name" />
+                        </div>
+                    </div>
+
+                    <!-- Mobile -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mobile No.</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                            <input asp-for="s_mobile_no" class="form-control" maxlength="10" placeholder="Enter Mobile" />
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <textarea asp-for="s_address" class="form-control" rows="2"
+                                      placeholder="Enter full address"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- State -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">State</label>
+                        <select asp-for="state_id"
+                                asp-items="ViewBag.StateList"
+                                class="form-select"
+                                onchange="DistrictSelect()">
+                            <option value="0">Select State</option>
+                        </select>
+                    </div>
+
+                    <!-- District -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">District</label>
+                        <select asp-for="dist_id"
+                                asp-items="ViewBag.DistrictList"
+                                class="form-select">
+                            <option value="0">Select District</option>
+                        </select>
+                    </div>
+
+                    <!-- City -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">City</label>
+                        <input asp-for="s_city" class="form-control" placeholder="Enter City" />
+                    </div>
+
+                    <!-- Pincode -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Pin Code</label>
+                        <input asp-for="s_pincode" class="form-control" maxlength="6" placeholder="Enter Pincode" />
+                    </div>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"> Cancel  </button>
+
+                    <button type="button" class="btn btn-primary px-4"
+                            onclick="SaveShippingAddress()">
+                        💾 Save Address
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+

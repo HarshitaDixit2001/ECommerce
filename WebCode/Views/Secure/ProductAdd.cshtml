@@ -1,0 +1,546 @@
+﻿@model ProductView
+@{
+    ViewData["Title"] = Model.pid == 0 ? "Add Product" : "Edit Product";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Product Management
+    </h4>
+    <a asp-action="product" asp-controller="secure" class="btn btn-sm btn-outline-success">
+        <i class="fa fa-list" aria-hidden="true"></i>  Product List
+    </a>
+</section>
+
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+
+                <form asp-action="product-add" asp-controller="secure" method="post" asp-route-id="@Model?.pid" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="pid" />
+
+                    <!-- Title fields (t1 to t5) -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label asp-for="cat_id" class="control-label">Category</label>
+                            <select asp-for="cat_id" id="cat_id" name="cat_id" asp-items="ViewBag.CategoryList"
+                                    onchange="Bind_product_code()" class="form-control select2">
+                                <option value="0">🔍Select an Option</option>
+                            </select>
+                            <span asp-validation-for="cat_id" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="batch_id" class="control-label"></label>
+                            <select asp-for="batch_id" asp-items="ViewBag.BatchList" class="form-control select2">
+                                <option value="0"> @Const.DROPDOWN_DEFAULT </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 custom-checkbox">
+                            <input asp-for="status" type="checkbox" id="status" />
+                            <br />
+                            <br />
+                            <label asp-for="status"></label>
+                        </div>
+
+                        <div class="col-md-2 custom-checkbox">
+                            <input asp-for="is_arv" type="checkbox" />
+                            <br />
+                            <br />
+                            <label asp-for="is_arv"></label>
+                        </div>
+                        <div class="col-md-2 custom-checkbox">
+                            <input asp-for="is_trending" type="checkbox" />
+                            <br />
+                            <br />
+                            <label asp-for="is_trending"></label>
+                        </div>
+                        <div class="col-md-2 custom-checkbox">
+                            <input asp-for="is_best_selling" type="checkbox" />
+                            <br />
+                            <br />
+                            <label asp-for="is_best_selling"></label>
+                        </div>
+
+                        @* <div class="col-md-4">   onchange="SubCategorySelect()"
+                                <label asp-for="sub_cat_id" class="form-label">Sub-Category</label>
+                                <select id="sub_cat_id" name="sub_cat_id" asp-items="ViewBag.SubCategoryList" class="form-control select2"></select>
+                            </div> *@
+                    </div>
+
+                    <div class="clearfix"></div>
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label asp-for="prod_code" class="form-label"></label> <span class="font-bold text-danger">*</span>
+                            <input asp-for="prod_code" class="form-control" readonly />
+                            <span asp-validation-for="prod_code" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="prod_name" class="form-label"></label> <span class="font-bold text-danger">*</span>
+                            <input asp-for="prod_name" class="form-control" />
+                            <span asp-validation-for="prod_name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="hsncode" class="form-label"></label> <span class="font-bold text-danger">*</span>
+                            <input asp-for="hsncode" class="form-control" />
+                            <span asp-validation-for="hsncode" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="barcode" class="form-label"></label>
+                            <input asp-for="barcode" class="form-control" />
+                        </div>
+                    </div>
+
+
+
+                    <h6 class="mb-3 border-bottom pb-2 text-primary">
+                        <i class="fa fa-money me-2"></i> Pricing
+                    </h6>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+                            <label asp-for="pur_price" class="form-label"></label>
+                            <input asp-for="pur_price" class="form-control" onkeypress="return onlyDecimal(event)" />
+                            <span asp-validation-for="pur_price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="mrp" class="form-label"></label>
+                            <input asp-for="mrp" class="form-control" />
+                            <span asp-validation-for="mrp" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="asso_price" class="form-label"></label>
+                            <input asp-for="asso_price" class="form-control" />
+                            <span asp-validation-for="asso_price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="cust_price" class="form-label"></label>
+                            <input asp-for="cust_price" class="form-control" />
+                            <span asp-validation-for="cust_price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="fran_price" class="form-label"></label>
+                            <input asp-for="fran_price" class="form-control" onkeypress="return onlyDecimal(event)" />
+                            <span asp-validation-for="fran_price" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="gst" class="form-label"></label>
+                            <select asp-for="gst" class="form-control select2">
+                                <option value="0.00"> 0 %  </option>
+                                <option value="5.00"> 5 % </option>
+                                <option value="12.00"> 12 % </option>
+                                <option value="18.00"> 18 % </option>
+                                <option value="28.00"> 28 % </option>
+                            </select>
+                            <span asp-validation-for="gst" class="text-danger"></span>
+                        </div>
+
+
+
+                    </div>
+
+                    <h6 class="mb-3 border-bottom pb-2 text-primary" style="display:none;">
+                        <i class="fa fa-share-alt me-2"></i> Distribute BV
+                    </h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="b_bv" class="form-label">@Const.B_BV</label>
+                            <input asp-for="b_bv" class="form-control" />
+                            <span asp-validation-for="b_bv" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="m_bv" class="form-label">@Const.M_BV</label>
+                            <input asp-for="m_bv" class="form-control" />
+                            <span asp-validation-for="m_bv" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="f_bv" class="form-label">@Const.F_BV</label>
+                            <input asp-for="f_bv" class="form-control" />
+                        </div>
+
+                        <div class="col-md-2 form-check pt-2" style="display:none;">
+                            <br />
+                            <input asp-for="default_show" class="form-check-input me-2" />
+                            <label asp-for="default_show" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+
+
+
+                    <h6 class="mb-3 border-bottom pb-2 text-primary">
+                        <i class="fa fa-ruler me-2"></i> Measurement
+                    </h6>
+                    <div class="row mb-3">
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="width" class="form-label"></label>
+                            <input asp-for="width" class="form-control" />
+                        </div>
+                        <div class="col-md-2" style="display:none;">
+                            <label asp-for="height" class="form-label"></label>
+                            <input asp-for="height" class="form-control" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="lenght_unit" class="control-label"></label>
+                            <select asp-for="lenght_unit" asp-items="ViewBag.LenghtUnitList" class="form-control select2">
+                                <option value="0"> @Const.DROPDOWN_DEFAULT </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="lenght" class="form-label"></label>
+                            <input asp-for="lenght" class="form-control" />
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="weight" class="form-label"></label>
+                            <input asp-for="weight" class="form-control" />
+                        </div>
+                        <div class="col-md-2 d-none">
+                            <label asp-for="case_size" class="form-label"></label>
+                            <input asp-for="case_size" class="form-control" />
+                        </div>
+
+                    </div>
+
+
+                    <h6 class="mb-3 border-bottom pb-2 text-primary">
+                        <i class="fa fa-upload me-1"></i> Upload Images
+                    </h6>
+                    <div class="row mb-3">
+                        <div class="col-md-2 mb-3">
+                            <label for="img1" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                <i class="fa fa-upload me-1 text-success"></i> Prod Img-1
+                            </label>
+                            <span asp-validation-for="img1" class="text-danger d-block mt-1"></span>
+                            <input type="file" asp-for="img1" class="form-control" onchange="previewImage(event, 'img_name_1')" accept="image/*" style="display:none;" />
+                            <span asp-validation-for="img1" class="text-danger"></span>
+                            <img id="img_name_1" src="@(string.IsNullOrWhiteSpace(Model?.img_name_1) ? Const.NO_IMAGE : "/" + Model.img_name_1)" class="img-thumbnail mt-2" style="max-height:80px; cursor:zoom-in;" onclick="showZoom(this.src)" />
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="img2" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                <i class="fa fa-upload me-1 text-success"></i> Prod Img-2
+                            </label>
+                            <span asp-validation-for="img2" class="text-danger d-block mt-1"></span>
+                            <input type="file" asp-for="img2" class="form-control" onchange="previewImage(event, 'img_name_2')" accept="image/*" style="display:none;" />
+                            <span asp-validation-for="img2" class="text-danger"></span>
+
+                            <img id="img_name_2" src="@(string.IsNullOrWhiteSpace(Model?.img_name_2) ? Const.NO_IMAGE : "/" + Model.img_name_2)"
+                                 class="img-thumbnail mt-2" style="max-height:80px; cursor:zoom-in;" onclick="showZoom(this.src)" />
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="img3" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                <i class="fa fa-upload me-1 text-success"></i> Prod Img-3
+                            </label>
+                            <span asp-validation-for="img3" class="text-danger d-block mt-1"></span>
+                            <input type="file" asp-for="img3" class="form-control" onchange="previewImage(event, 'img_name_3')" accept="image/*" style="display:none;" />
+                            <span asp-validation-for="img3" class="text-danger"></span>
+
+                            <img id="img_name_3" src="@(string.IsNullOrWhiteSpace(Model?.img_name_3) ? Const.NO_IMAGE : "/" + Model.img_name_3)"
+                                 class="img-thumbnail mt-2" style="max-height:80px; cursor:zoom-in;" onclick="showZoom(this.src)" />
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+                            <label for="img4" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                <i class="fa fa-upload me-1 text-success"></i> Prod Img-4
+                            </label>
+                            <span asp-validation-for="img4" class="text-danger d-block mt-1"></span>
+                            <input type="file" asp-for="img4" class="form-control" onchange="previewImage(event, 'img_name_4')" accept="image/*" style="display:none;" />
+                            <span asp-validation-for="img4" class="text-danger"></span>
+
+                            <img id="img_name_4" src="@(string.IsNullOrWhiteSpace(Model?.img_name_4) ? Const.NO_IMAGE : "/" + Model.img_name_4)"
+                                 class="img-thumbnail mt-2" style="max-height:80px; cursor:zoom-in;" onclick="showZoom(this.src)" />
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="img5" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                <i class="fa fa-upload me-1 text-success"></i> Prod Img-5
+                            </label>
+                            <span asp-validation-for="img5" class="text-danger d-block mt-1"></span>
+                            <input type="file" asp-for="img5" class="form-control" onchange="previewImage(event, 'img_name_5')" accept="image/*" style="display:none;" />
+                            <span asp-validation-for="img5" class="text-danger"></span>
+
+                            <img id="img_name_5" src="@(string.IsNullOrWhiteSpace(Model?.img_name_5) ? Const.NO_IMAGE : "/" + Model.img_name_5)"
+                                 class="img-thumbnail mt-2" style="max-height:80px; cursor:zoom-in;" onclick="showZoom(this.src)" />
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="img6" class="btn btn-outline-primary rounded-pill px-1 py-1">
+                                <i class="fa fa-upload me-1 text-success"></i> Prod Img-6
+                            </label>
+                            <span asp-validation-for="img6" class="text-danger d-block mt-1"></span>
+                            <input type="file" asp-for="img6" class="form-control" onchange="previewImage(event, 'img6')" accept="image/*" style="display:none;" />
+                            <span asp-validation-for="img6" class="text-danger"></span>
+
+                            <img id="img_name_6" src="@(string.IsNullOrWhiteSpace(Model?.img_name_6) ? Const.NO_IMAGE : "/" + Model.img_name_6)"
+                                 class="img-thumbnail mt-2" style="max-height:80px; cursor:zoom-in;" onclick="showZoom(this.src)" />
+                        </div>
+                    </div>
+
+                    <!-- Boolean fields -->
+                    <div class="row mb-4">
+
+                        <div class="col-md-2 form-check" style="display:none;">
+                            <input asp-for="is_pkd" class="form-check-input" />
+                            <label asp-for="is_pkd" class="form-check-label"></label>
+                        </div>
+                        <div class="col-md-2 form-check" style="display:none;">
+                            <input asp-for="is_shop" class="form-check-input" />
+                            <label asp-for="is_shop" class="form-check-label"></label>
+                        </div>
+
+                        <div class="col-md-2 form-check" style="display:none;">
+                            <input asp-for="is_po" class="form-check-input" />
+                            <label asp-for="is_po" class="form-check-label"></label>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label for="prod_desc" class="form-label">Product Description </label>
+                            <textarea asp-for="prod_desc" id="prod_desc" class="form-control" rows="15"></textarea>
+                            <span asp-validation-for="prod_desc" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Title fields (t1 to t5) -->
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label asp-for="t1" class="form-label">Title 1</label>
+                            <input asp-for="t1" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label for="d1" class="form-label">Description 1</label>
+                            <textarea asp-for="d1" id="d1" class="form-control" rows="15"></textarea>
+                            <span asp-validation-for="d1" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label asp-for="t2" class="form-label">Title 2</label>
+                            <input asp-for="t2" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label for="d2" class="form-label">Description 2</label>
+                            <textarea asp-for="d2" id="d2" class="form-control" rows="15"></textarea>
+                            <span asp-validation-for="d2" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label asp-for="t3" class="form-label">Title 3</label>
+                            <input asp-for="t3" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label for="d3" class="form-label">Description 3</label>
+                            <textarea asp-for="d3" id="d3" class="form-control" rows="15"></textarea>
+                            <span asp-validation-for="d3" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label asp-for="t4" class="form-label">Title 4</label>
+                            <input asp-for="t4" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label for="d4" class="form-label">Description 4</label>
+                            <textarea asp-for="d4" id="d4" class="form-control" rows="15"></textarea>
+                            <span asp-validation-for="d4" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label asp-for="t5" class="form-label">Title 5</label>
+                            <input asp-for="t5" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row mb-12">
+                        <div class="col-md-8">
+                            <label for="d5" class="form-label">Description 5</label>
+                            <textarea asp-for="d5" id="d5" class="form-control"></textarea>
+                            <span asp-validation-for="d5" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+
+
+                    <hr />
+                    <h6 class="mb-3 border-bottom pb-2 text-primary">
+                        <i class="fa fa-search me-2"></i> SEO Settings
+                    </h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="seo_title" class="form-label"></label>
+                            <input asp-for="seo_title" class="form-control" maxlength="70" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label asp-for="seo_description" class="form-label"></label>
+                            <textarea asp-for="seo_description" class="form-control" rows="3" maxlength="160"></textarea>
+                            <small class="text-muted"> Recommended length: 150–160 characters. </small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label asp-for="ingredient_title" class="form-label"></label>
+                            <textarea asp-for="ingredient_title" class="form-control" rows="3" maxlength="160"></textarea>
+                            <small class="text-muted"> Recommended length: 150–200 characters. </small>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-success px-4">@((Model.pid == 0) ? "Add" : "Update") Product</button>
+                        <a asp-action="Index" class="btn btn-danger ms-2">Cancel</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<script src="https://cdn.ckeditor.com/ckeditor5/12.0.0/classic/ckeditor.js"></script>
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert") 
+@await Html.PartialAsync("_ValidationScriptsPartial")
+<script>
+    
+    ClassicEditor.create(document.querySelector('#prod_desc')).then(editor => { editor.editing.view.change(writer => {writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot()); }); }).catch(error => { console.error(error); });
+    ClassicEditor.create(document.querySelector('#d1')).then(editor => { editor.editing.view.change(writer => {writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot()); }); }).catch(error => { console.error(error); });
+    ClassicEditor.create(document.querySelector('#d2')).then(editor => { editor.editing.view.change(writer => {writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot()); }); }).catch(error => { console.error(error); });
+    ClassicEditor.create(document.querySelector('#d3')).then(editor => { editor.editing.view.change(writer => {writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot()); }); }).catch(error => { console.error(error); });
+    ClassicEditor.create(document.querySelector('#d4')).then(editor => { editor.editing.view.change(writer => {writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot()); }); }).catch(error => { console.error(error); });
+    ClassicEditor.create(document.querySelector('#d5')).then(editor => { editor.editing.view.change(writer => {writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot()); }); }).catch(error => { console.error(error); });
+     
+</script>
+<script>
+    // Initialize Select2 dropdown with a placeholder and allow clearing the selection
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+    let URL_DROPDOWN_LIST =  `/common/get-master-dropdown`;
+    let URL_LIST = `/common/master-reports`;
+
+    $(function () {
+        @if (TempData["Error"] != null)
+        {
+              <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+        }
+    });
+
+
+    function Bind_product_code(){
+        var mst_key_detail = true;
+        let mst_key="GET_CATEGORY_LIST";
+        let id=$('#cat_id').val();
+        let pid = $('#pid').val();
+        if(id > 0 && pid == 0)
+        { debugger;
+            showLoader();
+            $.ajax({
+                url: URL_LIST + `?id=${id}&mst_key=${mst_key}&mst_key_detail=${mst_key_detail}`,
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+
+                    hideLoader();
+                     if (response.success === true ) {
+                         const dataArray = JSON.parse(response.data) || [];
+                         const data = dataArray[0] || {};
+                        $('#prod_code').val(data.prod_code);
+                     }
+                },
+                error: function (res_error) {
+                    showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+                }
+            });
+        }
+    }
+
+
+
+</script>
+<style>
+    .custom-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .custom-checkbox input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #dc3545; /* Red when unchecked */
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            background-color: #dc3545; /* Red background */
+        }
+
+            .custom-checkbox input[type="checkbox"]::after {
+                content: '✖';
+                color: #fff;
+                font-size: 12px;
+                font-weight: bold;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .custom-checkbox input[type="checkbox"]:checked {
+                background-color: #198754; /* Green when checked */
+                border-color: #198754;
+            }
+
+                .custom-checkbox input[type="checkbox"]:checked::after {
+                    content: '✔';
+                    color: #fff;
+                    font-size: 14px;
+                }
+
+        .custom-checkbox label {
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+</style>
+ 

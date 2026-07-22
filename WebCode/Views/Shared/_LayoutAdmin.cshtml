@@ -1,0 +1,512 @@
+﻿@{
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var last_login = User.FindFirst("last_login")?.Value;
+    var pf_img = User.FindFirst("pf_img")?.Value;
+    string profileImg = string.IsNullOrEmpty(pf_img) ? "/images/noimage.jpg" : pf_img;
+    var role_name = User.FindFirst("role_name")?.Value;
+    //var sub_role_name = User.FindFirst("sub_role_name")?.Value;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- CDN resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+    @* <link href="~/css/all.min.css?v=1.0" rel="stylesheet"/>   *@
+
+    <link href="~/css/bootstrap.min.css?v=1.0" rel="stylesheet" />
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js?v=1.0"></script>
+    <link href="~/css/admin-site.css?v=1.0" rel="stylesheet" />
+</head>
+<body>
+    <div id="app" data-theme="lightgrey" aria-live="polite">
+        <!-- TOPBAR --> 
+        <div class="topbar">
+            <!-- LOGO AREA (same width as sidebar) -->
+            <div class="topbar-logo">
+                <img src="@Const.LOGO" alt="logo" />
+                <div class="menu-toggle" id="menuToggle">
+                    <i class="fa fa-bars"></i>
+                </div>
+            </div>
+
+            <!-- LEFT INFO -->
+            <div class="topbar-left-info ms-3">
+                <div class="d-inline-flex align-items-center bg-light border rounded-pill px-3 py-2 shadow-sm">
+
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                         style="width:34px;height:34px;">
+                        <i class="fas fa-clock small"></i>
+                    </div>
+
+                    <div>
+                        <div class="small text-muted lh-1">Last Login</div>
+                        <div class="fw-semibold">@last_login</div>
+                    </div>
+
+                </div>
+            </div>
+           
+
+            <!-- USER PROFILE -->
+            <div class="topbar-right">
+                <div class="user-profile" id="profileRoot">
+                    <div class="profile-btn" id="profileBtn">
+                        <img src="@profileImg" alt="Image" title="Image" loading="lazy" />
+                        <div class="profile-info">
+                            <span class="name">@userName</span>
+                            <span class="role">@role_name</span>
+                        </div>
+                        <i class="fa fa-chevron-down"></i>
+                    </div>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <img src="@profileImg" />
+                            <div>
+                                <div class="fw-bold">@userName</div>
+                                <small>ID : @userId</small>
+                            </div>
+                        </div>
+                        <hr />
+                        <a asp-action="change-password" asp-controller="user" class="dropdown-item">
+                            <i class="fa fa-key"></i> Change Password
+                        </a>
+                        <a asp-action="Logout" asp-controller="Home" class="dropdown-item text-danger">
+                            <i class="fa fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SIDEBAR -->
+
+        <nav class="sidebar" id="sidebar" aria-label="Main menu">
+            <ul>
+                @* ADMIN ROLE *@
+                @if (role_name == "admin_role")
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="secure" asp-action="dashboard">
+                            <span class="icon"><i class="fa fa-home"></i></span>
+                            <span class="title">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-users-cog"></i></span>
+                            <span class="title">User Details</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="user" asp-action="admin-user-list">User List </a>
+                          @*   <a asp-controller="user" asp-action="admin-franchise-list">Franchise List </a>
+                            <a asp-controller="user" asp-action="admin-sysuser-list">System Admin List</a> 
+                            <a asp-controller="user" asp-action="change-sponsor">Change Sponsor/ User ID </a> *@
+                        </div>
+                    </li>
+
+
+                    <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-file-invoice-dollar"></i></span>
+                            <span class="title">Order Details</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            @* <a asp-controller="bulk" asp-action="select-product-for-cart">Select Product</a> 
+                            <a asp-controller="billing" asp-action="generate-user-invoice">Gen. User Invoice </a>*@
+                            <a asp-controller="billing" asp-action="admin-user-invoice-list"> User Invoice List</a>
+                            <a asp-controller="billing" asp-action="admin-user-order-list"> User Order List</a>
+                            @* <a asp-controller="billing" asp-action="admin-fran-invoice-list"> Franchise Inv. List</a>
+                            <a asp-controller="billing" asp-action="admin-fran-order-list"> Franchise Order List</a>   *@
+                        </div>
+                    </li>
+
+
+                  @*   <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-hand-holding-usd"></i></span>
+                            <span class="title">Payout System</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="payout" asp-action="repurchase-payout">Generate Payout </a>
+                            <a asp-controller="payout" asp-action="repurchase-payout-period">Payout Period</a>
+                            <a asp-controller="payout" asp-action="repurchase-payout-dispatch">Payout Dispatch</a>
+                            <a asp-controller="payout" asp-action="user-income-list">User Income Details</a>
+                        </div>
+                    </li> *@
+
+
+                   
+
+
+                  
+
+                    <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-shopping-bag"></i></span>
+                            <span class="title">Product Master</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="secure" asp-action="batch">Batch List</a>
+                            <a asp-controller="secure" asp-action="category">Category List</a>
+                            <a asp-controller="secure" asp-action="product">Product List</a>
+                            <a asp-controller="secure" asp-action="stock-list">Product Stock</a>
+                        </div>
+                    </li>
+
+
+
+
+                    <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-building"></i></span>
+                            <span class="title">Vendor Master</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="vendor" asp-action="vendor-list"> Vendor List</a>
+                            <a asp-controller="vendor" asp-action="generate-vendor-po">Generate Purchase Order </a>
+                            <a asp-controller="vendor" asp-action="vendor-po-list">Purchase Order List</a>
+                        </div>
+                    </li>
+
+
+                    <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-chart-bar"></i></span>
+                            <span class="title">Reports</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="billing" asp-action="profit-loss"> Profit & Loss Reports</a>
+                            <a asp-controller="secure" asp-action="month-wise-product-qty"> Product Wise Qty </a>
+                            <a asp-controller="secure" asp-action="sales-collection">Monthly Sales  </a>
+                            @* <a asp-controller="secure" asp-action="sales-collection-commission">Monthly Performance </a>
+                           
+                            <a asp-controller="billing" asp-action="party-ledger"> User ledger</a>
+                            <a asp-controller="billing" asp-action="franchise-wallet-transaction"> Ledger Report</a> *@
+                        </div>
+                    </li>
+
+
+                  @*   <li class="nav-item has-sub">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-credit-card"></i></span>
+                            <span class="title">Wallet</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="wallet" asp-action="admin-company-wallet-request">User Wallet Request </a>
+                            <a asp-controller="wallet" asp-action="admin-company-wallet-tran"> Company Wallet Trans. </a>
+                            <a asp-controller="wallet" asp-action="admin-payout-wallet-tran"> Payout Wallet Trans. </a>
+                        </div>
+                    </li> *@
+
+                    <li class="nav-item has-sub" data-id="signup">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-chart-bar"></i></span>
+                            <span class="title">Other Reports</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="secure" asp-action="enquiry-list"> Enquiry Details</a>
+
+                        </div>
+                    </li>
+                }
+
+
+                @* @if (role_name == "franchise_role") 
+
+                @if (role_name == "user_role") 
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="secure" asp-action="user-dashboard">
+                            <span class="icon"><i class="fa fa-home"></i></span>
+                            <span class="title">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item has-sub">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-user"></i></span>
+                            <span class="title">My Profile</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-action="welcome-letter" asp-controller="user">Welcome Letter</a>
+                            <a asp-action="user-profile" asp-controller="user"> Change Profile</a>
+                            <a asp-action="change-password" asp-controller="user"> Change Password</a>
+                            <a asp-action="user-profile" asp-controller="user" asp-route-page="UploadKyc">Upload Kyc</a> 
+                        </div>
+                    </li>
+
+                    <li class="nav-item has-sub">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-receipt"></i></span>
+                            <span class="title">Billing</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="" asp-action="">Shopping</a>
+                            <a asp-controller="billing" asp-action="generate-user-order">Generate Order </a>
+                            <a asp-controller="billing" asp-action="user-invoice-list"> Invoice List</a>
+                            <a asp-controller="billing" asp-action="user-order-list">Order List</a>
+                        </div>
+                    </li>
+
+
+                    <li class="nav-item has-sub">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-sitemap"></i></span>
+                            <span class="title">My Team</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="user-report" asp-action="user-binary-tree">Binary Tree</a>
+                             <a asp-controller="user-report" asp-action="matrix-tree-view">User Tree </a>  
+                            <a asp-controller="user-report" asp-action="user-binary-list">Downline Team</a>
+                            <a asp-controller="user-report" asp-action="user-matrix-list">Downline Team</a>  
+                        </div>
+                    </li>
+
+                    <li class="nav-item has-sub">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-hand-holding-usd"></i></span>
+                            <span class="title">Payout</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="payout" asp-action="repurchase-payout-dispatch-user">Payout Dispatch</a>
+                            <a asp-controller="payout" asp-action="user-income-list">User Income Details</a>
+                            <a asp-controller="payout" asp-action="binary-payout-user">Binary Payout</a>
+                            <a asp-controller="user-report" asp-action="user-reward-list">Reward List</a>
+                        </div>
+                    </li>
+
+
+                    <li class="nav-item has-sub">
+                        <a href="#" class="nav-link">
+                            <span class="icon"><i class="fa fa-credit-card"></i></span>
+                            <span class="title">Wallet</span>
+                            <span style="margin-left:auto" class="chev"><i class="fa fa-chevron-down"></i></span>
+                        </a>
+                        <div class="submenu">
+                            <a asp-controller="wallet" asp-action="user-company-wallet-request"> Wallet Request </a>
+                            <a asp-controller="wallet" asp-action="user-company-wallet-tran"> Company Wallet Trans. </a>
+                            <a asp-controller="wallet" asp-action="user-payout-wallet-tran"> Payout Wallet Trans. </a>
+                        </div>
+                    </li>
+                } *@
+                <li class="nav-item" data-id="logout">
+                    <a asp-action="logout" asp-controller="home" class="nav-link text-danger">
+                        <span class="icon text-danger">
+                            <i class="fa fa-sign-out-alt"></i>
+                        </span>
+                        <span class="title">Logout</span>
+                        <span style="margin-left:auto" class="chev"></span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="container-app" id="mainApp">
+            <div class="form-card">
+                @RenderBody()
+            </div>
+            @* <div class="form-card">
+                <h2>Welcome Boss Ji 😎</h2>
+                <p>This dashboard includes theme switch, sidebar, submenu animation, active highlight bar and profile dropdown.</p>
+                <hr />
+                <div class="table-responsive">
+                    <table id="memberTable" class="display" style="width:100%">
+                        <thead>
+                            <tr><th>Name</th><th>Role</th><th>Joined</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Rahul</td><td>Member</td><td>2025-07-01</td></tr>
+                            <tr><td>Sunita</td><td>Distributor</td><td>2025-06-02</td></tr>
+                            <tr><td>Priya</td><td>Member</td><td>2025-05-10</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div> *@
+        </main>
+    </div>
+
+    <!-- 🔍 Zoom Image Modal -->
+    <div id="zoomModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+         background-color:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+        <img id="zoomedImage" style="max-width:90%; max-height:90%; border:5px solid white; border-radius:10px;" />
+    </div>
+    <!-- ================== SCRIPT ================== -->
+    <script src="~/js/admin-site.js?v=1.0" asp-append-version="true"></script>
+
+    <script>
+
+        $(document).on('input', '#user_id, #password, #tran_password, #mobile, #email_id, #account_no, #ifsc, #pan_no, #aadhar_no, #gst_no, #pin_code' , function () {
+            this.value = this.value.replace(/\s/g, '');
+        });
+
+
+        (function ($) {
+            // Cached selectors
+            const $app = $('#app');
+            const $sidebar = $('#sidebar');
+            const $menuToggle = $('#menuToggle');
+            const $profileRoot = $('#profileRoot');
+            const $profileBtn = $('#profileBtn');
+            const $profileDropdown = $('#profileDropdown');
+            const $memberTable = $('#memberTable');
+
+
+            // debounce helper
+            function debounce(fn, delay) {
+                let t;
+                return function () { clearTimeout(t); t = setTimeout(() => fn.apply(this, arguments), delay); };
+            }
+
+            // Toggle sidebar (click or keyboard)
+        $menuToggle.on('click keydown', function (e) {
+
+            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+
+            if (window.innerWidth <= 991) {
+                // Mobile behaviour: slide in/out
+                $sidebar.toggleClass('visible');
+            } else {
+                // Desktop behaviour: collapse width
+                $sidebar.toggleClass('hidden');
+            }
+
+            e.preventDefault();
+        });
+
+
+        // PROFILE: open/close with animation class
+        function openProfile() {
+            $profileDropdown.addClass('open').attr('aria-hidden', 'false');
+            $profileBtn.attr('aria-expanded', 'true');
+        }
+        function closeProfile() {
+            $profileDropdown.removeClass('open').attr('aria-hidden', 'true');
+            $profileBtn.attr('aria-expanded', 'false');
+        }
+
+        $profileBtn.on('click keydown', function (e) {
+            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+            e.stopPropagation();
+            if ($profileDropdown.hasClass('open')) closeProfile();
+            else {
+                openProfile();
+            }
+        });
+
+        // Close on outside click or Esc
+        $(document).on('click', function (e) {
+            const $t = $(e.target);
+            if (!$t.closest('#profileRoot').length) closeProfile();
+            if (window.innerWidth <= 991 && !$t.closest('#sidebar, #menuToggle').length) {
+                $sidebar.removeClass('visible');
+            }
+        });
+
+        $(document).on('keydown', function (e) {
+            if (e.key === "Escape") {
+                closeProfile();
+                if (window.innerWidth <= 991) $sidebar.removeClass('visible');
+            }
+        });
+
+        // SIDEBAR: submenu behavior (Option C: slide + arrow rotate + active highlight)
+        $sidebar.on('click', '.nav-item > .nav-link', function (e) {
+            const $link = $(this);
+            const $li = $link.parent();
+            const $submenu = $li.find('.submenu').first();
+            if ($submenu.length) {
+                e.preventDefault();
+                // Close other open submenus (one at a time)
+                $sidebar.find('.nav-item.open').not($li).each(function () {
+                    $(this).removeClass('open').find('.submenu').slideUp(180);
+                });
+
+                if ($li.hasClass('open')) {
+                    $li.removeClass('open'); $submenu.slideUp(180);
+                } else {
+                    $li.addClass('open'); $submenu.slideDown(220);
+                }
+
+                // Active highlight for parent item
+                $sidebar.find('.nav-item').removeClass('active');
+                $li.addClass('active');
+            } else {
+                // regular link: clear others & set active
+                $sidebar.find('.nav-item').removeClass('active open').find('.submenu').slideUp(120);
+                $li.addClass('active');
+            }
+        });
+
+        // submenu item click sets active and keeps parent open
+        $sidebar.on('click', '.submenu a', function (e) {
+            // DO NOT prevent default → allow redirect
+            $sidebar.find('.submenu a.active').removeClass('active');
+            $(this).addClass('active');
+
+            const $parentLi = $(this).closest('.nav-item');
+            $sidebar.find('.nav-item').removeClass('active').not($parentLi).removeClass('open');
+            $parentLi.addClass('active open').find('.submenu').slideDown(180);
+
+            // Let ASP.NET Core redirect normally
+        });
+
+
+
+        // Auto-open based on current url or data-link
+        (function autoOpenActive() {
+            try {
+                const current = window.location.pathname.split('/').pop() || '';
+                let opened = false;
+                $sidebar.find('.submenu a').each(function () {
+                    const link = ($(this).attr('href') || $(this).data('link') || '').toString();
+                    if (link && (link === current || link === window.location.pathname || link === ('#' + current))) {
+                        $(this).addClass('active');
+                        const $parent = $(this).closest('.nav-item');
+                        $parent.addClass('open active').find('.submenu').show();
+                        opened = true;
+                    }
+                });
+                if (!opened) {
+                    const $firstHas = $sidebar.find('.nav-item.has-sub').first();
+                    if ($firstHas.length) $firstHas.addClass('open').find('.submenu').show();
+                }
+            } catch (err) { /* silent */ }
+        })();
+
+        // Accessibility & small helpers
+        $('.menu-toggle, #profileBtn').attr('tabindex', '0');
+        $('#menuToggle, #profileBtn').on('mousedown', function (e) { e.preventDefault(); });
+
+        // Resize handler (debounced)
+        $(window).on('resize', debounce(function () {
+            if (window.innerWidth > 991) {
+                $sidebar.removeClass('visible');
+            }
+        }, 160));
+
+        })(jQuery);
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html> 

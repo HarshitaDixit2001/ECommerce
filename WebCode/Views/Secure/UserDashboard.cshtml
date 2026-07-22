@@ -1,0 +1,926 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ 
+<style>
+    .dashboard-overview {
+        border: 0;
+        border-radius: 15px;
+    }
+
+    .user-avatar {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #f1f1f1;
+        cursor: pointer;
+    }
+
+    .stat-box {
+        min-width: 90px;
+        text-align: center;
+        border-left: 1px solid #eee;
+        padding: 0 10px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .wallet-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .wallet-main {
+        background: #e8f5e9;
+        color: #198754;
+    }
+
+    .wallet-reward {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .kyc-card {
+        border-radius: 16px;
+        border: none;
+    }
+
+    .kyc-box {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        position: relative;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .kyc-box:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.12);
+        }
+
+        .kyc-box h6 {
+            margin: 12px 0;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .kyc-box img {
+            max-height: 130px;
+            width: auto;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+    /* Status Badge */
+    .kyc-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 5px 12px;
+        font-size: 13px;
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+        .kyc-badge.success {
+            background-color: #e9f7ef;
+            color: #198754;
+        }
+
+        .kyc-badge.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .kyc-badge.failed {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+
+
+
+
+    news-card {
+        border-radius: 14px;
+        border: 0;
+    }
+
+    .news-item {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+        position: relative;
+        transition: .25s ease-in-out;
+    }
+
+        .news-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .news-item h6 {
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .news-item p {
+            font-size: 14px;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        .news-item small {
+            color: #6c757d;
+        }
+
+    /* News Badges */
+    .news-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 3px 10px;
+        font-size: 11px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+        .news-badge.new {
+            background: #e7f1ff;
+            color: #0d6efd;
+        }
+
+        .news-badge.info {
+            background: #e9f7ef;
+            color: #198754;
+        }
+
+        .news-badge.alert {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+</style>
+<!-- ================= BREADCRUMB SECTION ================= -->
+<section class="breadcrumb-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="breadcrumb-title">
+                    📊 User Dashboard
+                </h1>
+                <p class="breadcrumb-subtitle mb-0">
+                    | Manage your account, orders, and activities
+                </p>
+            </div>
+
+            
+        </div>
+    </div>
+</section>
+<div class="clearfix"></div>
+
+<section class="py-2">
+
+    <div class="container">
+        
+        <div class="card dashboard-overview shadow-sm mb-3">
+            <div class="card-body py-3">
+
+                <div class="d-flex flex-wrap align-items-center justify-content-between">
+
+                    <!-- User Info -->
+                    <div class="d-flex align-items-center">
+
+                        <img id="pf_img"
+                             src="@Const.NO_IMAGE"
+                             class="user-avatar me-3"
+                             onclick="showZoom(this.src)">
+
+                        <div>
+                            <h6 class="fw-bold mb-1">
+                                Welcome Back 👋 <span id="name"></span>
+                            </h6>
+
+                            <div class="small text-muted">
+                                ID:
+                                <strong id="user_id"></strong>
+                                |
+                                <span id="mobile"></span>
+                            </div>
+
+                            <div class="small text-muted">
+                                DOJ: <span id="doe"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Wallet -->
+                    <div class="d-flex align-items-center gap-2 my-2 my-lg-0">
+
+                        <span class="wallet-badge wallet-main">
+                            <i class="fas fa-wallet me-1"></i>
+                            ₹ <span id="company_wallet_balance">0</span> Wallet Balance
+                        </span>
+
+                        <span class="wallet-badge wallet-reward">
+                            <i class="fas fa-gift me-1"></i>
+                            <span id="payout_wallet">0</span> Reward Points
+                        </span>
+
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="d-flex flex-wrap">
+
+                        <div class="stat-box">
+                            <div class="stat-value text-primary">0</div>
+                            <div class="stat-label">Orders</div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-value text-warning">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-value text-success">0</div>
+                            <div class="stat-label">Delivered</div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-value text-danger">0</div>
+                            <div class="stat-label">Cancelled</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Button -->
+                    <div>
+                        <a href="/home/products" class="btn btn-primary btn-sm">
+                            Shop Now
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        @* 
+        <div class="card dashboard-card shadow-sm mb-3">
+            <div class="card-body p-3">
+
+                <div class="row align-items-center">
+
+                    <div class="col-lg-8">
+
+                        <div class="d-flex align-items-center">
+
+                            <img id="pf_img"
+                                 src="@Const.NO_IMAGE"
+                                 class="user-avatar me-3"
+                                 alt="Profile"
+                                 onclick="showZoom(this.src)">
+
+                            <div>
+                                <h5 class="mb-1 fw-bold">
+                                    Welcome Back 👋
+                                    <span id="name"></span>
+                                </h5>
+
+                                <div class="small text-muted mb-1">
+                                    ID :
+                                    <strong id="user_id"></strong>
+                                </div>
+
+                                <div class="small text-muted mb-1">
+                                    Mobile :
+                                    <span id="mobile"></span>
+                                    |
+                                    DOJ :
+                                    <span id="doe"></span>
+                                </div>
+
+                                <div class="small text-muted">
+                                    Manage orders, track shipments and discover exclusive offers.
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-4 mt-3 mt-lg-0">
+
+                        <div class="d-flex flex-column align-items-lg-end gap-2">
+
+                            <div class="wallet-box wallet-main">
+                                <i class="fas fa-wallet me-1"></i>
+                                ₹ <span id="company_wallet_balance">0</span>
+                            </div>
+
+                            <div class="wallet-box wallet-reward">
+                                <i class="fas fa-gift me-1"></i>
+                                <span id="payout_wallet">0</span> Reward Points
+                            </div>
+
+                            <a href="/Shop" class="btn btn-primary btn-sm">
+                                Continue Shopping
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-6 col-md-3">
+                <div class="card summary-card shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+
+                        <div class="summary-icon bg-soft-primary me-3">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-0">25</h5>
+                            <small class="text-muted">Total Orders</small>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card summary-card shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+
+                        <div class="summary-icon bg-soft-warning me-3">
+                            <i class="fas fa-clock"></i>
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-0">3</h5>
+                            <small class="text-muted">Pending</small>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card summary-card shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+
+                        <div class="summary-icon bg-soft-success me-3">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-0">20</h5>
+                            <small class="text-muted">Delivered</small>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card summary-card shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+
+                        <div class="summary-icon bg-soft-danger me-3">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-0">2</h5>
+                            <small class="text-muted">Cancelled</small>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+ *@
+
+
+        @* 
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+
+                    <div class="col-md-8">
+                        <h3 class="fw-bold mb-2">
+                            Hello, Ajay 👋
+                        </h3>
+
+                        <p class="text-muted mb-0">
+                            Manage your orders, track shipments, update profile details,
+                            and discover exciting deals tailored just for you.
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <a href="/Shop" class="btn btn-primary">
+                            Continue Shopping
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- USER INFO CARD -->
+        <div class="card user-info-card shadow-sm">
+            <div class="card-body d-flex align-items-center justify-content-between flex-wrap">
+                <!-- Left: Avatar + Info -->
+                <div class="d-flex align-items-center gap-2">
+                    <img id="pf_img" class="user-avatar" src="@Const.NO_IMAGE" alt="User Avatar" onclick="showZoom(this.src)">
+                    <div>
+                        <small class="text-muted d-block mb-1">
+                            <strong>  <span id="user_id"></span> - <span id="name"></span> </strong>
+                        </small>
+                        <small class="text-muted d-block mb-1">
+                            <strong>DOJ:</strong> <span id="doe"></span>
+                        </small>
+                        <small class="text-muted d-block mb-1">
+                            <strong>Mobile:</strong> <span id="mobile"></span>
+                        </small>
+                        <small class="text-muted d-block mb-1">
+                            <p class="text-muted mb-0">
+                                We're glad to see you again. Explore our latest products,
+                                exclusive offers, and track your recent orders from your dashboard.
+                            </p>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Right: Status + Wallets -->
+                <div class="d-flex flex-column align-items-end gap-2 mt-2 mt-md-0">
+                    <!-- Main Wallet -->
+                    <div class="wallet-balance company-wallet">
+                        <i class="fa fa-wallet me-2"></i> Wallet Balance:&nbsp;
+                        <span id="company_wallet_balance">0</span>
+                    </div>
+                    <!-- Payout Wallet -->
+                    <div class="wallet-balance payout-wallet">
+                        <i class="fa fa-money-bill-wave me-2"></i> Reward Points:&nbsp;
+                        <span id="payout_wallet">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Order Summary Cards -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="fw-bold text-primary">25</h2>
+                        <p class="mb-0 text-muted">Total Orders</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="fw-bold text-warning">3</h2>
+                        <p class="mb-0 text-muted">Pending Orders</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="fw-bold text-success">20</h2>
+                        <p class="mb-0 text-muted">Delivered Orders</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="fw-bold text-danger">2</h2>
+                        <p class="mb-0 text-muted">Cancelled Orders</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+ *@
+        @* 
+        <div class="row g-4">
+
+            <div class="col-md-3">
+                <div class="point-box primary text-center">
+                    <small class="d-block text-title">Total Associate</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="t_sponsor" class="mb-0 text-primary">0</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="point-box success text-center">
+                    <small class="d-block text-title">Paid Associate</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="t_paid_sponsor" class="mb-0 text-success">0</h5>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-3">
+                <div class="point-box primary text-center">
+                    <span class="d-block text-title">Total Left/ Right</span>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="total_left" class="mb-0">0</h5>
+                        <span>/</span>
+                        <h5 id="total_right" class="mb-0">0</h5>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-3">
+                <div class="point-box success text-center">
+                    <small class="d-block text-title">Current Left/ Right</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="new_left" class="mb-0">0</h5>
+                        <span>/</span>
+                        <h5 id="new_right" class="mb-0">0</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="point-box danger text-center">
+                    <small class="d-block text-title">Carry Forward</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="carry_left" class="mb-0">0</h5>
+                        <span>/</span>
+                        <h5 id="carry_right" class="mb-0">0</h5>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="point-box danger text-center">
+                    <small class="d-block text-title">Brought Forward</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="bf_left" class="mb-0">0</h5>
+                        <span>/</span>
+                        <h5 id="bf_right" class="mb-0">0</h5>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="point-box primary text-center">
+                    <small class="d-block text-title">PBV</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="pbv" class="mb-0">0</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="point-box primary text-center">
+                    <small class="d-block text-title">GBV</small>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <h5 id="gbv" class="mb-0">0</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+ *@
+        <!-- ====== LEFT COLUMN : Recent Order Summary Content ======== -->
+
+        <div class="row g-3">
+
+            <div class="col-lg-6 col-md-12">
+                <div class="card shadow h-100 border-0">
+
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0 fw-semibold">Recent Activity</h5>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="mb-3">
+                                <strong>Order #ORD10254</strong>
+                                <span class="badge bg-success ms-2">Delivered</span>
+                                <p class="text-muted small mb-0">
+                                    Delivered on 15 Aug 2026
+                                </p>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>Order #ORD10258</strong>
+                                <span class="badge bg-warning text-dark ms-2">Processing</span>
+                                <p class="text-muted small mb-0">
+                                    Expected delivery: 20 Aug 2026
+                                </p>
+                            </div>
+
+                            <a href="/billing/user-order-list" class="btn btn-outline-primary btn-sm">
+                                View All Orders
+                            </a>
+
+                        </div>
+                    </div>
+
+
+
+                    @* <div class="card-header bg-light fw-semibold d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="bi bi-award-fill text-primary me-2"></i>
+                            Reward List
+                        </span>
+                        <small class="text-muted">Achievements</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="div_reward"></div>
+                    </div> *@
+                </div>
+            </div>
+
+            <!-- ================= RIGHT COLUMN : NEWS ================= -->
+            <div class="col-lg-6 col-md-12">
+                <div class="card news-card shadow-sm h-100">
+                    <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
+                        <span>Latest News & Updates</span>
+                        <small class="text-muted">Updated Today</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="news-item">
+                            <span class="news-badge new">NEW</span>
+                            <h6>KYC Mandatory Update</h6>
+                            <p>All users are required to complete Bank & Aadhaar KYC before 30th September.</p>
+                            <small>15 Sep 2025</small>
+                        </div>
+
+                        <div class="news-item">
+                            <span class="news-badge info">INFO</span>
+                            <h6>Weekly Payout Processed</h6>
+                            <p>This week's payout has been successfully credited to verified bank accounts.</p>
+                            <small>12 Sep 2025</small>
+                        </div>
+
+                        <div class="news-item">
+                            <span class="news-badge alert">ALERT</span>
+                            <h6>System Maintenance</h6>
+                            <p>Dashboard services will be temporarily unavailable on Sunday (2 AM – 4 AM).</p>
+                            <small>10 Sep 2025</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- USER KYC -->
+        <div class="card kyc-card shadow-sm mt-1">
+            <div class="card-header kyc-header-glass d-flex align-items-center gap-2">
+                <i class="fa fa-id-card"></i>
+                <span>KYC Status</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+
+                    <!-- BANK -->
+                    <div class="col-md-4">
+                        <div class="kyc-box">
+                            <span id="BankkycStatus" class="kyc-badge"></span>
+                            <h6>Bank Details</h6>
+                            <img id="bank_img" class="img-fluid rounded" src="@Const.NO_IMAGE" alt="Bank Image" onclick="showZoom(this.src)">
+                        </div>
+                    </div>
+
+                    <!-- PAN -->
+                    <div class="col-md-4">
+                        <div class="kyc-box">
+                            <span id="PankycStatus" class="kyc-badge"></span>
+                            <h6>PAN Card</h6>
+                            <img id="pan_img" class="img-fluid rounded" src="@Const.NO_IMAGE" alt="PAN Image" onclick="showZoom(this.src)">
+                        </div>
+                    </div>
+
+                    <!-- AADHAAR -->
+                    <div class="col-md-4">
+                        <div class="kyc-box">
+                            <span id="AadhaarkycStatus" class="kyc-badge"></span>
+                            <h6>Aadhaar</h6>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <img id="aadhar_img_1" class="img-fluid rounded" src="@Const.NO_IMAGE" alt="Aadhaar Front" onclick="showZoom(this.src)">
+                                <img id="aadhar_img_2" class="img-fluid rounded" src="@Const.NO_IMAGE" alt="Aadhaar Back" onclick="showZoom(this.src)">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+<script src="~/js/jquery-3.7.1.min.js"></script>
+<script>
+
+    let uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    $(function () {
+         GetUserDashboard();
+    });
+
+
+    function GetUserDashboard() {
+        let URL_LIST = `/secure/get-user-dashboard?uid=${uid}`;
+        showLoader();
+        $.get(URL_LIST, function (resp) {
+            hideLoader();
+            if (resp.success === true) {
+                 const dataArray = JSON.parse(resp.data) || [];
+                 const data = dataArray[0] || {};
+
+                 $('#user_id').html(data.user_id);
+                 $('#name').html(data.name);
+                 //$('#doe').html(data.doe);
+                  if (data.doe) {
+                     const d = new Date(data.doe);
+                     $('#doe').html(d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).replace(/ /g, '-'));
+                 } else { $('#doe').html('-'); }
+
+                 $('#mobile').html(data.mobile);
+
+
+
+                 $('#t_sponsor').html(data.t_sponsor);
+                 $('#t_paid_sponsor').html(data.t_paid_sponsor);
+
+                 $('#total_left').html(formatINR(data.total_left));
+                 $('#total_right').html(formatINR(data.total_right));
+                 $('#new_left').html(formatINR(data.new_left));
+                 $('#new_right').html(formatINR(data.new_right));
+                 $('#carry_left').html(formatINR(data.carry_left));
+                 $('#carry_right').html(formatINR(data.carry_right));
+
+                 $('#pbv').html(formatINR(data.pbv));
+                 $('#gbv').html(formatINR(data.gbv));
+                 $('#prev_pbv').html(formatINR(data.prev_pbv));
+                 $('#prev_gbv').html(formatINR(data.prev_gbv));
+
+                 $('#company_wallet').html(formatINR(data.company_wallet));
+                 $('#payout_wallet').html(formatINR(data.payout_wallet));
+
+
+
+
+
+                  // BANK KYC
+                  $('#BankkycStatus')
+                      .removeClass('bg-success-subtle text-success bg-warning-subtle text-warning')
+                      .addClass(data.bank_status === '1' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning')
+                      .text(data.bank_status === '1' ? 'Verified' : 'Pending');
+
+
+                  // PAN KYC
+                  $('#PankycStatus')
+                      .removeClass('bg-success-subtle text-success bg-warning-subtle text-warning')
+                      .addClass(data.pan_status === '1' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning')
+                      .text(data.pan_status === '1' ? 'Verified' : 'Pending');
+
+
+                  // AADHAAR KYC
+                  $('#AadhaarkycStatus')
+                      .removeClass('bg-success-subtle text-success bg-warning-subtle text-warning')
+                      .addClass(data.aadhar_status === '1' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning')
+                      .text(data.aadhar_status === '1' ? 'Verified' : 'Pending');
+
+
+                  // Bank
+                 $('#bank_img').attr('src', data.bank_img && data.bank_img !== '' ? '/'+data.bank_img : '@Const.NO_IMAGE');
+                 // PAN
+                 $('#pan_img').attr('src', data.pan_img && data.pan_img !== '' ? '/'+data.pan_img : '@Const.NO_IMAGE');
+                 // Aadhaar
+                 $('#aadhar_img_1').attr('src', data.aadhar_img_1 && data.aadhar_img_1 !== '' ? '/'+data.aadhar_img_1 : '@Const.NO_IMAGE');
+                 $('#aadhar_img_2').attr('src', data.aadhar_img_2 && data.aadhar_img_2 !== '' ? '/'+data.aadhar_img_2 : '@Const.NO_IMAGE');
+
+                 $('#pf_img').attr('src', data.pf_img && data.pf_img !== '' ? '/'+data.pf_img : '@Const.NO_IMAGE');
+
+            }
+         });
+    }
+
+       // Reward symbols
+     const rewardIcons = {
+        'Fast Achiever': '⚡',
+        'Bronze': '🥉',
+        'Silver': '🥈',
+        'Gold': '🥇',
+        'Platinum': '💎',
+        'Topaz': '🔶',
+        'Ruby': '♦️',
+        'Diamond': '💠',
+        'Blue Diamond': '🔷',
+        'Black Diamond': '⬛💎',
+        'Royal Diamond': '👑💎',
+        'Crown': '👑',
+        'President': '🏆',
+        'Kohinoor': '💍',
+        'Super Kohinoor': '👑💍'
+    };
+
+
+
+    // function BindReward() {
+    //     showLoader();
+
+    //     $.get(`/common/master-reports?mst_key=GET_USER_REWARD_LIST&id=${uid}`)
+    //         .done(r => {
+    //             hideLoader();
+
+    //             const d = r?.success ? JSON.parse(r.data || '[]') : [];
+
+    //             $('#div_reward').html(
+    //                 d.length ? d.map(x => `
+    //                     <div class="d-flex justify-content-between align-items-center px-3 py-3 border-bottom reward-hover">
+
+    //                         <!-- LEFT SIDE -->
+    //                         <div>
+    //                             <small class="text-muted text-uppercase">  ${x.trip_type || 'Rewards & Gift'}  </small>
+    //                             <h6 class="mb-1 fw-semibold"> ${rewardIcons[x.reward_name] || '🎁'} ${x.reward_name}  </h6>
+    //                             <small class="text-muted">  Left: <b>${x.left_count}</b> |  Right: <b>${x.right_count}</b>  </small>
+    //                         </div>
+
+    //                         <!-- RIGHT SIDE -->
+    //                         <div class="text-end">
+    //                             <div class="fw-semibold ${x.is_given ? 'text-success' : 'text-primary'}">
+    //                                 Bonus Income : ₹${(+x.bonus_income || 0).toLocaleString('en-IN')}
+    //                             </div>
+    //                             <div class="fw-semibold text-success">
+    //                                 Trip Type : ₹${(+x.trip_type || 0).toLocaleString('en-IN')}
+    //                             </div>
+    //                             ${x.doe ? `
+    //                                 <small class="text-muted d-block">
+    //                                     Given Date: ${new Date(x.doe).toLocaleDateString('en-IN', { day: '2-digit', month: 'short',  year: 'numeric' })}
+    //                                 </small>` : ''}
+    //                              <span class="badge ${x.is_given ? 'bg-success' : 'bg-warning text-dark'} mt-1"> ${x.is_given ? 'Given' : 'Pending'} </span>
+    //                         </div>
+    //                     </div>
+    //                 `).join('')
+    //                 : `<div class="text-center text-muted py-4">No rewards available</div>`
+    //             );
+    //         })
+    //         .fail(() => {
+    //             hideLoader();
+    //             showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+    //         });
+    // }
+
+</script>

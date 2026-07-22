@@ -1,0 +1,162 @@
+﻿@{
+    ViewData["Title"] = "Reward List";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Reward List
+    </h4>
+</section>
+<div class="clearfix"></div>
+
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+
+        <div class="col-sm-12">
+            <div class="table-responsive mb-4">
+                <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@await Html.PartialAsync("_DatatableScript")
+<script>
+    const user_id = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+    let uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    let token = "";
+    const DOWNLOAD_FILE_NAME="RewardList_";
+    $(function () {
+        BindTableData();
+    });
+
+
+
+    const rewardIcons = {
+        'Fast Achiever': '⚡',
+        'Bronze': '🥉',
+        'Silver': '🥈',
+        'Gold': '🥇',
+        'Platinum': '💎',
+        'Topaz': '🔶',
+        'Ruby': '♦️',
+        'Diamond': '💠',
+        'Blue Diamond': '🔷',
+        'Black Diamond': '⬛💎',
+        'Royal Diamond': '👑💎',
+        'Crown': '👑',
+        'President': '🏆',
+        'Kohinoor': '💍',
+        'Super Kohinoor': '👑💍'
+    };
+    
+    
+    
+    function BindTableData() {
+        showLoader();
+
+        $.ajax({
+            url: `/common/master-reports?mst_key=GET_USER_REWARD_LIST&id=${uid}`,
+            type: 'GET',
+            success: function (r) {
+                hideLoader();
+                if (!r?.success) return;
+
+                const data = JSON.parse(r.data || '[]');
+
+                $('#tblList').DataTable({
+                    dom: 'Blfrtip',
+                    destroy: true,
+                    responsive: true,
+                    autoWidth: false,
+                    scrollX: true,
+                    scrollCollapse: true,
+                    language: { emptyTable: "No records found" },
+                    lengthMenu: [[15, 50, 100, -1], [15, 50, 100, "All"]],
+                    pageLength: -1,
+
+                    buttons: [
+                        { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                        { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                        { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                        { extend: 'copyHtml5', text: 'Copy' }
+                    ],
+
+                    data: data,
+
+                    columns: [
+                        {
+                            data: null,
+                            title: '#',
+                            className: 'text-center',
+                            render: (d, t, r, m) => m.row + m.settings._iDisplayStart + 1
+                        },
+
+                        {
+                            data: 'reward_name',
+                            title: 'Reward',
+                            render: d => `${rewardIcons[d] || '🎁'} ${d}`
+                        },
+
+                        {
+                            data: null,
+                            title: 'Left | Right',
+                            className: 'text-center',
+                            render: d => `${d.left_count} | ${d.right_count}`
+                        },
+
+                        {
+                            data: 'bonus_income',
+                            title: 'Bonus Income',
+                            className: 'text-end',
+                            render: d => `₹${(+d || 0).toLocaleString('en-IN')}`
+                        },
+
+                        {
+                            data: 'trip_type',
+                            title: 'Trip Type',
+                            className: 'text-center',
+                            render: d => d
+                                ? `<span class="badge bg-info text-dark">${d}</span>`
+                                : '-'
+                        },
+
+                        {
+                            data: 'is_given',
+                            title: 'Status',
+                            className: 'text-center',
+                            render: d => d == 1
+                                ? `<span class="badge bg-success">✅ Given</span>`
+                                : `<span class="badge bg-warning text-dark">⏳ Pending</span>`
+                        },
+
+                        {
+                            data: 'doe',
+                            title: 'Achievement Date',
+                            className: 'text-center',
+                            render: d => d
+                                ? new Date(d).toLocaleDateString('en-GB', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric'
+                                  }).replace(/ /g, '-')
+                                : '-'
+                        }
+                    ]
+                });
+            },
+            error: () => {
+                hideLoader();
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+            }
+        });
+    }
+
+
+
+</script>
+
+

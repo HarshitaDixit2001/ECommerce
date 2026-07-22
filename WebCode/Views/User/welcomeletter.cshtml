@@ -1,0 +1,95 @@
+﻿@{
+    ViewData["Title"] = "welcomeletter";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Welcome Letter
+    </h4>
+</section>
+<div class="clearfix"></div>
+<br />
+
+
+<!-- Everything inside this div will be printed -->
+<div id="welcomeLetter" class="letter-container">
+    <header>
+        <h1>NEED FEED INDIA</h1>
+    </header>
+
+    <section class="recipient-info">
+        <p><strong>To,</strong></p>
+        <p>Mr./Ms./Mrs: <strong>NAVEEN KUMAR</strong></p>
+        <p>Your Id No.: <strong>NFI696521</strong></p>
+        <p>Subject: Welcome to NEED FEED INDIA.</p>
+    </section>
+
+    <main class="content">
+        <p>Dear Sir,</p>
+        <p>I extend a warm welcome to you on behalf of the entire family of NEED FEED INDIA and would like to express my heartfelt gratitude for extending your support in making the journey of NEED FEED INDIA a success.</p>
+        <p>Undoubtedly, together we shall create history and reach newer zeniths as I have complete faith in our wide range of products and your potential. From time to time, with the inputs of our research and development team, and customer feedback, we shall be introducing new products on a regular basis. We shall also ensure that our products reach out to maximum consumers within India and abroad.</p>
+        <p>I will ensure that our organization follows ethical norms and proper processes and will ensure complete cooperation in helping us grow together. You are most welcome to come up with newer and brighter suggestions with respect to this venture and we shall be happy to incorporate the same with mutual consent.</p>
+        <p>Wish you good luck for your future endeavors.</p>
+    </main>
+
+    <footer>
+        <p>With Warm Regards,</p>
+        <p><strong>(Chief Managing Director)</strong></p>
+        <p><strong>NEED FEED INDIA</strong></p>
+    </footer>
+</div>
+<!-- This button is visible on screen but hidden on paper -->
+<div class="no-print" style="text-align: center; margin: 20px;">
+    <button class="print-btn" onclick="window.print()">Print Welcome Letter Only</button>
+</div>
+<style>
+   /*  body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        padding: 20px;
+    } */
+
+    .letter-container {
+        background-color: white;
+        /* max-width: 800px; */
+        margin: 0 auto;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .print-btn {
+        padding: 12px 25px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    /* --- Print Styles (What comes out of the printer) --- */
+    @@media print {
+        /* Hide everything marked as no-print */
+        .no-print {
+            display: none !important;
+        }
+        /* Reset background and shadows for a clean white paper look */
+        body {
+            background-color: white !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .letter-container {
+            box-shadow: none !important;
+            margin: 0 !important;
+            width: 100% !important;
+            padding: 0 !important; /* Allow printer margins to take over */
+        }
+        /* Optional: Force text to black for better readability */
+        * {
+            color: black !important;
+        }
+    }
+</style>

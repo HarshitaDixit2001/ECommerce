@@ -1,0 +1,104 @@
+﻿@{
+    ViewData["Title"] = "Downline Reports";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Binary Downline
+    </h4>
+    <a class="btn btn-sm btn-outline-success" onclick="GoUp()"> <i class="fa fa-home"></i> Go Up  </a>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+                @*  <div class="panel-heading row"> 
+                    <div class="col-sm-2">
+                        <input type="button" class="btn btn-info" value="Go Up" onclick="Goup()" />
+                       
+                    </div>
+                </div> *@
+                <div class="panel-body">
+                    <div class="table-responsive mb-4">
+                        <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<input id="user_id" type="hidden" />
+@await Html.PartialAsync("_DatatableScript")
+<script>
+
+    let table;
+    var user_id = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+    const URL_LIST = `/user-report/get-binary-list`;
+    const DOWNLOAD_FILE_NAME = "User_Matrix_List";
+
+    $(function () {
+        $('#user_id').val(user_id);
+        initializeTable();
+        $('#btnSearch').on('click', function () {  table.ajax.reload(); });
+    });
+
+
+    function GoUp(){
+        $('#user_id').val(user_id);
+        table.ajax.reload();
+    }
+
+
+
+    function initializeTable() {
+        table = $('#tblList').DataTable({
+            dom: 'Blfrtip',
+            processing: true,
+           // scrollY: "700px",
+            scrollX: true,
+            autoWidth: true,
+            responsive: true,
+            destroy: true,
+            lengthMenu: [[25, 100, -1], [25, 100, "All"]],
+            pageLength: @Const.NO_OF_PAGE_RECORDS,
+            buttons: ['excelHtml5', 'csvHtml5', 'colvis'],
+            ajax: {
+                url: URL_LIST,
+                type: 'POST',
+                contentType: 'application/json',
+                data: d => JSON.stringify({ ...d, user_id: $('#user_id').val() }),
+                dataSrc: j => j.data
+            },
+            columns: [
+                { data: null, title: '#', render: (d, t, r, m) => m.row + m.settings._iDisplayStart + 1 },
+                { data: null, title: 'User', render: r => `${r.user_id}<br>${r.name}` },
+                { data: 'user_id', title: 'Action', render: d => `<button class="btn btn-sm btn-primary view-user" data-userid="${d}">View</button>` },
+                { data: null, title: 'Parent', render: r => `${r.sponsor_user_id}<br>${r.sponsor_name}` },
+                { data: 'total_left', title: "Total Left" },
+                { data: 'total_right', title: "Total Right" },
+                { data: 'new_left', title: "Curr. Left" },
+                { data: 'new_right', title: "Curr. Right" },
+                { data: 'is_paid', title: 'Paid Status', orderable: false,
+                       render: (d) => {
+                       const map = {
+                           1: ['Paid', 'text-success'],
+                           0: ['UnPaid', 'text-danger']
+                       };
+                       const s = map[d] || ['Unknown', 'text-secondary'];
+                       return `<span> <i class="fa fa-circle ${s[1]} me-1"></i> ${s[0]} </span>`;
+                   }
+               },
+               { data: 'side', title: 'Side', render: (d) => d === 'L' ? 'Left' : d === 'R' ? 'Right' : 'Unknown' },
+               { data: 'rank_name', title: 'Rank' },
+
+            ]
+        });
+    }
+
+    $(document).on('click', '.view-user', function () {
+        $('#user_id').val($(this).data('userid'));
+        table.ajax.reload();
+    });
+</script>

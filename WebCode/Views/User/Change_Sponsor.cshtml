@@ -1,0 +1,183 @@
+﻿@{
+    ViewData["Title"] = "Sponsor Change";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+<!-- Breadcrumb -->
+@* <section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a><i class="fa fa-list"></i> <strong>User ID/ Sponsor Change </strong></a></li>
+    </ol>
+</section> 
+
+<div class="clearfix"></div>*@
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Change Sponsor/ User ID
+    </h4> 
+</section> 
+<div class="clearfix"></div>
+<br />
+
+
+<section class="content">
+
+    <div class="row">
+
+        <div class="col-md-3">
+             <label class="form-label">👤 Select Type</label> 
+            <select id="user_type" onchange="fn_user_type()" class="form-control">
+                <option value="1">Sponsor Change</option>
+                <option value="2">User ID Change</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+              <label class="form-label">👤 Select User</label> 
+            <select id="uid" asp-items="ViewBag.BuyerList" class="form-control">
+                <option value="0">🔍 Search User</option>
+            </select>
+        </div>
+
+
+        <div class="col-md-3" id="div_sponsor_change">
+            <label class="form-label">👤 Select Sponsor</label>  
+            <select id="sponsor_uid" asp-items="ViewBag.BuyerList" class="form-control">
+                <option value="0">🔍 Search Sponsor</option>
+            </select>
+        </div>
+
+
+
+
+
+        <div class="col-md-3" id="div_userid_change">
+            @* <label class="form-label">👤 Enter New User Id</label> *@
+            <input id="user_id" class="form-control" maxlength="15" />
+        </div>
+
+
+
+        <div class="col-md-2 d-flex align-items-end">
+            <label class="form-label"></label>
+            <button type="submit" id="saveBtn" class="btn btn-success w-100"
+                    onclick="confirmSubmissionReceivedAmount(event)">
+                Submit
+            </button>
+
+        </div>
+    </div>
+</section>
+ 
+@await Html.PartialAsync("_DropdownSearch")  
+
+<script>
+
+    $(function () {
+        $('.select2').select2({ placeholder: "🔍 Select an Option", allowClear: true });
+
+        fn_user_type();
+
+        $('#user_id').on('keypress', function (e) {
+            if (e.which === 32) {
+                e.preventDefault();
+                showErrorLog(`@Const.ERROR_HEADER`, "User ID must not contain spaces.");
+            }
+        });
+
+    @if (TempData["Error"] != null)
+    {
+        <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <text> showSuccessMessage(`@Const.SUCCESS_HEADER`, '@TempData["Success"]'); </text>
+    }
+    });
+
+
+
+
+
+    function ChangeSponsor() {
+        const user_type = $('#user_type').val();
+        const uid = $('#uid').val();
+        const sponsor_uid = $('#sponsor_uid').val();
+        const user_id = $('#user_id').val().trim();
+
+         if (parseInt(uid) <= 0) {
+                showErrorLog(`@Const.ERROR_HEADER`, "Please select a user."); return;
+         }
+
+        if(user_type == "1"){
+            if (parseInt(sponsor_uid) <= 0) {
+                showErrorLog(`@Const.ERROR_HEADER`, "Please select a sponsor."); return;
+            }
+        }
+       if(user_type == "2"){
+            if (user_id === "") {
+               showErrorLog(`@Const.ERROR_HEADER`, "Please enter new User ID.");
+               return;
+           }
+       }
+
+
+        showLoader();
+        const url = `/user/sponsor-update`;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: { user_type: user_type, uid: uid, sponsor_uid: sponsor_uid , user_id : user_id},
+            success: function (response) {
+                hideLoader();
+                if (response.success === true) {
+                    showToastSuccess('Data saved successfully.');
+                    showSuccessMessage(`@Const.SUCCESS_HEADER`, response.message);
+                    $('#uid').val('0').trigger('change'); // Reset the user dropdown
+                    $('#sponsor_uid').val('0').trigger('change'); // Reset the sponsor dropdown
+                } else {
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message || "Failed to save data.");
+                }
+            },
+            error: function () {
+                hideLoader();
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+            }
+        });
+    }
+
+
+     function confirmSubmissionReceivedAmount(event) {
+            event.preventDefault(); // stop the form from auto-submitting
+            Swal.fire({
+                icon: 'question',
+                title: '⚠️ Are you sure you want to continue?',
+                html: `<div style="text-align: left; white-space: pre-wrap; font-size: 16px;"><strong>${'Do you want to submit the details?'}</strong></div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                customClass: { htmlContainer: 'text-left' },
+                width: '35%'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    ChangeSponsor();
+                }
+            });
+        }
+
+
+    function fn_user_type() {
+        const user_type = $('#user_type').val();
+        if (user_type === "1") {
+            $('#div_sponsor_change').show();
+            $('#div_userid_change').hide();
+        } else if (user_type === "2") {
+            $('#div_sponsor_change').hide();
+            $('#div_userid_change').show();
+        }
+    }
+
+
+</script>

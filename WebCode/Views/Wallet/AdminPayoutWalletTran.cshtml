@@ -1,0 +1,177 @@
+﻿@{
+    ViewData["Title"] = "Payout Wallet Passbook";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Payout Wallet Passbook
+    </h4>
+</section>
+<div class="clearfix"></div>
+<br />
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="text" id="from_date" class="form-control" placeholder="From Date" />
+        </div>
+        <div class="col-sm-2">
+            <input type="text" id="to_date" class="form-control" placeholder="To Date" />
+        </div>
+        <div class="col-sm-2">
+            <input id="user_id" class="form-control" placeholder="User Id" />
+        </div>
+        <div class="col-sm-2">
+            <select id="d_c" class="form-control select2">
+                <option value="">All Debit/Credit </option>
+                <option value="D">Debit</option>
+                <option value="C">Credit</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <input type="button" id="btnSearch" class="btn btn-info" value="Search" />
+        </div>
+
+        <div class="col-sm-12">
+            <div class="table-responsive mb-4">
+                <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%"> </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_Sweetalert")
+<script>
+    let token = "";
+    const DOWNLOAD_FILE_NAME="PayoutWalletPassbook_";
+    const uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    $(function () {
+        const formatDate = date => date.toLocaleDateString('en-GB').split('/').join('-');
+        const today = new Date();
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        $('#from_date').val(formatDate(monthStart));
+        $('#to_date').val(formatDate(today));
+        $('#from_date, #to_date').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+
+
+        token = "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(ViewBag.Token?.ToString()))";
+        BindTableData();
+        $('#btnSearch').on('click', function () {  BindTableData(); });
+    });
+
+
+    function BindTableData() {
+         showLoader();
+         const formData = new FormData();
+         formData.append('from_date', parseDate($('#from_date').val()));
+         formData.append('to_date', parseDate($('#to_date').val()));
+         formData.append('uid', uid);
+         formData.append('d_c', $('#d_c').val());
+         formData.append('paid_user_id', $('#user_id').val());
+
+         $.ajax({
+             url: '/wallet/get-user-Payout-wallet-passbook',
+             type: 'POST',
+             data: formData,
+             processData: false,
+             contentType: false,
+             success: function (response) {
+                 hideLoader();
+                 if (response.success === true) {
+                     const data = response.data || [];
+                     $('#tblList').DataTable({
+                         dom: 'Blfrtip',
+                         scrollX: true,
+                         scrollCollapse: true,
+                         destroy: true,
+                         responsive: true,
+                         autoWidth: false,
+                         language: { emptyTable: "No records found" },
+                         "lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]],
+                         "pageLength": 15,
+                         buttons: [
+                             { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                             { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                             { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                             { extend: 'copyHtml5', text: 'Copy'},
+                         ],
+                         data: data,
+                         columns:[
+                                 {
+                                  data: null, title: '#',
+                                  render: (d,t,r,m)=>`<span class="badge bg-secondary">${m.row + m.settings._iDisplayStart + 1}</span>`
+                                },
+
+                                {
+                                  data:'doe', title:'Txn. Date',
+                                  render:d=>d
+                                    ? `<i class="bi bi-calendar-event text-primary me-1"></i>${new Date(d)
+                                        .toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+                                        .replace(/ /g,'-')}`
+                                    : ''
+                                },
+
+                                {
+                                  data:'amount', title:'Txn. Amount',
+                                  render:(d,t,r)=>r.d_c==='D'
+                                    ? `<i class="bi bi-arrow-down-circle text-danger me-1"></i><span class="text-danger fw-semibold">${d}</span>`
+                                    : `<i class="bi bi-arrow-up-circle text-success me-1"></i><span class="text-success fw-semibold">${d}</span>`
+                                },
+
+                                {
+                                  data:'balance', title:'Curr. Balance',
+                                  render:d=>`<span class="fw-semibold text-dark">₹ ${d}</span>`
+                                },
+
+                                {
+                                  data:'d_c', title:'Dr. / Cr.',
+                                  render:d=>d==='D'
+                                    ? `<span class="badge bg-danger-subtle text-danger"><i class="bi bi-dash-circle me-1"></i>Debit</span>`
+                                    : `<span class="badge bg-success-subtle text-success"><i class="bi bi-plus-circle me-1"></i>Credit</span>`
+                                },
+
+                                {
+                                  data:'user_id', title:'User ID',
+                                  render:d=>`<i class="bi bi-person-badge text-info me-1"></i>${d}`
+                                },
+
+                                {
+                                  data:'name', title:'User Name',
+                                  render:d=>`<i class="bi bi-person text-primary me-1"></i>${d}`
+                                },
+
+                                {
+                                  data:'paid_user_id', title:'Paid UID',
+                                  render:d=>`<i class="bi bi-person-check text-success me-1"></i>${d}`
+                                },
+
+                                {
+                                  data:'paid_name', title:'Paid Name',
+                                  render:d=>`<i class="bi bi-person-check-fill text-success me-1"></i>${d}`
+                                },
+
+                                {
+                                  data:'remarks', title:'Remark',
+                                  render:d=>`<i class="bi bi-chat-left-text text-muted me-1"></i>${d || '-'}`
+                                },
+
+                                {
+                                  data:'tran_no', title:'Txn. No.',
+                                  render:d=>`<span class="badge bg-light text-dark border">${d}</span>`
+                                }
+                         ],
+                     });
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+     }
+</script>
+
+@await Html.PartialAsync("_DatePicker")

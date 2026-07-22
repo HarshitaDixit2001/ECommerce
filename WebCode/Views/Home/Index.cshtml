@@ -1,0 +1,1018 @@
+﻿@model List<ProductViewModel>
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    .hero-slide {
+        min-height: 70vh;
+        padding: 70px 0;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* OVERLAY (Dark Effect) */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient( rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.45) );
+        z-index: 1;
+    }
+
+    /* CONTENT CENTER */
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 750px;
+        text-align: center;
+        animation: fadeUp 1s ease;
+    }
+
+        /* HEADING */
+        .hero-content h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+        }
+
+        /* TEXT */
+        .hero-content p {
+            font-size: 1.1rem;
+            margin: 15px 0;
+            color: #ddd;
+        }
+
+
+
+    /* TEXT ANIMATION */
+    @@keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(35px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* SMOOTH SLIDE FADE */
+    .carousel-fade .carousel-item {
+        transition: opacity 1s ease-in-out;
+    }
+
+    /* INDICATORS STYLE */
+    .carousel-indicators button {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    /* ARROWS */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+    }
+
+    section:hover {
+        transition: 0.3s;
+    }
+
+    .service-card {
+        transition: all 0.3s ease;
+        border: 0;
+        box-shadow: 0 2px 15px rgba(0,0,0,.08);
+    }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,.15);
+        }
+</style>
+
+<style>
+    /* ==========================================
+                      AYURVEDIC HERO BANNER
+                 ========================================== */
+
+    .hero-banner {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        border: 2px solid #d8eadc;
+        box-shadow: 0 10px 30px rgba(25,135,84,.12);
+    }
+
+    .hero-banner-img {
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Overlay */
+    .banner-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient( to right, rgba(10, 60, 30, 0), rgba(15, 100, 84, 0.30) );
+        display: flex;
+        align-items: center;
+    }
+
+    /* Content */
+    .banner-content {
+        max-width: 650px;
+        color: #fff;
+        padding: 40px;
+    }
+
+    .banner-badge {
+        display: inline-block;
+        background: rgba(255,255,255,.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.25);
+        padding: 8px 18px;
+        border-radius: 50px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .banner-title {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        text-shadow: 0 3px 12px rgba(0,0,0,.3);
+    }
+
+    .banner-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: rgba(255,255,255,.95);
+        margin-bottom: 25px;
+    }
+
+    .btn-banner {
+        background: #198754;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 28px;
+        font-weight: 600;
+    }
+
+        .btn-banner:hover {
+            background: #146c43;
+            color: #fff;
+        }
+
+    /* ==========================================
+                        MOBILE
+                 ========================================== */
+
+    @@media (max-width: 991px) {
+        .hero-banner-img {
+            height: 350px;
+        }
+
+        .banner-content {
+            text-align: center;
+            max-width: 100%;
+            padding: 25px;
+        }
+
+        .banner-title {
+            font-size: 2rem;
+        }
+
+        .banner-text {
+            font-size: .95rem;
+            line-height: 1.6;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .hero-banner-img {
+            height: 280px;
+        }
+
+        .banner-title {
+            font-size: 1.5rem;
+        }
+
+        .banner-badge {
+            font-size: 13px;
+        }
+    }
+</style>
+
+<style>
+    /* Ayurvedic Blog Section */
+
+    .blog-card {
+        border-radius: 18px;
+        overflow: hidden;
+        transition: all .3s ease;
+    }
+
+        .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(25,135,84,.15) !important;
+        }
+
+        .blog-card img {
+            height: 240px;
+            object-fit: cover;
+        }
+
+        .blog-card .card-title {
+            color: #1d5a34;
+            line-height: 1.4;
+        }
+
+        .blog-card a:hover {
+            color: #146c43 !important;
+        }
+
+    /* ==========================================
+                                                   NEWSLETTER SECTION
+                                                ========================================== */
+
+    .newsletter-section {
+        background: linear-gradient( 135deg, #f8fcf8 0%, #edf7ef 50%, #e4f4e8 100% );
+    }
+
+    .newsletter-box {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 60px 30px;
+        border: 1px solid #d8eadc;
+        box-shadow: 0 15px 40px rgba(25,135,84,.08);
+    }
+
+    .newsletter-badge {
+        display: inline-block;
+        background: #e8f5ec;
+        color: #198754;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .newsletter-title {
+        color: #1d5a34;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .newsletter-text {
+        max-width: 700px;
+        margin: auto;
+        color: #5f6f64;
+        line-height: 1.8;
+    }
+
+    .newsletter-input {
+        border: 1px solid #cfe8d6;
+    }
+
+        .newsletter-input:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 .2rem rgba(25,135,84,.15);
+        }
+
+    @@media (max-width:768px) {
+        .newsletter-box {
+            padding: 40px 20px;
+        }
+
+        .newsletter-title {
+            font-size: 1.7rem;
+        }
+
+        .input-group {
+            flex-direction: column;
+        }
+
+            .input-group .btn {
+                margin-top: 10px;
+                width: 100%;
+            }
+    }</style>
+
+<style>
+
+    /*=========================================
+                        BEST SELLING PRODUCTS
+     =========================================*/
+
+     .product-card {
+        position: relative;
+    }
+
+    .product-code-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #198754;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        z-index: 2;
+        box-shadow: 0 2px 6px rgba(0,0,0,.15);
+        white-space: nowrap;
+    }
+
+    .best-selling-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .marquee-container {
+        width: 100%;
+        overflow: hidden;
+        padding: 10px 55px;
+    }
+
+    .marquee-track {
+        display: flex;
+        align-items: stretch;
+        gap: 20px;
+        width: max-content;
+        animation: marqueeScroll 40s linear infinite;
+    }
+
+    .marquee-container:hover .marquee-track {
+        animation-play-state: paused;
+    }
+
+    .marquee-item {
+        flex: 0 0 auto;
+        width: 280px;
+    }
+
+    /*=========================================
+                        Navigation Buttons
+                =========================================*/
+
+    .marquee-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 10px 25px rgba(0,0,0,.18);
+        transition: .3s;
+    }
+
+        .marquee-btn:hover {
+            background: #146c43;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+    .marquee-prev {
+        left: 5px;
+    }
+
+    .marquee-next {
+        right: 5px;
+    }
+
+    /*=========================================
+                        Marquee Animation
+                =========================================*/
+
+    @@keyframes marqueeScroll {
+
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    /*=========================================
+                        Responsive
+                =========================================*/
+
+    @@media (max-width:992px) {
+
+        .marquee-item {
+            width: 240px;
+        }
+    }
+
+    @@media (max-width:768px) {
+
+        .marquee-container {
+            padding: 10px 45px;
+        }
+
+        .marquee-item {
+            width: 200px;
+        }
+
+        .marquee-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+    }
+</style>
+
+
+<!-- HERO SLIDER -->
+<div id="heroSlider" class="carousel slide carousel-fade"
+     data-bs-ride="carousel"
+     data-bs-interval="8000"
+     data-bs-pause="false">
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="1"></button>
+        @*  <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="2"></button>
+        <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="3"></button>
+        <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="4"></button> *@
+    </div>
+
+    <div class="carousel-inner">
+
+        <!-- Slide 1 -->
+        <div class="carousel-item active hero-slide" style="background-image:url('/images/baner1.png');">
+            <div class="overlay"></div>
+             <div class="container">
+                <div class="hero-content text-center text-white">
+
+                    <h1 class="banner-title">
+                        Premium Ayurvedic Health Products for a Healthy Lifestyle
+                    </h1>
+
+                    <p class="banner-text text-white">
+                        Build secure and scalable Binary, Matrix, Unilevel and Direct Selling
+                        Software solutions with mobile apps, e-wallets and payment gateway integration.
+                    </p>
+                     
+                </div>
+            </div> 
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="carousel-item hero-slide" style="background-image:url('/images/baner2.png');">
+            <div class="overlay"></div>
+
+            <div class="container">
+                <div class="hero-content text-center text-white">
+
+                    <h1 class="banner-title">
+                        Natural Ayurvedic Solutions for Better Health
+                    </h1>
+
+                    <p class="banner-text text-white">
+                        Discover a wide range of authentic Ayurvedic health products, herbal supplements,
+                        wellness essentials, and natural remedies carefully crafted to support your overall
+                        health, immunity, and well-being.
+                    </p>
+                     
+                </div>
+            </div> 
+        </div>
+
+        @*  <!-- Slide 3 -->
+        <div class="carousel-item hero-slide"
+             style="background-image:url('/images/Banner3.jpeg');">
+            <div class="overlay"></div>
+
+            <div class="container">
+                <div class="hero-content text-center text-white">
+
+                    <h2 class="display-5 fw-bold">
+                        CRM & Business Automation Software
+                    </h2>
+
+                    <p class="lead">
+                        Manage customers, leads, sales pipelines, workflows and business operations
+                        through customized CRM and ERP solutions.
+                    </p>
+
+                    <a href="#"
+                       class="btn btn-orange btn-lg"
+                       data-bs-toggle="modal"
+                       data-bs-target="#quoteModal">
+                        Start Your Project
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="carousel-item hero-slide"
+             style="background-image:url('/images/Banner4.jpeg');">
+            <div class="overlay"></div>
+
+            <div class="container">
+                <div class="hero-content text-center text-white">
+
+                    <h2 class="display-5 fw-bold">
+                        Android & iOS Mobile App Development
+                    </h2>
+
+                    <p class="lead">
+                        Create powerful mobile applications using Flutter, .NET and modern
+                        technologies for startups, enterprises and MLM businesses.
+                    </p>
+
+                    <a href="#"
+                       class="btn btn-orange btn-lg"
+                       data-bs-toggle="modal"
+                       data-bs-target="#quoteModal">
+                        Build Your App
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="carousel-item hero-slide"
+             style="background-image:url('/images/Banner5.jpeg');">
+            <div class="overlay"></div>
+
+            <div class="container">
+                <div class="hero-content text-center text-white">
+
+                    <h2 class="display-5 fw-bold">
+                        Custom Software & E-commerce Development
+                    </h2>
+
+                    <p class="lead">
+                        Develop scalable web applications, ecommerce platforms,
+                        enterprise software and digital solutions tailored to your business needs.
+                    </p>
+
+                    <a href="#"
+                       class="btn btn-orange btn-lg"
+                       data-bs-toggle="modal"
+                       data-bs-target="#quoteModal">
+                        Get Started
+                    </a>
+
+                </div>
+            </div>
+        </div> *@
+
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev"
+            type="button"
+            data-bs-target="#heroSlider"
+            data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+
+    <button class="carousel-control-next"
+            type="button"
+            data-bs-target="#heroSlider"
+            data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+
+</div>
+
+
+<!-- ===== SHOP BY CATEGORY ===== -->
+<section class="py-5 bg-light border rounded-4 shadow">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h2 class="fw-bold text-success mb-1">
+                    🛍️ Product Categories
+                </h2>
+                <p class="text-muted mb-0">
+                    Browse products by category.
+                </p>
+            </div>
+            <a href="/product" class="btn btn-outline-success rounded-pill px-4">
+                View All Products
+            </a>
+        </div>
+    </div>
+    @await Component.InvokeAsync("Category")
+</section>
+
+
+<!-- ===== Best selling products ===== -->
+<section class="py-5 bg-light border rounded-4 shadow">
+    <div class="container-fluid px-4">
+        <div class="best-selling-wrapper">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-success mb-1">
+                        🔥 Best Selling Products
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Explore Our Most Loved & Best Selling Collection
+                    </p>
+                </div>
+            </div>
+            <button class="marquee-btn marquee-prev" id="prevBtn">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <div class="marquee-container" id="marqueeContainer">
+                <div class="marquee-track" id="marqueeTrack"></div>
+            </div>
+            <button class="marquee-btn marquee-next" id="nextBtn">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+
+<!-- ===== PROMOTIONAL BANNER ===== -->
+<section class="container-fluid px-0 my-4 border rounded-4 shadow">
+    <div class="hero-banner position-relative">
+
+        <img src="~/images/baner1.png" class="hero-banner-img" alt="Ayurvedic Health Products">
+
+        @*  <div class="banner-overlay">
+
+            <div class="container">
+
+                <div class="banner-content">
+
+                    <h1 class="banner-title">
+                        Pure Ayurvedic Wellness for Every Family
+                    </h1>
+
+                    <p class="banner-text">
+                        Discover authentic herbal supplements, immunity boosters,
+                        natural health products, and Ayurvedic remedies crafted
+                        to support a healthier and balanced lifestyle.
+                    </p>
+                </div>
+
+            </div>
+
+        </div> *@
+
+    </div>
+
+</section>
+
+
+<!-- ===== AYURVEDIC HEALTH BLOGS ===== -->
+<section class="py-5 bg-light border rounded-4 shadow">
+
+    <div class="container-fluid px-4">
+
+        <!-- Section Header -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
+
+            <div>
+                <span class="badge bg-success-subtle text-success mb-2 px-3 py-2">
+                    💚 Expert Insights
+                </span>
+                <h2 class="fw-bold text-success mb-1">
+                    Our Latest Blogs
+                </h2>
+                <p class="text-muted mb-0">
+                    Read informative articles, wellness tips, and trusted health guidance.
+                </p>
+            </div>
+
+            <a href="/blog" class="btn btn-outline-success rounded-pill px-4">
+                View All Articles
+            </a>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Blog 1 -->
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm h-100 blog-card">
+
+                    <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"
+                         class="card-img-top"
+                         alt="Ayurvedic Immunity">
+
+                    <div class="card-body">
+
+                        <span class="badge bg-success mb-2">
+                            Immunity
+                        </span>
+
+                        <h5 class="card-title fw-bold">
+                            Natural Ways to Boost Immunity with Ayurveda
+                        </h5>
+
+                        <p class="card-text text-muted">
+                            Discover powerful Ayurvedic herbs and daily practices that help strengthen your immune system naturally.
+                        </p>
+
+                        <a href="#" class="text-success fw-semibold text-decoration-none">
+                            Read More →
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Blog 2 -->
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm h-100 blog-card">
+
+                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80"
+                         class="card-img-top"
+                         alt="Healthy Lifestyle">
+
+                    <div class="card-body">
+
+                        <span class="badge bg-warning text-dark mb-2">
+                            Lifestyle
+                        </span>
+
+                        <h5 class="card-title fw-bold">
+                            Daily Ayurvedic Habits for a Healthier Life
+                        </h5>
+
+                        <p class="card-text text-muted">
+                            Learn simple morning and evening routines inspired by Ayurveda for better health and wellness.
+                        </p>
+
+                        <a href="#" class="text-success fw-semibold text-decoration-none">
+                            Read More →
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Blog 3 -->
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm h-100 blog-card">
+
+                    <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80"
+                         class="card-img-top"
+                         alt="Herbal Remedies">
+
+                    <div class="card-body">
+
+                        <span class="badge bg-info mb-2">
+                            Herbal Care
+                        </span>
+
+                        <h5 class="card-title fw-bold">
+                            Top Ayurvedic Herbs for Everyday Wellness
+                        </h5>
+
+                        <p class="card-text text-muted">
+                            Explore the benefits of Ashwagandha, Tulsi, Turmeric and other traditional Ayurvedic herbs.
+                        </p>
+
+                        <a href="#" class="text-success fw-semibold text-decoration-none">
+                            Read More →
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===== FEATURES ===== -->
+<section class="section-features py-5 border rounded-4 shadow">
+    <div class="container-fluid px-4">
+
+        <h3 class="section-title text-center mb-5">Why Shop With Us?</h3>
+
+        <div class="row g-4">
+
+            <div class="col-md-3">
+                <div class="feature-card text-center">
+                    <i class="bi bi-truck feature-icon"></i>
+                    <h6>Fast Delivery</h6>
+                    <p>Quick and reliable shipping to your doorstep.</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="feature-card text-center">
+                    <i class="bi bi-shield-check feature-icon"></i>
+                    <h6>Secure Payments</h6>
+                    <p>100% safe and encrypted payment methods.</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="feature-card text-center">
+                    <i class="bi bi-arrow-repeat feature-icon"></i>
+                    <h6>Easy Returns</h6>
+                    <p>Hassle-free return and refund process.</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="feature-card text-center">
+                    <i class="bi bi-headset feature-icon"></i>
+                    <h6>24/7 Support</h6>
+                    <p>Friendly customer support whenever you need help.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+<script>
+     $(document).on("click", ".wishlist-btn", function () {
+         $(this).toggleClass("active");
+     });
+
+
+    $(document).ready(function () {
+        BindProduct();
+    });
+
+
+    function BindProduct() {
+
+        $.ajax({
+            url: "/product/get-product",
+            type: "GET",
+            data: {cart_id: 0, fetch_type: "HOME_BEST_SELLING" },
+            success: function (response) {
+
+                if (!response.success)
+                    return;
+
+                let products = response.data || [];
+                let html = "";
+
+                // Duplicate products for infinite marquee
+                for (let r = 0; r < 2; r++) {
+
+                    $.each(products, function (i, product) {
+
+                        let img = "/images/noimage.jpg";
+
+                        if (product.img1 && product.img1 !== "") {
+                            img = "/" + product.img1.replace(/^\/+/, "");
+                        }
+
+                        let name = product.prod_name || "";
+
+                        if (name.length > 25) {
+                            name = name.substring(0, 25) + "...";
+                        }
+
+                        let discount = product.discount ? Number(product.discount).toFixed(0) : 0;
+
+                        let mrp = product.mrp ? Number(product.mrp).toFixed(2) : "0.00";
+                        let price = product.price ? Number(product.price).toFixed(2) : "0.00";
+
+                        let code = product.prod_code || "";
+
+                        html += `
+                        <div class="marquee-item">
+                            <div class="product-card">
+                                <!-- Product Code -->
+                                <div class="product-code-badge"> ${code} </div>
+
+                                <!-- Wishlist -->
+                                <div class="wishlist-btn"> <i class="bi bi-heart"></i> </div>
+
+                                <a href="/product/${product.seo_url}">
+                                    <img src="${img}" class="product-img" alt="${product.prod_name}">
+                                </a>
+
+                                <div class="product-info">
+                                    <h6 class="product-title mb-2"> ${name} </h6>
+
+                                    <div class="product-price-box d-flex justify-content-between align-items-center">
+                                        <span class="mrp"> MRP${mrp} </span>
+                                        <span class="dp"> Rs.${price} </span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="badge bg-warning text-dark">
+                                            ${discount}% OFF
+                                        </span>
+
+                                        <button class="btn-cart-sm"
+                                                onclick="AddToCart(0,${product.pid},1,'')">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                }
+
+                $("#marqueeTrack").html(html);
+
+                // Reinitialize marquee if available
+                if (typeof InitializeMarquee === "function") {
+                    InitializeMarquee();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading products:", error);
+            }
+        });
+    } 
+</script>
+
+
+<script>
+
+    $(function () {
+        var container = $("#marqueeContainer");
+        var timer;
+        function startAutoScroll() {
+            timer = setInterval(function () {
+                var maxScroll = container[0].scrollWidth - container.innerWidth();
+                if (container.scrollLeft() >= maxScroll) {
+                    container.scrollLeft(0);
+                } else {
+                    container.scrollLeft(container.scrollLeft() + 1);
+                }
+            }, 20);
+        }
+
+        function stopAutoScroll() {
+            clearInterval(timer);
+        }
+
+        startAutoScroll();
+        container.hover(function () {
+            stopAutoScroll();
+        }, function () {
+            startAutoScroll();
+        });
+
+        $("#nextBtn").click(function () {
+            stopAutoScroll();
+            container.stop().animate({
+                scrollLeft: container.scrollLeft() + 320
+            }, 400);
+            startAutoScroll();
+        });
+
+        $("#prevBtn").click(function () {
+            stopAutoScroll();
+            container.stop().animate({
+                scrollLeft: container.scrollLeft() - 320
+            }, 400);
+            startAutoScroll();
+        });
+    });
+</script>
+ 

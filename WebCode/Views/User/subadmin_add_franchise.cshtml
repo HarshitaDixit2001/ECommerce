@@ -1,0 +1,462 @@
+﻿@model AddUpdateUserRequest
+@{
+    ViewData["Title"] = "Edit_User_Profile";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+<!-- Breadcrumb -->
+@* <section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a><i class="fa fa-list"></i> Party Management</a></li>
+    </ol>
+   <a asp-action="subadmin-franchise-list" asp-controller="user" class="btn btn-success pull-right"> Party List </a>
+   
+</section> *@
+ 
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Party Management
+    </h4>
+    <a asp-action="subadmin-franchise-list" asp-controller="user" class="btn btn-sm btn-outline-success">
+        Party List
+    </a>
+</section>
+<div class="clearfix"></div>
+<br />
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+
+                <!-- 🔒 User & Nominee & Security -->
+                <div class="tab-content">
+
+                    <form asp-action="subadmin-add-franchise" asp-controller="user" method="post" id="FormSubmit"
+                          asp-route-user_id="@Model?.user_id" autocomplete="off" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="uid" />
+                        @Html.AntiForgeryToken()
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label asp-for="sub_role_id" class="form-label">Party Type</label>
+                                <select asp-for="sub_role_id" class="form-control select2" id="sub_role_id">
+                                    <option value="4">Party</option>
+                                    <option value="5">Retailer</option>
+                                    <option value="6">other</option>
+                                </select>
+                                <span asp-validation-for="sub_role_id" class="text-danger"></span>
+                            </div>
+
+                            @if (Model?.user_id != null)
+                            {
+                                <div class="col-md-3">
+                                    <label asp-for="user_id" class="form-label"></label>
+                                    <input asp-for="user_id" class="form-control" maxlength="15" readonly />
+                                    <span asp-validation-for="user_id" class="text-danger"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-3">
+                                    <label asp-for="user_id" class="form-label"></label>
+                                    <input asp-for="user_id" class="form-control" maxlength="15" />
+                                    <span asp-validation-for="user_id" class="text-danger"></span>
+                                </div>
+                            }
+
+                            <div class="col-md-3" id="sponsorField">
+                                @if (Model?.sponsor_user_id != null)
+                                {
+                                    <label asp-for="sponsor_user_id" class="form-label">Referral User Id</label>
+                                    <input asp-for="sponsor_user_id" class="form-control" onchange="GetSponsorName()" readonly />
+                                    <span asp-validation-for="sponsor_user_id" class="text-danger"></span>
+                                }
+                                else
+                                {
+                                    <label asp-for="sponsor_user_id" class="form-label">Referral User Id</label>
+                                    <input asp-for="sponsor_user_id" class="form-control" onchange="GetSponsorName()" />
+                                    <span asp-validation-for="sponsor_user_id" class="text-danger"></span>
+                                }
+                            </div>
+                            <div class="col-md-3">
+                                <br />
+                                <span id="sponsor_name"></span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label asp-for="com_name" class="form-label">Firm Name</label>
+                                <input asp-for="com_name" class="form-control" />
+                                <span asp-validation-for="com_name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="name" class="form-label">Party Name</label>
+                                <input asp-for="name" class="form-control" />
+                                <span asp-validation-for="name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="mobile" class="form-label"></label>
+                                <input asp-for="mobile" class="form-control" maxlength="10" />
+                                <span asp-validation-for="mobile" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="email_id" class="form-label"></label>
+                                <input asp-for="email_id" class="form-control" />
+                                <span asp-validation-for="email_id" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="address" class="form-label"></label>
+                                <textarea asp-for="address" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="address" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="state_id" class="form-label"></label>
+                                <select asp-for="state_id" asp-items="ViewBag.StateList"
+                                        onchange="DistrictSelect()" class="form-control select2">
+                                    <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                </select>
+                                <span asp-validation-for="state_id" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="dist_id" class="form-label"></label>
+                                <select id="dist_id" name="dist_id" asp-items="ViewBag.DistrictList" class="form-control select2">
+                                    <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="city" class="form-label"></label>
+                                <input asp-for="city" class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="pin_code" class="form-label"></label>
+                                <input asp-for="pin_code" class="form-control" />
+                                <span asp-validation-for="pin_code" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2" style="display:none;">
+                                <label asp-for="gender" class="form-label"></label>
+                                <select asp-for="gender" class="form-control select2">
+                                    <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="dob" class="form-label"></label>
+                                <input asp-for="dob" class="form-control" type="text" />
+                                <span asp-validation-for="dob" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+                        <h6 class="mb-3 border-bottom pb-2 text-primary" style="display:none;">
+                            <i class="fa fa-handshake me-2"></i> 🤝 Nominee Details
+                        </h6>
+
+
+                        <div class="row mb-3" style="display:none;">
+                            <div class="col-md-3">
+                                <label asp-for="nom_name" class="form-label"></label>
+                                <input asp-for="nom_name" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="nom_rela" class="form-label"></label>
+                                <input asp-for="nom_rela" class="form-control" />
+                            </div>
+
+                            <div class="col-md-3" style="display:none;">
+                                <label asp-for="tin_no" class="form-label"></label>
+                                <input asp-for="tin_no" class="form-control" type="text" />
+                                <span asp-validation-for="tin_no" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3" style="display:none;">
+                                <label asp-for="cin_no" class="form-label"></label>
+                                <input asp-for="cin_no" class="form-control" type="text" />
+                                <span asp-validation-for="cin_no" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-3">
+                                <label asp-for="gst_no" class="form-label"></label>
+                                <input asp-for="gst_no" class="form-control" type="text" />
+                                <span asp-validation-for="gst_no" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="pan_no" class="form-label"></label>
+                                <input asp-for="pan_no" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="aadhar_no" class="form-label">Aadhar Number</label>
+                                <input asp-for="aadhar_no" class="form-control" />
+                                <span asp-validation-for="aadhar_no" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-2">
+                                @* <label asp-for="upload_gst_img"> GST Image</label> *@
+                                <label for="upload_gst_img" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    <i class="fa fa-upload me-2 text-success"></i>GST Image
+                                </label>
+                                <span asp-validation-for="upload_gst_img" class="text-danger d-block mt-1"></span>
+
+                                <input type="file" asp-for="upload_gst_img" class="form-control" onchange="previewImage(event, 'gst_img')" accept="image/*" style="display:none;" />
+                                <span asp-validation-for="upload_gst_img" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                @* <label asp-for="upload_pan">PAN Image</label> *@
+                                <label for="upload_pan" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    <i class="fa fa-upload me-2 text-success"></i> PAN Image
+                                </label>
+                                <span asp-validation-for="upload_pan" class="text-danger d-block mt-1"></span>
+                                <input type="file" asp-for="upload_pan" class="form-control" onchange="previewImage(event, 'pan_img')" accept="image/*" style="display:none;" />
+                                <span asp-validation-for="upload_pan" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                @*    <label asp-for="upload_aadhar_1">Front Aadhar Image</label> *@
+
+                                <label for="upload_aadhar_1" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    <i class="fa fa-upload me-2 text-success"></i> Front Aadhar Image
+                                </label>
+                                <span asp-validation-for="upload_aadhar_1" class="text-danger d-block mt-1"></span>
+
+                                <input type="file" asp-for="upload_aadhar_1" class="form-control" onchange="previewImage(event, 'aadhar_img_1')" accept="image/*" style="display:none;" />
+                                <span asp-validation-for="upload_aadhar_1" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-2">
+                                @*  <label asp-for="upload_aadhar_2"> Back Aadhar Image</label> *@
+                                <label for="upload_aadhar_2" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    <i class="fa fa-upload me-2 text-success"></i> Back Aadhar Image
+                                </label>
+                                <span asp-validation-for="upload_aadhar_2" class="text-danger d-block mt-1"></span>
+                                <input type="file" asp-for="upload_aadhar_2" class="form-control" onchange="previewImage(event, 'aadhar_img_2')" accept="image/*" style="display:none;" />
+                                <span asp-validation-for="upload_aadhar_2" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                @*  <label asp-for="upload_pf_img"></label> *@
+                                <label for="upload_pf_img" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    <i class="fa fa-upload me-2 text-success"></i> Profile Image
+                                </label>
+                                <span asp-validation-for="upload_pf_img" class="text-danger d-block mt-1"></span>
+                                <input type="file" asp-for="upload_pf_img" class="form-control" onchange="previewImage(event, 'pf_img')" accept="image/*" style="display:none;" />
+                                <span asp-validation-for="upload_pf_img" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-3">
+                            <div class="col-md-2">
+                                <img id="gst_img" class="img-thumbnail mt-2" style="max-height: 100px;" src="@($"/{Model.gst_img ?? "NoImage.jpg"}")" onclick="showZoom(this.src)" />
+                            </div>
+                            <div class="col-md-2">
+                                <img id="pan_img" class="img-thumbnail mt-2" style="max-height: 100px;" src="@($"/{Model.pan_img ?? "NoImage.jpg"}")" onclick="showZoom(this.src)" />
+                            </div>
+                            <div class="col-md-2">
+                                <img id="aadhar_img_1" class="img-thumbnail mt-2" style="max-height: 100px;" src="@($"/{Model.aadhar_img_1 ?? "NoImage.jpg"}")" onclick="showZoom(this.src)" />
+                            </div>
+                            <div class="col-md-2">
+                                <img id="aadhar_img_2" class="img-thumbnail mt-2" style="max-height: 100px;" src="@($"/{Model.aadhar_img_2 ?? "NoImage.jpg"}")" onclick="showZoom(this.src)" />
+                            </div>
+                            <div class="col-md-2">
+                                <img id="pf_img" class="img-thumbnail mt-2" style="max-height: 100px;" src="@($"/{Model.aadhar_img_2 ?? "NoImage.jpg"}")" onclick="showZoom(this.src)" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" style="display:none;">
+                            <div class="col-md-3">
+                                <label asp-for="bank_id" class="form-label"></label>
+                                <select id="bank_id" name="bank_id" asp-items="ViewBag.BankList" class="form-control select2">
+                                    <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="branch" class="form-label"></label>
+                                <input asp-for="branch" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="account_no" class="form-label"></label>
+                                <input asp-for="account_no" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="ifsc" class="form-label"></label>
+                                <input asp-for="ifsc" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" style="display:none;">
+                            <div class="col-md-3">
+                                <label asp-for="ac_type" class="form-label"></label>
+                                <select asp-for="ac_type" class="form-control select2">
+                                    <option value="">@Const.DROPDOWN_DEFAULT</option>
+                                    <option value="Saving">Saving</option>
+                                    <option value="Current">Current</option>
+                                </select>
+
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="upload_bank">Upload Front Aadhar Image</label>
+                                <input type="file" asp-for="upload_bank" class="form-control" onchange="previewImage(event, 'bank_img')" accept="image/*" />
+                                <span asp-validation-for="upload_bank" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <img id="bank_img" class="img-thumbnail mt-2" style="max-height: 150px;" src="@($"{Const.PROD_URL}/{Model.bank_img ?? "default.png"}")" onclick="showZoom(this.src)" />
+                            </div>
+
+                        </div>
+
+
+                        <h6 class="mb-3 border-bottom pb-2 text-primary" style="display:none;">
+                            <i class="fa fa-lock me-2"></i> Security Details
+                        </h6>
+
+                        <div class="row mb-3" style="display:none;">
+                            <div class="col-md-3">
+                                <label asp-for="password" class="form-label"></label>
+                                <input asp-for="password" class="form-control" type="text" />
+                                <span asp-validation-for="password" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="tran_password" class="form-label"></label>
+                                <input asp-for="tran_password" class="form-control" type="text" />
+                                <span asp-validation-for="tran_password" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <!-- 🔘 Submit Button -->
+                                <div class="text-end">
+                                    <label class="form-label"></label><br />
+                                    <button type="submit" class="btn btn-success" onclick="confirmSubmission(event)">
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+@* @await Html.PartialAsync("_ValidationScriptsPartial") *@
+<script src="~/webtemplate/js/controlvalidation.js"></script>
+<script>
+     let URL_DROPDOWN_LIST =  `/common/get-master-dropdown`;
+
+    $(function () {
+    @if (TempData["Error"] != null)
+    {
+        <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+    }
+        
+        $('#dob').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+
+
+        $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+
+         $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+             localStorage.setItem('activeTab', $(e.target).attr('href'));
+         });
+         var activeTab = localStorage.getItem('activeTab');
+         if (activeTab) {
+             $('#myTab a[href="' + activeTab + '"]').tab('show');
+         }
+    });
+
+
+     
+    document.addEventListener("DOMContentLoaded", function () {
+         let uid=$('#uid').val();
+         if(parseInt(uid)<= 0){
+            const userIdInput = document.getElementById("user_id");
+            const mobileInput = document.getElementById("mobile");
+            mobileInput.value = userIdInput.value;
+            userIdInput.addEventListener("input", function () {
+                mobileInput.value = userIdInput.value;
+            });
+         }
+    });
+
+ 
+
+    function confirmSubmission(event) {
+        event.preventDefault(); // stop the form from auto-submitting
+        Swal.fire({
+            icon: 'question',
+            title: '⚠️ Are you sure you want to continue?',
+            html: `<div style="text-align: left; white-space: pre-wrap; font-size: 16px;"><strong>${'Do you want to submit the details?'}</strong></div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            customClass: { htmlContainer: 'text-left' },
+            width: '35%'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('FormSubmit').submit(); // ✅ manually submit
+            }
+        });
+    }
+
+
+    function DistrictSelect() {
+        const stateId = $('#state_id').val(), $dist = $('#dist_id');
+        $dist.html('<option selected value="0">Loading...</option>');
+
+        $.get(`${URL_DROPDOWN_LIST}?id=${stateId}&mst_key=GET_DISTRICT_LIST`, res => {
+            const def = '@Const.DROPDOWN_DEFAULT';
+            stateId == 0
+                ? $dist.html(`<option selected value="0">${def}</option>`)
+                : PopulateControl(res.data, $dist, def, 0);
+        }).fail(() => {
+            $dist.html('<option selected value="0">@Const.DROPDOWN_DEFAULT</option>');
+        });
+    }
+
+
+    function GetSponsorName() {
+        const userId = $('#sponsor_user_id').val();
+        const $name = $('#sponsor_name');
+        if (!userId) return $name.text('').css('color', '');
+
+        $name.text('Loading...').css('color', 'blue');
+
+        $.get(`/common/master-reports?mst_key=GET_BASIC_USER_DATA&user_id=${userId}`, res => {
+            const data = (JSON.parse(res.data || '[]')[0]) || {};
+            if (data?.name) {
+                $name.text(data.name).css('color', 'blue');
+            } else {
+                $name.text('Invalid Sponsor Name.!!').css('color', 'red');
+            }
+        }).fail(() => $name.text('').css('color', ''));
+    }
+
+</script>
+ 

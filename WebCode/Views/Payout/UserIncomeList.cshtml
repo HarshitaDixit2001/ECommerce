@@ -1,0 +1,202 @@
+﻿@{
+    ViewData["Title"] = "User Income Details";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+ 
+@{ 
+    var role_name = User.FindFirst("role_name")?.Value;
+}
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>User Income Details
+    </h4> 
+</section>
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+                <div class="panel-heading row">
+                    <div class="col-sm-2">
+                        <input type="text" id="from_date" class="form-control" placeholder="From Date" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" id="to_date" class="form-control" placeholder="To Date" />
+                    </div>
+                    @if (role_name == "admin_role")
+                    {
+                        <div class="col-sm-4">
+                            <select id="seller_id" asp-items="ViewBag.SallerList" class="form-control select2">
+                                <option value="0">🔍 Search Order By</option>
+                            </select>
+                        </div>
+                    }
+                    <div class="col-sm-2 d-none">
+                        <input id="invoice_no" class="form-control" placeholder="Invoice No" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input id="btnSearch" class="btn btn-info" type="button" value="Search" />
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="table-responsive mb-4">
+                        <table id="tblList" class="table table-striped table-hover display nowrap cell-border" style="width:100%">
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">Total:</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+
+<script>
+
+    let table;
+    const uid = '@User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value';
+    const URL_LIST = `/payout/get-user-income-list`;
+    const subRole = '@User.FindFirst("SubRole")?.Value';
+    const DOWNLOAD_FILE_NAME = "User_income_list";
+    $('.select2').select2({ placeholder: "🔍Select an Option", allowClear: true });
+    var uidParam='';
+    $(function () {
+        
+         const formatDate = date => date.toLocaleDateString('en-GB').split('/').join('-');
+         const today = new Date();
+         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+         $('.doe').val(formatDate(today));
+         $('.doe').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+
+         // Set values
+         $('#from_date').val(formatDate(monthStart));
+         $('#to_date').val(formatDate(today));
+
+         $('#from_date, #to_date').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+ 
+         let urlParams = new URLSearchParams(window.location.search);
+         let payoutNoParam = urlParams.get("payout_no");  
+         uidParam = urlParams.get("uid");
+         
+
+         payout_no = payoutNoParam ? atob(payoutNoParam) : '';
+         uidParam = uidParam ? atob(uidParam) : '';
+         
+
+        if(payout_no != ""){
+            $('#seller_id').val(uidParam).trigger('change');
+            GetPayoutDate(payout_no);
+        }
+        else{
+            initializeTable();
+        }
+         
+         $('#btnSearch').on('click', function () {  table.ajax.reload(); });
+    });
+
+
+
+    function GetPayoutDate(payout_no) {
+        let URL_LIST = `/common/master-reports`;
+        let mst_key = "GET_MATRIX_DATE"; 
+        $.ajax({
+            url: URL_LIST + `?mst_key=${mst_key}&id=${payout_no}`,
+            type: 'GET',
+            success: function (response) {
+                if (response.success === true) {
+                    const dataArray = JSON.parse(response.data) || [];
+                    const data = dataArray[0] || {};
+                    $('#to_date').val(data.to_date);
+                    $('#from_date').val(data.from_date);
+                    initializeTable();
+                }
+            },
+            error: function () { }
+        });
+    }
+
+
+
+
+    function initializeTable() {
+        const parseDate = d => d ? d.split("-").reverse().join("/") : null;
+
+        table = $('#tblList').DataTable({
+            dom: 'Blfrtip',
+            processing: true,
+           // scrollY: "700px",
+            scrollX: true,
+            autoWidth: true,
+            responsive: true,
+            destroy: true,
+            lengthMenu: [[25, 100, -1], [25, 100, "All"]],
+            pageLength: -1,
+            buttons: [
+               { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toISOString().replace(/[:T]/g, '_') },
+                { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                { extend: 'copyHtml5', text: 'Copy'},
+                'fullscreenToggle',
+                'colvis',
+            ],
+            ajax: {
+                url: URL_LIST,
+                type: 'POST',
+                contentType: 'application/json',
+                data: () => { 
+                    let selectedUid = uid;
+                    if(payout_no != ""){
+                        selectedUid = uidParam;
+                    }else if (subRole === "admin_sub_role") {
+                        selectedUid = $('#seller_id').val() || null;
+                    }
+                    return JSON.stringify({
+                        uid: selectedUid,
+                        from_date: parseDate($('#from_date').val()),
+                        to_date: parseDate($('#to_date').val()),
+                        invoice_no: $('#invoice_no').val() || null
+                    });
+                }, 
+                dataSrc: json => json?.data || []
+            },
+            columns: [
+                { title: '#', data: null, render: (d, t, r, m) => m.row + m.settings._iDisplayStart + 1 },
+                { data: 'doe', title: 'Date', render: d => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '' },
+                { data: 'user_id', title: 'User ID' },
+                { data: 'name', title: 'User Name' }, 
+                { data: 'amount', title: 'Amount', render: d => formatINR(d) },
+                { data: 'invoice_no', title: 'Invoice No' },
+                { data: 'buyer_user_id', title: 'Buyer ID' },
+                { data: 'buyer_name', title: 'Buyer Name' },
+                { data: 'remark', title: 'Remark' }, 
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                const api = this.api();
+                const calc = i => api.column(i, { page: 'current' }).data().reduce((a, b) => (+a || 0) + (+b || 0), 0).toFixed(2);
+                [4].forEach(i => $(api.column(i).footer()).html(calc(i)));
+            }
+        });
+    }
+</script>
+ 

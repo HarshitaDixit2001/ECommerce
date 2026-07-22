@@ -1,0 +1,301 @@
+﻿@model UpdateInvoiceDto
+@{
+    ViewData["Title"] = "InvoiceUpdate";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+@* <!-- Breadcrumb -->
+<section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a><i class="fa fa-list"></i>Generate Invoice</a></li> 
+    </ol>
+    <a asp-controller="billing" asp-action="invoice-list" class="btn btn-success pull-right"> <i class="fa fa-list"></i>  Invoice List </a>
+</section> *@
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-list me-2 text-muted"></i>Generate Invoice
+    </h4>
+    <a asp-controller="billing" asp-action="invoice-list" class="btn btn-sm btn-outline-success">
+        Invoice List
+    </a>
+</section>
+<div class="clearfix"></div>
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+           @*  <div class="panel panel-bd lobidrag"> *@
+                <div class="panel-heading row">
+
+                    <ul class="nav nav-tabs" id="myTab">
+                       @*  <li class="active">
+                            <a href="#tab10" data-toggle="tab" class="nav-link">💰 Received Amount </a>
+                        </li> *@
+                        <li class="active">
+                            <a href="#tab11" data-toggle="tab" class="nav-link">🚚 Dispatch</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#tab12" data-toggle="tab" class="nav-link">💼 Commission </a>
+                        </li>
+                    </ul>
+
+
+                    <div class="panel-body">
+                        <div class="row mb-12">
+                            <div class="col-md-2">
+                                <label class="form-label">Invoice No.</label>
+                                <span> <strong>@Model.invoice_no </strong>  </span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Total Amount</label>
+                                <span> <strong>@Model.t_amount </strong>  </span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Received Amount</label>
+                                <span> <strong>@Model.receive_amount </strong>  </span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Commission</label>
+                                <span> <strong>@Model.commission </strong>  </span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Date</label>
+                                <span> <strong>@Model.doe </strong>  </span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Remarks</label>
+                                <span> <strong>@Model.remark </strong>  </span>
+                            </div>
+                        </div>
+                        <hr />
+
+
+                        <div class="tab-content">
+
+                            
+
+                            <div class="tab-pane fade in active" id="tab11">
+                                 
+                                <form asp-action="invoice-update" asp-controller="billing"
+                                      asp-route-inv_id="@Model?.inv_id" id="FormSubmitDispatched" method="post" autocomplete="off" enctype="multipart/form-data">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" asp-for="inv_id" />
+                                    <input type="hidden" asp-for="invoice_no" />
+                                    <div class="row mb-3">
+                                        <!-- Delivery Status -->
+                                        <div class="col-md-3">
+                                            <label asp-for="delivery_status" class="form-label">Delivery Status</label>
+                                            <select asp-for="delivery_status" class="form-control select2">
+                                                <option value="1">🚚 Dispatched</option>
+                                                <option value="2">📦 Delivered</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Transport Name -->
+                                        <div class="col-md-3">
+                                            <label asp-for="transport" class="form-label">Transport</label>
+                                            <input asp-for="transport" class="form-control" type="text" maxlength="50" />
+                                            <span asp-validation-for="transport" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Tracking Number -->
+                                        <div class="col-md-2">
+                                            <label asp-for="tracking" class="form-label">Tracking No.</label>
+                                            <input asp-for="tracking" class="form-control" type="text" maxlength="50" />
+                                            <span asp-validation-for="tracking" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Dispatch Date -->
+                                        <div class="col-md-2">
+                                            <label asp-for="dispatch_date" class="form-label">Dispatch Date</label>
+                                            <span class="form-control-plaintext">@Model.dispatch_date</span>
+                                        </div>
+
+                                        <!-- Delivered By -->
+                                        <div class="col-md-2">
+                                            <label asp-for="del_by" class="form-label">Delivered By</label>
+                                            <span class="form-control-plaintext">@Model.del_by</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <!-- Upload LR 1 -->
+                                        <div class="col-md-2">
+                                            <label for="upload_lr_1" class="btn btn-outline-primary rounded-pill px-4 py-2 w-100 text-start">
+                                                <i class="fa fa-upload me-2 text-success"></i>LR Image 1
+                                            </label>
+                                            <input type="file" asp-for="upload_lr_1" id="upload_lr_1" class="form-control"
+                                                   onchange="previewImage(event, 'lr_1')" accept="image/*" style="display:none;" />
+
+                                        </div>
+
+                                        <!-- Upload LR 2 -->
+                                        <div class="col-md-2">
+                                            <label for="upload_lr_2" class="btn btn-outline-primary rounded-pill px-4 py-2 w-100 text-start">
+                                                <i class="fa fa-upload me-2 text-success"></i>LR Image 2
+                                            </label>
+                                            <input type="file" asp-for="upload_lr_2" id="upload_lr_2" class="form-control"
+                                                   onchange="previewImage(event, 'lr_2')" accept="image/*" style="display:none;" />
+                                        </div>
+
+                                        <!-- LR Image Preview 1 -->
+                                        <div class="col-md-3">
+                                            <label class="form-label">LR Image 1</label>
+                                            <img id="lr_1" class="img-thumbnail" style="max-height: 150px;"
+                                                 src="@($"/{Model.lr_1 ?? "default.png"}")" onclick="showZoom(this.src)" />
+                                        </div>
+
+                                        <!-- LR Image Preview 2 -->
+                                        <div class="col-md-3">
+                                            <label class="form-label">LR Image 2</label>
+                                            <img id="lr_2" class="img-thumbnail" style="max-height: 150px;"
+                                                 src="@($"/{Model.lr_2 ?? "default.png"}")" onclick="showZoom(this.src)" />
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-success w-100" onclick="confirmSubmissionDispatched(event)">
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+
+
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab12">
+                                <div class="table-responsive mb-4">
+                                    <table id="tblCommision" class="table table-striped table-hover display nowrap cell-border" style="width:100%">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+           @*  </div> *@
+        </div>
+    </div>
+</section>
+
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+
+<script>
+
+    $(function () {
+
+    @if (TempData["Error"] != null)
+    {
+        <text> showErrorLog(`@Const.ERROR_HEADER`, '@TempData["Error"]'); </text>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <text>
+          showSuccessMessage(`@Const.SUCCESS_HEADER`, '@TempData["Success"]');
+        </text>
+    }
+
+        let inv_id = $('#inv_id').val();
+        if (!isNaN(inv_id) && inv_id > 0) { 
+            BindCommisionTable(inv_id);
+        }
+         
+        $('#checkdate').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+    });
+
+ 
+
+    function BindCommisionTable(){
+        let inv_id=$('#inv_id').val();
+        let URL_LIST = `/billing/get-commision-history`;
+         $.ajax({
+             url: URL_LIST + `?inv_id=${inv_id}`,
+             type: 'GET',
+             success: function (response) {
+                 if (response.success === true ) {
+                     const data = JSON.parse(response.data) || [];
+                     $('#tblCommision').DataTable({
+                         dom: 'Blrtip',
+                             scrollY: "500px",
+                             scrollX: true,
+                             scrollCollapse: true,
+                             destroy: true,
+                             responsive: true,
+                             autoWidth: true,
+                             paging: false,
+                             language: { emptyTable: "No records found" },
+                             buttons: [
+                                 { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 'colvis'
+                             ],
+                             data: data,
+                             columns: [
+                               { data: null, title: 'Product Details',
+                                  render: function (data, type, row) {
+                                    return `<strong>${row.prod_code}</strong><br><small>${row.prod_name}</small>`;
+                                  }
+                                },
+                                { data: 'actual_qty', title: 'A.Qty' },
+                                { data: 'qty', title: 'Qty' },
+                                { data: 'price', title: 'Rate' },
+                                { data: 'gross', title: 'Gross' },
+                                { data: 'gst', title: 'GST%', render: gst => `${gst}%` },
+                                { data: 'gst_amt', title: 'GST Amt' },
+                                { data: 'total_amt', title: 'Inv. Amt' },
+                                { data: 'perc', title: 'Perc%', render: perc => `${perc}%` },
+                                { data: 'comm', title: 'Comm ₹' },
+                         ],
+                     });
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred 2.');
+             }
+         });
+    }
+
+      
+
+     
+
+    function confirmSubmissionDispatched(event) {
+        event.preventDefault(); // stop the form from auto-submitting
+        Swal.fire({
+            icon: 'question',
+            title: '⚠️ Are you sure you want to continue?',
+            html: `<div style="text-align: left; white-space: pre-wrap; font-size: 16px;"><strong>${'Do you want to submit the details?'}</strong></div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            customClass: { htmlContainer: 'text-left' },
+            width: '35%'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('FormSubmitDispatched').submit(); // ✅ manually submit
+            }
+        });
+    }
+
+
+    $(document).ready(function () {
+        $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+            localStorage.setItem('activeTab', $(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            $('#myTab a[href="' + activeTab + '"]').tab('show');
+        }
+    });
+
+ 
+</script>
+
+ 

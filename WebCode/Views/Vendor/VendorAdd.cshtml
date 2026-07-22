@@ -1,0 +1,148 @@
+﻿@model VendorDto
+@{
+    ViewData["Title"] = Model.vendor_id == 0 ? "Add Vendor" : "Edit Vendor";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+ 
+<!-- Breadcrumb -->
+<section class="content-header">
+    <ol class="breadcrumb pull-left"> 
+        <li><a ><i class="fa fa-list"></i> Vendor Management</a></li>
+
+    </ol>
+    <a asp-action="vendor-list" asp-controller="vendor" class="btn btn-success pull-right"> Vendor List </a>
+</section>
+
+
+
+<!-- Main Content -->
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-bd lobidrag">
+                <div class="panel-body">
+                    <!-- Form: Add / Edit -->
+                    <div class="bg-dark">
+                        <h4 class="header-title">Vendor Management</h4>
+                    </div>
+
+                    <form asp-action="vendor-add" asp-controller="vendor" method="post" asp-route-id="@Model?.vendor_id">
+                        <input type="hidden" asp-for="vendor_id" />
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="vendor_name" class="form-label">Vendor Name</label> <span class="font-bold text-danger">*</span>
+                                <input asp-for="vendor_name" class="form-control" />
+                                <span asp-validation-for="vendor_name" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="display_name" class="form-label">Display Name</label>
+                                <input asp-for="display_name" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="email_id" class="form-label">Email ID</label>
+                                <input asp-for="email_id" type="email" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="phone_no" class="form-label">Phone No</label>
+                                <input asp-for="phone_no" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="mobile_id" class="form-label">Mobile ID</label>
+                                <input asp-for="mobile_id" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="state_id" class="form-label">Source Supply</label>
+                                <select asp-for="state_id" asp-items="ViewBag.StateList" class="form-control select2">
+                                    <option value="0">@Const.DROPDOWN_DEFAULT</option>
+                                </select>
+                                <span asp-validation-for="state_id" class="text-danger"></span>
+
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="skype_name" class="form-label">Skype Name</label>
+                                <input asp-for="skype_name" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="designation" class="form-label">Designation</label>
+                                <input asp-for="designation" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="department" class="form-label">Department</label>
+                                <input asp-for="department" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="website" class="form-label">Website</label>
+                                <input asp-for="website" type="url" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-2 form-check">
+                                <input asp-for="status" class="form-check-input" />
+                                <label asp-for="status" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success px-4">@((Model?.vendor_id == 0) ? "Add" : "Update") Vendor</button>
+                            <a asp-action="Index" class="btn btn-danger ms-2">Cancel</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+ 
+@await Html.PartialAsync("_DropdownSearch")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+@await Html.PartialAsync("_ValidationScriptsPartial") 
+<script src="~/webtemplate/js/controlvalidation.js"></script>
+@* <script>
+
+    let URL_DROPDOWN_LIST = `/common/get-drop-list`;
+
+    function CategorySelect() {
+        $('#cat_id').empty().append('<option selected value="0">Loading...</option>');
+        $.ajax({
+            url: `${URL_DROPDOWN_LIST}?id=0&mst_key=GET_CATEGORY_LIST`,
+            type: 'GET',
+            success: function (response) {
+                PopulateControl(response.data, $('#cat_id'), `@Const.DROPDOWN_DEFAULT`, 0);
+            },
+            error: function () { $('#cat_id').empty().append('<option selected value="0">`@Const.DROPDOWN_DEFAULT`</option>'); }
+        });
+    }
+
+
+    function SubCategorySelect() { 
+        let cat_id=$('#cat_id').val()
+        $('#sub_cat_id').empty().append('<option selected value="0">Loading...</option>');
+        $.ajax({
+            url: `${URL_DROPDOWN_LIST}?id=${cat_id}&mst_key=GET_SUBCATEGORY_LIST`,
+            type: 'GET',
+            success: function (response) {
+                if(cat_id==0)
+                    $('#sub_cat_id').empty().append('<option selected value="0">`@Const.DROPDOWN_DEFAULT`</option>');
+                else
+                    PopulateControl(response.data, $('#sub_cat_id'), `@Const.DROPDOWN_DEFAULT`, 0);
+            },
+            error: function () { $('#sub_cat_id').empty().append('<option selected value="0">`@Const.DROPDOWN_DEFAULT`</option>'); }
+        });
+    }
+
+
+</script> *@

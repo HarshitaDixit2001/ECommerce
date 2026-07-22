@@ -1,0 +1,15 @@
+D:\Shopping\AppServices\bin\Debug\net8.0\AppServices.deps.json
+D:\Shopping\AppServices\bin\Debug\net8.0\AppServices.dll
+D:\Shopping\AppServices\bin\Debug\net8.0\AppServices.pdb
+D:\Shopping\AppServices\bin\Debug\net8.0\AppModels.dll
+D:\Shopping\AppServices\bin\Debug\net8.0\AppModels.pdb
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.csproj.AssemblyReference.cache
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.GeneratedMSBuildEditorConfig.editorconfig
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.AssemblyInfoInputs.cache
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.AssemblyInfo.cs
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.csproj.CoreCompileInputs.cache
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServi.98DF7DA4.Up2Date
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.dll
+D:\Shopping\AppServices\obj\Debug\net8.0\refint\AppServices.dll
+D:\Shopping\AppServices\obj\Debug\net8.0\AppServices.pdb
+D:\Shopping\AppServices\obj\Debug\net8.0\ref\AppServices.dll

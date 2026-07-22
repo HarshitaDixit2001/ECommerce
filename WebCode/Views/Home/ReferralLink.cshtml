@@ -1,0 +1,227 @@
+﻿@{
+    ViewData["Title"] = "Referral Link";
+}
+
+
+
+<style>
+    .tracking {
+        position: relative;
+    }
+
+    .tracking-item {
+        position: relative;
+        padding-left: 60px;
+        padding-bottom: 25px;
+    }
+
+        .tracking-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .tracking-item::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: #dee2e6;
+        }
+
+        .tracking-item:last-child::before {
+            display: none;
+        }
+
+    .tracking-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tracking-content {
+        padding-top: 5px;
+    }
+
+    .completed .tracking-content strong {
+        color: #198754;
+    }
+
+    .active .tracking-content strong {
+        color: #fd7e14;
+    }
+</style>
+<!-- ================= BREADCRUMB SECTION ================= -->
+<section class="breadcrumb-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="breadcrumb-title">
+                    🔗 Referral Link
+                </h1>
+                <p class="breadcrumb-subtitle mb-0">
+                    | Share your referral link and earn rewards
+                </p>
+            </div>
+            <div class="col-lg-6 text-lg-end">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-lg-end mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="/secure/user-dashboard">Dashboard</a>
+                        </li> 
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="clearfix"></div>
+
+<div class="row mb-3">
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Total Referrals</h6>
+                <h3 class="text-success mb-0">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Successful Joins</h6>
+                <h3 class="text-primary mb-0">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Referral Earnings</h6>
+                <h3 class="text-danger mb-0">₹0</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+ 
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <label class="form-label fw-bold">
+            Your Referral Link
+        </label>
+
+        <div class="input-group">
+            <input type="text" id="txtReferralLink" class="form-control"
+                   value="https://yourdomain.com/register?ref=USR12345"
+                   readonly />  
+
+           @*  <input type="text"
+                   id="txtReferralLink"
+                   class="form-control"
+                   value="@($"{Context.Request.Scheme}://{Context.Request.Host}/register?ref={Model.ReferralCode}")"
+                   readonly /> *@
+
+
+            <button class="btn btn-success" id="btnCopyReferral">
+                <i class="bi bi-copy"></i> Copy Link
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script src="~/js/jquery-3.7.1.min.js"></script>
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_Sweetalert")
+@await Html.PartialAsync("_DatePicker")
+<script>
+    $(document).ready(function () {
+
+               var referralList = [
+        {
+            referralCode: "USR12345",
+            referredUser: "Rahul Sharma",
+            joinDate: "01-Aug-2026",
+            status: "Joined",
+            reward: "₹100"
+        },
+        {
+            referralCode: "USR12345",
+            referredUser: "Amit Kumar",
+            joinDate: "03-Aug-2026",
+            status: "Joined",
+            reward: "₹100"
+        },
+        {
+            referralCode: "USR12345",
+            referredUser: "Priya Singh",
+            joinDate: "05-Aug-2026",
+            status: "Pending",
+            reward: "₹0"
+        }
+    ];
+
+              $('#tblList').DataTable({
+        destroy: true,
+        responsive: true,
+        pageLength: 10,
+        data: referralList,
+
+        columns: [
+            {
+                title: "#",
+                data: null,
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                }
+            },
+            {
+                title: "Referral Code",
+                data: "referralCode",
+                render: function (data) {
+                    return `<span class="badge bg-primary">${data}</span>`;
+                }
+            },
+            {
+                title: "Referred User",
+                data: "referredUser"
+            },
+            {
+                title: "Join Date",
+                data: "joinDate"
+            },
+            {
+                title: "Status",
+                data: "status",
+                render: function (data) {
+                    return data === "Joined"
+                        ? '<span class="badge bg-success">Joined</span>'
+                        : '<span class="badge bg-warning text-dark">Pending</span>';
+                }
+            },
+            {
+                title: "Reward",
+                data: "reward",
+                className: "fw-bold text-success"
+            }
+        ]
+    });
+
+       });
+</script>
+

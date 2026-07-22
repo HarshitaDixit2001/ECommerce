@@ -1,0 +1,357 @@
+﻿@{
+    ViewData["Title"] = "Product Ingredient";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Breadcrumb -->
+<section class="content-header d-flex justify-content-between align-items-center py-2 border-bottom">
+    <h4 class="mb-0 fw-semibold text-secondary">
+        <i class="fa fa-leaf me-2"></i> Manage Ingredients
+    </h4>
+    <a asp-action="product" asp-controller="secure" class="btn btn-sm btn-outline-success">
+        <i class="fa fa-list" aria-hidden="true"></i>  Product List
+    </a>
+</section>
+  
+ 
+<section class="content py-3">
+
+    <div class="row">
+
+        <!-- ===================== Ingredient List ===================== -->
+        <div class="col-lg-8 mb-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+                    <h5 class="mb-0">
+                        <i class="fa fa-leaf me-2"></i>
+                        Product Ingredients
+                    </h5> 
+                </div>
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="tblList"
+                               class="table table-bordered table-hover align-middle nowrap"
+                               style="width:100%"></table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===================== Add/Edit Form ===================== -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h5 class="mb-0">
+                        <i class="fa fa-plus-circle me-2"></i>
+                        Add Ingredient
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form id="SubmitForm" enctype="multipart/form-data">
+
+                        <input type="hidden"
+                               id="pid"
+                               name="pid" />
+
+                        <input type="hidden"
+                               id="ingredient_id"
+                               name="ingredient_id"
+                               value="0" />
+
+                        <!-- Ingredient Name -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Ingredient Name
+                            </label>
+
+                            <input type="text"
+                                   id="ingredient_name"
+                                   name="ingredient_name"
+                                   class="form-control"
+                                   placeholder="Enter Ingredient Name">
+
+                        </div>
+
+                        <!-- Display Order -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Display Order
+                            </label>
+
+                            <input type="number"
+                                   id="display_order"
+                                   name="display_order"
+                                   class="form-control"
+                                   value="1">
+
+                        </div>
+
+                        <!-- Description -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Description
+                            </label>
+
+                            <textarea id="ingredient_desc"
+                                      name="ingredient_desc"
+                                      rows="4"
+                                      class="form-control"
+                                      placeholder="Enter Ingredient Description"></textarea>
+
+                        </div>
+
+                        <!-- Image Upload -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Ingredient Image
+                            </label>
+
+                            <input type="file"
+                                   class="form-control"
+                                   name="upload_ingredient_img"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   onchange="previewImage(event,'ingredient_img')">
+
+                        </div>
+
+                        <div class="text-center mb-3">
+
+                            <img id="ingredient_img"
+                                 src="@Const.NO_IMAGE"
+                                 class="img-thumbnail rounded shadow-sm"
+                                 style="width:170px;height:170px;object-fit:cover;cursor:pointer;"
+                                 onclick="showZoom(this.src)" />
+
+                        </div>
+
+                        <!-- Buttons -->
+
+                        <div class="d-grid gap-2">
+
+                            <button type="submit"
+                                    id="saveBtn"
+                                    class="btn btn-success">
+
+                                <i class="fa fa-save me-1"></i>
+
+                                Save Ingredient
+
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="ClearForm();">
+
+                                <i class="fa fa-refresh me-1"></i>
+
+                                Reset
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+@await Html.PartialAsync("_DatatableScript")
+@await Html.PartialAsync("_Sweetalert")
+
+
+<script>
+    let token = "";
+    const DOWNLOAD_FILE_NAME="Ingredient_";
+    //const URL_LIST = `/common/master-reports`;
+    
+    $(function () {
+        BindTableData();
+    });
+
+
+    $('#SubmitForm').submit(function (e) {
+        
+        let pid = window.location.pathname.split('/').pop();
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.set("pid", pid);
+        
+        showLoader();
+        $.ajax({
+            url: '/secure/ingredient',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                hideLoader();
+                if(response.success == true ){
+                    showToastSuccess('Data save successfully');
+                    $('#SubmitForm')[0].reset();
+                    $('#saveBtn').text('Add');
+                    $('#ingredient_id').val(0);
+                    
+                    // File Upload
+                    $("input[name='upload_ingredient_img']").val(""); 
+                    $('#ingredient_img').attr('src', '@Const.NO_IMAGE');
+
+                    BindTableData();
+                }else{
+                    showErrorLog(`@Const.ERROR_HEADER`, response.message);
+                }
+            },
+            error: function (res_error) {
+               showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.'); return;
+            }
+        });
+    });
+     
+
+    function BindTableData() {
+         let mst_key="GET_INGREDIENT_LIST";
+         showLoader();
+         let pid = window.location.pathname.split('/').pop();
+         $.ajax({
+             url: `/common/master-reports?mst_key=${mst_key}&id=${pid}`,
+             type: 'GET',
+             success: function (response) {
+                 hideLoader();
+                 if (response.success === true ) {
+                     const data = JSON.parse(response.data) || [];
+                     $('#tblList').DataTable({
+                         dom: 'Blfrtip',
+                             scrollX: true,
+                             scrollCollapse: true,
+                             destroy: true,
+                             responsive: true,
+                             autoWidth: false,
+                             language: { emptyTable: "No records found" },
+                             "lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]],
+                             "pageLength": 15,
+                             buttons: [
+                                 { extend: 'excelHtml5', text: 'Excel', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 { extend: 'csvHtml5', text: 'CSV', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_') },
+                                 // { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4', filename: () => DOWNLOAD_FILE_NAME + new Date().toLocaleString('sv-SE').replace(/[: ]/g, '_')},
+                                 // { extend: 'copyHtml5', text: 'Copy'},
+                             ],
+                             data: data,
+                             columns: [
+                             { title: '#', data: null, className: 'text-center', render: function (data, type, row, meta) { return meta.row + 1;  } },
+                             { data: 'ingredient_name', title: 'Ingredient' },
+                             { data: 'ingredient_desc', title: 'Description' },
+                             { data: 'display_order', title: 'Order' },
+                             {
+                                data: 'ingredient_img',  title: 'Image',
+                                render: function (d) {
+                                    const imgSrc = d ? `/${d}` : '@Const.NO_IMAGE';
+                                    return `<img src="${imgSrc}" onclick="showZoom(this.src)" class="img-thumbnail" style="max-height:90px; cursor:zoom-in;" />`;
+                                }
+                             },
+                             {
+                                 data: 'status', title: 'Action', orderable: false,
+                                 render: function (data) {
+                                      return data
+                                     ? '<i class="fa fa-circle text-success" aria-hidden="true" title="Active"></i> <div style="text-align:center; display:none;">' + data + '</div>'
+                                     : '<i class="fa fa-circle text-danger" aria-hidden="true" title="Inactive"></i> <div style="text-align:center; display:none;">' + data + '</div>';
+                                 }
+                             },
+                             {
+                                data: "ingredient_id",
+                                title: "Action",
+                                orderable: false,
+                                searchable: false,
+                                className: "text-center",
+                                render: function (id) {
+                                    return ` 
+                                        <button class="btn btn-danger btn-sm" onclick="DeleteIngredient(${id})">
+                                            <i class="fa fa-trash"></i>
+                                        </button>`;
+                                }
+                            }
+                         ],
+                     });
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+    }
+
+    
+    function DeleteIngredient(id) {
+         let mst_key="tbl_products_ingredients";
+         showLoader(); 
+         $.ajax({
+             url: `/common/master-delete-table-row?mst_key=${mst_key}&id=${id}`,
+             type: 'GET',
+             success: function (response) { 
+                 hideLoader();
+                 if (response.success === true ) {
+                      BindTableData();
+                 }
+             },
+             error: function (xhr, status, error) {
+                showErrorLog(`@Const.ERROR_HEADER`, 'Unexpected error occurred.');
+             }
+         });
+    }
+
+
+    function ClearForm() {
+
+        // Hidden Fields
+        $("#ingredient_id").val(0);
+
+        // Text Fields
+        $("#ingredient_name").val("");
+        $("#ingredient_desc").val("");
+        $("#display_order").val(1);
+
+        // File Upload
+        $("input[name='upload_ingredient_img']").val("");
+        $('#ingredient_img').attr('src', '@Const.NO_IMAGE');
+
+        // Button
+        $("#saveBtn")
+            .removeClass("btn-primary")
+            .addClass("btn-success")
+            .html('<i class="fa fa-save me-1"></i> Add Ingredient');
+
+        // Focus
+        $("#ingredient_name").focus();
+    }
+
+</script>
